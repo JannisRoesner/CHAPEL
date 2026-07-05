@@ -1,6 +1,6 @@
 import { asc, eq } from 'drizzle-orm'
 
-import { schema, useDb } from '../database'
+import { schema, useDb, type DbExecutor } from '../database'
 import type { ItemKind } from '#shared/types/chapel'
 
 export const DEFAULT_SONNTAGS_GOTTESDIENST = {
@@ -15,7 +15,6 @@ export const DEFAULT_SONNTAGS_GOTTESDIENST = {
   ]
 }
 
-type DbClient = ReturnType<typeof useDb>
 type ExistingItem = typeof schema.serviceTypeItems.$inferSelect
 
 function liturgyTrackByPositionKind(items: ExistingItem[]) {
@@ -27,7 +26,7 @@ function liturgyTrackByPositionKind(items: ExistingItem[]) {
 }
 
 async function insertDefaultItems(
-  db: DbClient,
+  db: DbExecutor,
   serviceTypeId: number,
   preserveTracksFrom: ExistingItem[] = []
 ) {
@@ -47,7 +46,7 @@ async function insertDefaultItems(
   )
 }
 
-export async function ensureDefaultServiceType(db: DbClient = useDb()) {
+export async function ensureDefaultServiceType(db: DbExecutor = useDb()) {
   const [existingByName] = await db
     .select()
     .from(schema.serviceTypes)

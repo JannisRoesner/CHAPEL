@@ -1,6 +1,6 @@
 import { asc, eq } from 'drizzle-orm'
 
-import { schema, useDb } from '../database'
+import { schema, useDb, type DbExecutor } from '../database'
 import type { ItemKind } from '#shared/types/chapel'
 
 export interface ServiceTypeTemplateItem {
@@ -9,8 +9,6 @@ export interface ServiceTypeTemplateItem {
   label: string
   defaultTrackId?: number | null
 }
-
-type DbClient = ReturnType<typeof useDb>
 
 function resolveTrackId(
   templateItem: ServiceTypeTemplateItem,
@@ -30,7 +28,7 @@ function resolveTrackId(
 export async function syncServicesFromTypeTemplate(
   serviceTypeId: number,
   templateItems: ServiceTypeTemplateItem[],
-  db: DbClient = useDb()
+  db: DbExecutor = useDb()
 ): Promise<number[]> {
   const sortedTemplate = [...templateItems].sort((a, b) => a.position - b.position)
   const updatedServiceIds: number[] = []

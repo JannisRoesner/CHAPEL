@@ -47,6 +47,19 @@ export default defineNuxtConfig({
     }
   },
 
+  typescript: {
+    tsConfig: {
+      compilerOptions: {
+        types: ['node']
+      }
+    },
+    nodeTsConfig: {
+      compilerOptions: {
+        types: ['node']
+      }
+    }
+  },
+
   eslint: {
     config: {
       stylistic: {

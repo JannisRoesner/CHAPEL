@@ -3,6 +3,7 @@ import type { UserDto, UserRole } from '#shared/types/chapel'
 
 const colorMode = useColorMode()
 const offlineCache = useOfflineCache()
+const { cachedServiceIds } = offlineCache
 const toast = useToast()
 const { user } = useUserSession()
 
@@ -219,7 +220,7 @@ async function clearCache() {
           Geschätzte Nutzung: {{ cacheSize }}
         </p>
         <p class="text-sm text-muted">
-          {{ offlineCache.cachedServiceIds.length }} Gottesdienst(e) offline vorbereitet
+          {{ cachedServiceIds.length }} Gottesdienst(e) offline vorbereitet
         </p>
         <UButton
           color="error"

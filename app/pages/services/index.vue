@@ -4,7 +4,7 @@ import type { ServiceDto, ServiceTypeDto } from '#shared/types/chapel'
 const servicesStore = useServicesStore()
 const toast = useToast()
 const creating = ref(false)
-const selectedTypeId = ref<number | null>(null)
+const selectedTypeId = ref<number | undefined>(undefined)
 const serviceName = ref('')
 const serviceDate = ref(new Date().toISOString().slice(0, 10))
 

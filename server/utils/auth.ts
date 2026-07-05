@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { asc, eq } from 'drizzle-orm'
+import type { H3Event } from 'h3'
 
 import { useDb, schema } from '../database'
 

@@ -19,6 +19,10 @@ async function logout() {
   await $fetch('/api/auth/logout', { method: 'POST' })
   await navigateTo('/login')
 }
+
+function openMobileMenu() {
+  mobileMenuOpen.value = true
+}
 </script>
 
 <template>
@@ -57,7 +61,7 @@ async function logout() {
               variant="ghost"
               size="sm"
               aria-label="Menü öffnen"
-              @click="mobileMenuOpen = true"
+              @click="openMobileMenu"
             >
               <FontAwesomeIcon icon="bars" />
             </UButton>
