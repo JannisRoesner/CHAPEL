@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Ungültige ID' })
   }
 
-  const body = await readBody<{ name?: string; description?: string | null }>(event)
+  const body = await readBody<{ name?: string, description?: string | null }>(event)
   const db = useDb()
 
   const updates: Record<string, unknown> = { updatedAt: new Date() }

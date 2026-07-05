@@ -45,11 +45,18 @@ function onSaved(track: TrackDto) {
 <template>
   <div class="space-y-6">
     <div>
-      <h1 class="text-2xl font-semibold mb-1">Bibliothek</h1>
-      <p class="text-muted">Audiodateien verwalten und kategorisieren</p>
+      <h1 class="text-2xl font-semibold mb-1">
+        Bibliothek
+      </h1>
+      <p class="text-muted">
+        Audiodateien verwalten und kategorisieren
+      </p>
     </div>
 
-    <LibraryTrackUpload @uploaded="onUploaded" @duplicate="onDuplicate" />
+    <LibraryTrackUpload
+      @uploaded="onUploaded"
+      @duplicate="onDuplicate"
+    />
 
     <div class="flex flex-wrap gap-3">
       <UInput

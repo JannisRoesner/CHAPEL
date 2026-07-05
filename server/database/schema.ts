@@ -49,7 +49,7 @@ export const tracks = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
   },
-  (table) => [uniqueIndex('tracks_file_hash_idx').on(table.fileHash)]
+  table => [uniqueIndex('tracks_file_hash_idx').on(table.fileHash)]
 )
 
 export const serviceTypes = pgTable('service_types', {

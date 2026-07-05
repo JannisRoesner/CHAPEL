@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
 
   if (templateItems.length) {
     await db.insert(schema.serviceItems).values(
-      templateItems.map((item) => ({
+      templateItems.map(item => ({
         serviceId: service!.id,
         position: item.position,
         kind: item.kind,

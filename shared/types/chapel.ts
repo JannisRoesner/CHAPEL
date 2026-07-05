@@ -91,16 +91,16 @@ export interface PlaylistStepDto {
   streamUrl: string | null
 }
 
-export type ChapelEventType =
-  | 'track.created'
-  | 'track.updated'
-  | 'track.deleted'
-  | 'serviceType.created'
-  | 'serviceType.updated'
-  | 'serviceType.deleted'
-  | 'service.created'
-  | 'service.updated'
-  | 'service.deleted'
+export type ChapelEventType
+  = | 'track.created'
+    | 'track.updated'
+    | 'track.deleted'
+    | 'serviceType.created'
+    | 'serviceType.updated'
+    | 'serviceType.deleted'
+    | 'service.created'
+    | 'service.updated'
+    | 'service.deleted'
 
 export interface ChapelEvent {
   type: ChapelEventType

@@ -1,4 +1,4 @@
-import type { ChapelEvent, ChapelEventType } from '#shared/types/chapel'
+import type { ChapelEvent } from '#shared/types/chapel'
 
 const orgPeers = new Set<{ publish: (channel: string, message: string) => void }>()
 

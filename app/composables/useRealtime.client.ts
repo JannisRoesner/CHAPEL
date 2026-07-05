@@ -1,7 +1,6 @@
 import { useWebSocket } from '@vueuse/core'
 
-import type { ChapelEvent } from '#shared/types/chapel'
-import type { TrackDto, ServiceDto, ServiceTypeDto } from '#shared/types/chapel'
+import type { ChapelEvent, TrackDto, ServiceDto, ServiceTypeDto } from '#shared/types/chapel'
 
 export function useRealtime() {
   const libraryStore = useLibraryStore()

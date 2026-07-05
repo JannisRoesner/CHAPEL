@@ -27,9 +27,18 @@ const emit = defineEmits<{
       ]"
       @click="emit('select', index)"
     >
-      <p class="text-xs text-muted mb-1">{{ step.label }}</p>
-      <p class="font-medium truncate">{{ step.title || '—' }}</p>
-      <p v-if="!step.trackId" class="text-xs text-warning mt-1">Leer</p>
+      <p class="text-xs text-muted mb-1">
+        {{ step.label }}
+      </p>
+      <p class="font-medium truncate">
+        {{ step.title || '—' }}
+      </p>
+      <p
+        v-if="!step.trackId"
+        class="text-xs text-warning mt-1"
+      >
+        Leer
+      </p>
     </button>
   </div>
 </template>

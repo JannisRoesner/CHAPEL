@@ -45,12 +45,19 @@ async function deleteService(id: number, name: string) {
 <template>
   <div class="space-y-6">
     <div>
-      <h1 class="text-2xl font-semibold mb-1">Gottesdienste</h1>
-      <p class="text-muted">Gottesdienste aus Vorlagen erstellen</p>
+      <h1 class="text-2xl font-semibold mb-1">
+        Gottesdienste
+      </h1>
+      <p class="text-muted">
+        Gottesdienste aus Vorlagen erstellen
+      </p>
     </div>
 
     <UCard>
-      <form class="grid gap-4 md:grid-cols-2" @submit.prevent="createService">
+      <form
+        class="grid gap-4 md:grid-cols-2"
+        @submit.prevent="createService"
+      >
         <UFormField label="Vorlage">
           <USelect
             v-model="selectedTypeId"
@@ -58,28 +65,70 @@ async function deleteService(id: number, name: string) {
           />
         </UFormField>
         <UFormField label="Datum">
-          <UInput v-model="serviceDate" type="date" />
+          <UInput
+            v-model="serviceDate"
+            type="date"
+          />
         </UFormField>
-        <UFormField label="Name (optional)" class="md:col-span-2">
-          <UInput v-model="serviceName" placeholder="z.B. 1. Advent" />
+        <UFormField
+          label="Name (optional)"
+          class="md:col-span-2"
+        >
+          <UInput
+            v-model="serviceName"
+            placeholder="z.B. 1. Advent"
+          />
         </UFormField>
         <div class="md:col-span-2">
-          <UButton type="submit" :loading="creating" :disabled="!selectedTypeId">Gottesdienst anlegen</UButton>
+          <UButton
+            type="submit"
+            :loading="creating"
+            :disabled="!selectedTypeId"
+          >
+            Gottesdienst anlegen
+          </UButton>
         </div>
       </form>
     </UCard>
 
-    <div v-if="servicesStore.services.length" class="space-y-2">
-      <UCard v-for="service in servicesStore.services" :key="service.id">
+    <div
+      v-if="servicesStore.services.length"
+      class="space-y-2"
+    >
+      <UCard
+        v-for="service in servicesStore.services"
+        :key="service.id"
+      >
         <div class="flex items-center justify-between gap-4">
           <div class="min-w-0">
-            <p class="font-medium truncate">{{ service.name }}</p>
-            <p class="text-sm text-muted">{{ formatServiceDate(service.serviceDate) }}</p>
+            <p class="font-medium truncate">
+              {{ service.name }}
+            </p>
+            <p class="text-sm text-muted">
+              {{ formatServiceDate(service.serviceDate) }}
+            </p>
           </div>
           <div class="flex gap-2 shrink-0">
-            <UButton :to="`/services/${service.id}`" variant="ghost" size="sm">Bearbeiten</UButton>
-            <UButton :to="`/playback/${service.id}`" color="primary" size="sm">Abspielen</UButton>
-            <UButton variant="ghost" size="sm" color="error" @click="deleteService(service.id, service.name)">
+            <UButton
+              :to="`/services/${service.id}`"
+              variant="ghost"
+              size="sm"
+            >
+              Bearbeiten
+            </UButton>
+            <UButton
+              :to="`/playback/${service.id}`"
+              color="primary"
+              size="sm"
+            >
+              Abspielen
+            </UButton>
+            <UButton
+              variant="ghost"
+              size="sm"
+              color="error"
+              @click="deleteService(service.id, service.name)"
+            >
               <FontAwesomeIcon icon="trash" />
             </UButton>
           </div>
@@ -87,6 +136,10 @@ async function deleteService(id: number, name: string) {
       </UCard>
     </div>
 
-    <UEmpty v-else title="Keine Gottesdienste" description="Erstellen Sie einen Gottesdienst aus einer Vorlage." />
+    <UEmpty
+      v-else
+      title="Keine Gottesdienste"
+      description="Erstellen Sie einen Gottesdienst aus einer Vorlage."
+    />
   </div>
 </template>

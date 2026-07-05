@@ -14,12 +14,18 @@ const { toggle, isPlaying } = useTrackPreview()
 
 <template>
   <div class="flex items-center gap-4 px-4 py-3">
-    <UBadge :color="item.kind === 'liturgy' ? 'info' : 'neutral'" variant="subtle" class="shrink-0">
+    <UBadge
+      :color="item.kind === 'liturgy' ? 'info' : 'neutral'"
+      variant="subtle"
+      class="shrink-0"
+    >
       {{ kindLabel(item.kind) }}
     </UBadge>
 
     <div class="flex-1 min-w-0">
-      <p class="font-medium truncate">{{ item.label }}</p>
+      <p class="font-medium truncate">
+        {{ item.label }}
+      </p>
       <p class="text-sm text-muted truncate">
         {{ item.track?.title || (item.kind === 'liturgy' ? 'Kein Track' : 'Noch kein Lied gewählt') }}
       </p>
@@ -34,7 +40,13 @@ const { toggle, isPlaying } = useTrackPreview()
       >
         {{ item.trackId ? 'Lied ändern' : 'Lied wählen' }}
       </UButton>
-      <UBadge v-else variant="subtle" color="neutral">Fix</UBadge>
+      <UBadge
+        v-else
+        variant="subtle"
+        color="neutral"
+      >
+        Fix
+      </UBadge>
 
       <UButton
         v-if="item.trackId"

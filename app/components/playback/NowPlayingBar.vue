@@ -41,16 +41,30 @@ const showProgress = computed(() => Boolean(props.step?.trackId))
 <template>
   <div class="rounded-2xl border border-default bg-elevated/50 p-6 space-y-4">
     <div class="text-center min-h-16">
-      <p class="text-sm text-muted">{{ step?.label || '—' }}</p>
+      <p class="text-sm text-muted">
+        {{ step?.label || '—' }}
+      </p>
       <h2 class="text-2xl md:text-3xl font-semibold mt-1 truncate">
         {{ step?.title || 'Kein Track' }}
       </h2>
-      <p v-if="step?.composer" class="text-muted mt-1">{{ step.composer }}</p>
+      <p
+        v-if="step?.composer"
+        class="text-muted mt-1"
+      >
+        {{ step.composer }}
+      </p>
     </div>
 
-    <UProgress v-if="showProgress" :model-value="progress" :max="100" />
+    <UProgress
+      v-if="showProgress"
+      :model-value="progress"
+      :max="100"
+    />
 
-    <p v-if="showProgress" class="text-center text-sm text-muted">
+    <p
+      v-if="showProgress"
+      class="text-center text-sm text-muted"
+    >
       {{ formatDuration(elapsedMs) }} / {{ formatDuration(totalDurationMs) }}
     </p>
 
@@ -62,7 +76,10 @@ const showProgress = computed(() => Boolean(props.step?.trackId))
         :disabled="!step?.trackId"
         @click="$emit('togglePlay')"
       >
-        <FontAwesomeIcon :icon="state === 'playing' ? 'pause' : 'play'" class="text-2xl" />
+        <FontAwesomeIcon
+          :icon="state === 'playing' ? 'pause' : 'play'"
+          class="text-2xl"
+        />
       </UButton>
 
       <UButton
@@ -71,12 +88,18 @@ const showProgress = computed(() => Boolean(props.step?.trackId))
         class="min-w-32 min-h-16 text-lg"
         @click="$emit('next')"
       >
-        <FontAwesomeIcon icon="forward-step" class="mr-2" />
+        <FontAwesomeIcon
+          icon="forward-step"
+          class="mr-2"
+        />
         Nächster
       </UButton>
     </div>
 
-    <p v-if="state === 'pausedAfterTrack'" class="text-center text-sm text-primary">
+    <p
+      v-if="state === 'pausedAfterTrack'"
+      class="text-center text-sm text-primary"
+    >
       Letzter Titel beendet
     </p>
   </div>

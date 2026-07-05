@@ -22,9 +22,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Keine Datei hochgeladen' })
   }
 
-  const filePart = form.find((part) => part.name === 'file' && part.data)
-  const categoryPart = form.find((part) => part.name === 'category')
-  const titlePart = form.find((part) => part.name === 'title')
+  const filePart = form.find(part => part.name === 'file' && part.data)
+  const categoryPart = form.find(part => part.name === 'category')
+  const titlePart = form.find(part => part.name === 'title')
 
   if (!filePart?.data || !filePart.filename) {
     throw createError({ statusCode: 400, statusMessage: 'Keine Datei hochgeladen' })
@@ -61,12 +61,12 @@ export default defineEventHandler(async (event) => {
   }
 
   const parsed = await parseAudioMetadata(filePart.data, mimeType)
-  const categoryValue =
-    categoryPart?.data?.toString() === 'liturgy' ? 'liturgy' : 'hymn'
-  const title =
-    titlePart?.data?.toString().trim()
-    || parsed.title
-    || filePart.filename.replace(/\.[^.]+$/, '')
+  const categoryValue
+    = categoryPart?.data?.toString() === 'liturgy' ? 'liturgy' : 'hymn'
+  const title
+    = titlePart?.data?.toString().trim()
+      || parsed.title
+      || filePart.filename.replace(/\.[^.]+$/, '')
 
   const storageKey = `${fileHash}${ext || '.mp3'}`
   const storagePath = getAudioFilePath(storageKey)

@@ -7,11 +7,18 @@ onMounted(() => servicesStore.fetchServices())
 <template>
   <div class="space-y-6">
     <div>
-      <h1 class="text-2xl font-semibold mb-1">Wiedergabe</h1>
-      <p class="text-muted">Gottesdienst für die Wiedergabe auswählen</p>
+      <h1 class="text-2xl font-semibold mb-1">
+        Wiedergabe
+      </h1>
+      <p class="text-muted">
+        Gottesdienst für die Wiedergabe auswählen
+      </p>
     </div>
 
-    <div v-if="servicesStore.services.length" class="grid gap-3 md:grid-cols-2">
+    <div
+      v-if="servicesStore.services.length"
+      class="grid gap-3 md:grid-cols-2"
+    >
       <NuxtLink
         v-for="service in servicesStore.services"
         :key="service.id"
@@ -23,8 +30,14 @@ onMounted(() => servicesStore.fetchServices())
       </NuxtLink>
     </div>
 
-    <UEmpty v-else title="Keine Gottesdienste" description="Erstellen Sie zuerst einen Gottesdienst.">
-      <UButton to="/services">Zu Gottesdiensten</UButton>
+    <UEmpty
+      v-else
+      title="Keine Gottesdienste"
+      description="Erstellen Sie zuerst einen Gottesdienst."
+    >
+      <UButton to="/services">
+        Zu Gottesdiensten
+      </UButton>
     </UEmpty>
   </div>
 </template>

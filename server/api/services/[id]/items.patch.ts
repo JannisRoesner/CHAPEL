@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Gottesdienst nicht gefunden' })
   }
 
-  const itemMap = new Map(existingItems.map((item) => [item.id, item]))
+  const itemMap = new Map(existingItems.map(item => [item.id, item]))
 
   for (const update of body.items) {
     const existing = itemMap.get(update.id)

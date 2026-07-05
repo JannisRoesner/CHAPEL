@@ -21,23 +21,23 @@ export const useServicesStore = defineStore('services', () => {
   }
 
   function upsertService(service: ServiceDto) {
-    const idx = services.value.findIndex((s) => s.id === service.id)
+    const idx = services.value.findIndex(s => s.id === service.id)
     if (idx >= 0) services.value[idx] = service
     else services.value.unshift(service)
   }
 
   function removeService(id: number) {
-    services.value = services.value.filter((s) => s.id !== id)
+    services.value = services.value.filter(s => s.id !== id)
   }
 
   function upsertServiceType(type: ServiceTypeDto) {
-    const idx = serviceTypes.value.findIndex((t) => t.id === type.id)
+    const idx = serviceTypes.value.findIndex(t => t.id === type.id)
     if (idx >= 0) serviceTypes.value[idx] = type
     else serviceTypes.value.push(type)
   }
 
   function removeServiceType(id: number) {
-    serviceTypes.value = serviceTypes.value.filter((t) => t.id !== id)
+    serviceTypes.value = serviceTypes.value.filter(t => t.id !== id)
   }
 
   return {

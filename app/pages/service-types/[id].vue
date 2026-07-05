@@ -26,7 +26,7 @@ async function load() {
   try {
     await libraryStore.fetchTracks()
     serviceType.value = await $fetch<ServiceTypeDto>(`/api/service-types/${id}`)
-    items.value = (serviceType.value.items || []).map((item) => ({
+    items.value = (serviceType.value.items || []).map(item => ({
       ...item,
       defaultTrackId: item.defaultTrackId ?? null
     }))
@@ -77,8 +77,8 @@ function onTrackPicked(track: TrackDto) {
   const item = items.value[index]
   if (!item) return
 
-  const label =
-    !item.label || item.label === 'Liturgieelement' || item.label === 'Lied-Slot'
+  const label
+    = !item.label || item.label === 'Liturgieelement' || item.label === 'Lied-Slot'
       ? track.title
       : item.label
 
@@ -96,7 +96,7 @@ async function save() {
     await $fetch(`/api/service-types/${id}/items`, {
       method: 'PUT',
       body: {
-        items: items.value.map((item) => ({
+        items: items.value.map(item => ({
           position: item.position,
           kind: item.kind,
           label: item.label,
@@ -115,67 +115,150 @@ async function save() {
 </script>
 
 <template>
-  <div v-if="loading" class="space-y-3">
+  <div
+    v-if="loading"
+    class="space-y-3"
+  >
     <USkeleton class="h-8 w-64" />
-    <USkeleton v-for="i in 4" :key="i" class="h-20 w-full" />
+    <USkeleton
+      v-for="i in 4"
+      :key="i"
+      class="h-20 w-full"
+    />
   </div>
 
-  <div v-else-if="serviceType" class="space-y-6">
+  <div
+    v-else-if="serviceType"
+    class="space-y-6"
+  >
     <div class="flex items-start justify-between gap-4">
       <div>
-        <UButton to="/service-types" variant="ghost" size="sm" class="mb-2">← Zurück</UButton>
-        <h1 class="text-2xl font-semibold">{{ serviceType.name }}</h1>
-        <p class="text-muted">Ablauf der Vorlage bearbeiten</p>
+        <UButton
+          to="/service-types"
+          variant="ghost"
+          size="sm"
+          class="mb-2"
+        >
+          ← Zurück
+        </UButton>
+        <h1 class="text-2xl font-semibold">
+          {{ serviceType.name }}
+        </h1>
+        <p class="text-muted">
+          Ablauf der Vorlage bearbeiten
+        </p>
       </div>
-      <UButton :loading="saving" @click="save">Speichern</UButton>
+      <UButton
+        :loading="saving"
+        @click="save"
+      >
+        Speichern
+      </UButton>
     </div>
 
     <div class="flex gap-2">
-      <UButton variant="outline" @click="addItem('liturgy')">+ Liturgieelement</UButton>
-      <UButton variant="outline" @click="addItem('songSlot')">+ Lied-Slot</UButton>
+      <UButton
+        variant="outline"
+        @click="addItem('liturgy')"
+      >
+        + Liturgieelement
+      </UButton>
+      <UButton
+        variant="outline"
+        @click="addItem('songSlot')"
+      >
+        + Lied-Slot
+      </UButton>
     </div>
 
     <div class="space-y-3">
-      <UCard v-for="(item, index) in items" :key="`${item.position}-${index}`">
+      <UCard
+        v-for="(item, index) in items"
+        :key="`${item.position}-${index}`"
+      >
         <div class="flex flex-wrap items-start gap-3">
           <div class="flex flex-col gap-1 shrink-0">
-            <UButton size="xs" variant="ghost" :disabled="index === 0" @click="moveItem(index, -1)">↑</UButton>
-            <UButton size="xs" variant="ghost" :disabled="index === items.length - 1" @click="moveItem(index, 1)">↓</UButton>
+            <UButton
+              size="xs"
+              variant="ghost"
+              :disabled="index === 0"
+              @click="moveItem(index, -1)"
+            >
+              ↑
+            </UButton>
+            <UButton
+              size="xs"
+              variant="ghost"
+              :disabled="index === items.length - 1"
+              @click="moveItem(index, 1)"
+            >
+              ↓
+            </UButton>
           </div>
 
           <div class="flex-1 min-w-0 space-y-3">
             <div class="flex flex-wrap gap-3 items-center">
-              <UBadge :color="item.kind === 'liturgy' ? 'info' : 'neutral'" variant="subtle">
+              <UBadge
+                :color="item.kind === 'liturgy' ? 'info' : 'neutral'"
+                variant="subtle"
+              >
                 {{ kindLabel(item.kind) }}
               </UBadge>
-              <UInput v-model="item.label" class="flex-1 min-w-48" />
+              <UInput
+                v-model="item.label"
+                class="flex-1 min-w-48"
+              />
             </div>
 
-            <div v-if="item.kind === 'liturgy'" class="flex items-center gap-3">
+            <div
+              v-if="item.kind === 'liturgy'"
+              class="flex items-center gap-3"
+            >
               <p class="text-sm flex-1 truncate">
                 {{ item.defaultTrack?.title || 'Kein Track gewählt' }}
               </p>
-              <UButton size="sm" variant="outline" @click="openPicker(index, item.kind)">
+              <UButton
+                size="sm"
+                variant="outline"
+                @click="openPicker(index, item.kind)"
+              >
                 {{ item.defaultTrackId ? 'Track ändern' : 'Track wählen' }}
               </UButton>
             </div>
 
-            <div v-else class="text-sm text-muted">
+            <div
+              v-else
+              class="text-sm text-muted"
+            >
               Optional: {{ item.defaultTrack?.title || 'Kein Standard-Lied' }}
-              <UButton size="xs" variant="ghost" class="ml-2" @click="openPicker(index, item.kind)">
+              <UButton
+                size="xs"
+                variant="ghost"
+                class="ml-2"
+                @click="openPicker(index, item.kind)"
+              >
                 Standard setzen
               </UButton>
             </div>
           </div>
 
-          <UButton variant="ghost" color="error" size="sm" @click="removeItem(index)">
+          <UButton
+            variant="ghost"
+            color="error"
+            size="sm"
+            @click="removeItem(index)"
+          >
             <FontAwesomeIcon icon="trash" />
           </UButton>
         </div>
       </UCard>
     </div>
 
-    <UEmpty v-if="!items.length" title="Keine Schritte" description="Fügen Sie Liturgieelemente und Lied-Slots hinzu." />
+    <UEmpty
+      v-if="!items.length"
+      title="Keine Schritte"
+      description="Fügen Sie Liturgieelemente und Lied-Slots hinzu."
+    />
 
     <LibraryTrackPicker
       v-model:open="pickerOpen"

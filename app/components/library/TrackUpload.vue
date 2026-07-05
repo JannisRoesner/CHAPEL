@@ -31,7 +31,7 @@ async function uploadFiles(files: FileList | File[]) {
       } catch (e: unknown) {
         const err = e as {
           statusCode?: number
-          data?: { existingTrack?: TrackDto; message?: string }
+          data?: { existingTrack?: TrackDto, message?: string }
           statusMessage?: string
         }
         if (err.statusCode === 409 && err.data?.existingTrack) {
@@ -69,7 +69,10 @@ function onDrop(event: DragEvent) {
       @dragleave="dragOver = false"
       @drop.prevent="onDrop"
     >
-      <FontAwesomeIcon icon="upload" class="text-3xl text-muted mb-3" />
+      <FontAwesomeIcon
+        icon="upload"
+        class="text-3xl text-muted mb-3"
+      />
       <p class="mb-4 text-muted">
         Audiodateien (MP3, WAV, FLAC, OGG) hier ablegen oder auswählen
       </p>
@@ -84,7 +87,11 @@ function onDrop(event: DragEvent) {
           class="w-40"
         />
         <label>
-          <UButton as="span" :loading="uploading" :disabled="uploading">
+          <UButton
+            as="span"
+            :loading="uploading"
+            :disabled="uploading"
+          >
             Dateien wählen
           </UButton>
           <input
@@ -97,7 +104,13 @@ function onDrop(event: DragEvent) {
         </label>
       </div>
 
-      <UAlert v-if="error" color="error" variant="subtle" :title="error" class="mt-4" />
+      <UAlert
+        v-if="error"
+        color="error"
+        variant="subtle"
+        :title="error"
+        class="mt-4"
+      />
     </div>
   </UCard>
 </template>

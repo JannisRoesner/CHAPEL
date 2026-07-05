@@ -39,7 +39,7 @@ export function useOfflineCache() {
       req.onsuccess = () => resolve(req.result as OfflineServiceRecord[])
       req.onerror = () => reject(req.error)
     })
-    cachedServiceIds.value = all.map((r) => r.serviceId)
+    cachedServiceIds.value = all.map(r => r.serviceId)
   }
 
   async function isServiceCached(serviceId: number): Promise<boolean> {
@@ -55,7 +55,7 @@ export function useOfflineCache() {
 
     try {
       const playlist = await $fetch<PlaylistStepDto[]>(`/api/services/${serviceId}/playlist`)
-      const tracksWithUrls = playlist.filter((step) => step.streamUrl)
+      const tracksWithUrls = playlist.filter(step => step.streamUrl)
 
       const cache = await caches.open('chapel-audio-v1')
       let done = 0

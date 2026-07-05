@@ -12,6 +12,7 @@ CHAPEL ist eine moderne Web-App zur Verwaltung und touch-gesteuerten Wiedergabe 
 - Touch-minimale Wiedergabe: Play → Stopp nach Titel → nächster Titel per Knopf
 - Echtzeit-Updates via WebSocket
 - PWA mit Offline-Cache für Gottesdienste
+- Benutzerverwaltung (Admin: Anlegen und Rollen zuweisen)
 - Hell/Dunkel-Modus, Font Awesome Icons
 - Docker-Deployment (eine Gemeinde pro Installation)
 
@@ -39,12 +40,20 @@ Kopieren Sie `.env.example` nach `.env` und passen Sie die Werte an.
 
 ### 3. Datenbank
 
-PostgreSQL starten (z. B. nur die DB via Docker):
+PostgreSQL muss erreichbar sein (lokal installiert oder per Docker):
 
 ```bash
-docker compose up db -d
+docker run -d --name chapel-db \
+  -e POSTGRES_USER=chapel \
+  -e POSTGRES_PASSWORD=chapel \
+  -e POSTGRES_DB=chapel \
+  -p 5432:5432 \
+  postgres:16
+
 npm run db:migrate
 ```
+
+`DATABASE_URL` in `.env` muss zum laufenden PostgreSQL passen (siehe `.env.example`).
 
 ### 4. Entwicklungsserver
 
@@ -54,7 +63,7 @@ npm run dev
 
 App: http://localhost:3000
 
-Standard-Login (nach Seed): `admin@chapel.local` / `changeme` (siehe `.env`)
+Standard-Login (nach Seed): Werte aus `ADMIN_EMAIL` und `ADMIN_PASSWORD` in `.env` (Default in `.env.example`: `admin@example.com` / `changeme`)
 
 ## Produktion (Docker)
 
@@ -107,7 +116,7 @@ scripts/       # Migration, Icon-Generierung
 | `/service-types` | Gottesdienst-Vorlagen |
 | `/services` | Konkrete Gottesdienste |
 | `/playback` | Touch-Wiedergabe |
-| `/settings` | Theme & Offline-Cache |
+| `/settings` | Theme, Offline-Cache & Benutzerverwaltung (Admin) |
 
 ## Skripte
 
@@ -122,4 +131,4 @@ scripts/       # Migration, Icon-Generierung
 
 ## Lizenz
 
-MIT
+[GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE) — Copyright © Jannis Rösner

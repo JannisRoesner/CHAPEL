@@ -11,12 +11,12 @@ export const useLibraryStore = defineStore('library', () => {
   const filteredTracks = computed(() => {
     let result = tracks.value
     if (categoryFilter.value !== 'all') {
-      result = result.filter((t) => t.category === categoryFilter.value)
+      result = result.filter(t => t.category === categoryFilter.value)
     }
     const q = search.value.trim().toLowerCase()
     if (q) {
       result = result.filter(
-        (t) =>
+        t =>
           t.title.toLowerCase().includes(q)
           || t.composer?.toLowerCase().includes(q)
           || t.originalFilename.toLowerCase().includes(q)
@@ -35,13 +35,13 @@ export const useLibraryStore = defineStore('library', () => {
   }
 
   function upsertTrack(track: TrackDto) {
-    const idx = tracks.value.findIndex((t) => t.id === track.id)
+    const idx = tracks.value.findIndex(t => t.id === track.id)
     if (idx >= 0) tracks.value[idx] = track
     else tracks.value.unshift(track)
   }
 
   function removeTrack(id: number) {
-    tracks.value = tracks.value.filter((t) => t.id !== id)
+    tracks.value = tracks.value.filter(t => t.id !== id)
   }
 
   return {

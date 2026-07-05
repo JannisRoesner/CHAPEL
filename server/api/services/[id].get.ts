@@ -34,16 +34,16 @@ export default defineEventHandler(async (event) => {
     .orderBy(asc(schema.serviceItems.position))
 
   const trackIds = items
-    .map((item) => item.trackId)
+    .map(item => item.trackId)
     .filter((trackId): trackId is number => trackId != null)
 
   const tracks = trackIds.length
     ? await db.select().from(schema.tracks).where(inArray(schema.tracks.id, trackIds))
     : []
 
-  const trackMap = new Map(tracks.map((t) => [t.id, toTrackDto(t)]))
+  const trackMap = new Map(tracks.map(t => [t.id, toTrackDto(t)]))
 
-  const itemDtos: ServiceItemDto[] = items.map((item) => ({
+  const itemDtos: ServiceItemDto[] = items.map(item => ({
     id: item.id,
     serviceId: item.serviceId,
     position: item.position,

@@ -8,7 +8,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  saved: [track: TrackDto]
+  'saved': [track: TrackDto]
 }>()
 
 const title = ref('')
@@ -49,16 +49,24 @@ async function save() {
 </script>
 
 <template>
-  <UModal :open="open" @update:open="emit('update:open', $event)">
+  <UModal
+    :open="open"
+    @update:open="emit('update:open', $event)"
+  >
     <template #content>
       <UCard>
         <template #header>
-          <h3 class="font-semibold">Track bearbeiten</h3>
+          <h3 class="font-semibold">
+            Track bearbeiten
+          </h3>
         </template>
 
         <div class="space-y-4">
           <UFormField label="Titel">
-            <UInput v-model="title" required />
+            <UInput
+              v-model="title"
+              required
+            />
           </UFormField>
           <UFormField label="Komponist">
             <UInput v-model="composer" />
@@ -76,8 +84,18 @@ async function save() {
 
         <template #footer>
           <div class="flex justify-end gap-2">
-            <UButton variant="ghost" @click="emit('update:open', false)">Abbrechen</UButton>
-            <UButton :loading="saving" @click="save">Speichern</UButton>
+            <UButton
+              variant="ghost"
+              @click="emit('update:open', false)"
+            >
+              Abbrechen
+            </UButton>
+            <UButton
+              :loading="saving"
+              @click="save"
+            >
+              Speichern
+            </UButton>
           </div>
         </template>
       </UCard>

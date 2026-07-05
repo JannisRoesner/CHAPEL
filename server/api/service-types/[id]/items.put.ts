@@ -1,4 +1,4 @@
-import { asc, eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 
 import { useDb, schema } from '../../../database'
 import type { ItemKind } from '#shared/types/chapel'
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Gottesdienst-Typ nicht gefunden' })
   }
 
-  const templateItems = body.items.map((item) => ({
+  const templateItems = body.items.map(item => ({
     position: item.position,
     kind: item.kind,
     label: item.label.trim(),
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
     if (templateItems.length) {
       await tx.insert(schema.serviceTypeItems).values(
-        templateItems.map((item) => ({
+        templateItems.map(item => ({
           serviceTypeId,
           position: item.position,
           kind: item.kind,

@@ -58,16 +58,33 @@ function onSelectStep(index: number) {
 <template>
   <div class="min-h-screen flex flex-col">
     <header class="flex items-center justify-between px-4 py-3 border-b border-default">
-      <UButton to="/playback" variant="ghost" size="sm">← Auswahl</UButton>
-      <h1 class="font-semibold truncate px-4">{{ serviceName }}</h1>
+      <UButton
+        to="/playback"
+        variant="ghost"
+        size="sm"
+      >
+        ← Auswahl
+      </UButton>
+      <h1 class="font-semibold truncate px-4">
+        {{ serviceName }}
+      </h1>
       <UiThemeToggle />
     </header>
 
-    <div v-if="loading" class="flex-1 flex items-center justify-center">
-      <UIcon name="i-lucide-loader-2" class="animate-spin text-3xl text-muted" />
+    <div
+      v-if="loading"
+      class="flex-1 flex items-center justify-center"
+    >
+      <UIcon
+        name="i-lucide-loader-2"
+        class="animate-spin text-3xl text-muted"
+      />
     </div>
 
-    <div v-else class="flex-1 flex flex-col gap-6 p-4 max-w-5xl mx-auto w-full">
+    <div
+      v-else
+      class="flex-1 flex flex-col gap-6 p-4 max-w-5xl mx-auto w-full"
+    >
       <PlaybackNowPlayingBar
         :step="currentStep"
         :state="state"

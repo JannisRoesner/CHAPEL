@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
     .where(eq(schema.serviceItems.serviceId, serviceId))
     .orderBy(asc(schema.serviceItems.position))
 
-  const steps: PlaylistStepDto[] = items.map((item) => ({
+  const steps: PlaylistStepDto[] = items.map(item => ({
     id: item.id,
     position: item.position,
     kind: item.kind,

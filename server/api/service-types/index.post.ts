@@ -2,7 +2,7 @@ import { useDb, schema } from '../../database'
 import type { ServiceTypeDto } from '#shared/types/chapel'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<{ name?: string; description?: string | null }>(event)
+  const body = await readBody<{ name?: string, description?: string | null }>(event)
   if (!body.name?.trim()) {
     throw createError({ statusCode: 400, statusMessage: 'Name erforderlich' })
   }

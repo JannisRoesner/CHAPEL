@@ -12,6 +12,16 @@ export default defineNuxtConfig({
     enabled: true
   },
 
+  app: {
+    head: {
+      title: 'CHAPEL',
+      meta: [
+        { name: 'description', content: 'Church Hymn Audio Playlist Engine for Liturgy' },
+        { name: 'theme-color', content: '#1e293b' }
+      ]
+    }
+  },
+
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
@@ -24,24 +34,25 @@ export default defineNuxtConfig({
     }
   },
 
-  app: {
-    head: {
-      title: 'CHAPEL',
-      meta: [
-        { name: 'description', content: 'Church Hymn Audio Playlist Engine for Liturgy' },
-        { name: 'theme-color', content: '#1e293b' }
-      ]
-    }
-  },
-
   routeRules: {
     '/login': { ssr: false },
     '/playback/**': { ssr: false }
   },
 
+  compatibilityDate: '2026-06-30',
+
   nitro: {
     experimental: {
       websocket: true
+    }
+  },
+
+  eslint: {
+    config: {
+      stylistic: {
+        commaDangle: 'never',
+        braceStyle: '1tbs'
+      }
     }
   },
 
@@ -90,17 +101,6 @@ export default defineNuxtConfig({
     },
     client: {
       installPrompt: true
-    }
-  },
-
-  compatibilityDate: '2026-06-30',
-
-  eslint: {
-    config: {
-      stylistic: {
-        commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
     }
   }
 })

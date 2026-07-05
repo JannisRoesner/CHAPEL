@@ -57,7 +57,7 @@ async function createUser() {
     newUserRole.value = 'editor'
     toast.add({ title: 'Benutzer angelegt', color: 'success' })
   } catch (e: unknown) {
-    const err = e as { data?: { message?: string }; statusMessage?: string }
+    const err = e as { data?: { message?: string }, statusMessage?: string }
     toast.add({
       title: 'Benutzer konnte nicht angelegt werden',
       description: err.data?.message || err.statusMessage,
@@ -78,13 +78,19 @@ async function clearCache() {
 <template>
   <div class="space-y-6">
     <div>
-      <h1 class="text-2xl font-semibold mb-1">Einstellungen</h1>
-      <p class="text-muted">Darstellung, Benutzer und Offline-Speicher</p>
+      <h1 class="text-2xl font-semibold mb-1">
+        Einstellungen
+      </h1>
+      <p class="text-muted">
+        Darstellung, Benutzer und Offline-Speicher
+      </p>
     </div>
 
     <UCard v-if="isAdmin">
       <template #header>
-        <h2 class="font-medium">Benutzerverwaltung</h2>
+        <h2 class="font-medium">
+          Benutzerverwaltung
+        </h2>
       </template>
 
       <div class="space-y-6">
@@ -92,16 +98,29 @@ async function clearCache() {
           Neue Benutzer können sich anmelden und auf Gottesdienste, Bibliothek und Wiedergabe zugreifen.
         </p>
 
-        <div v-if="loadingUsers" class="text-sm text-muted">
+        <div
+          v-if="loadingUsers"
+          class="text-sm text-muted"
+        >
           Benutzer werden geladen…
         </div>
 
-        <div v-else-if="users.length" class="space-y-2">
-          <UCard v-for="entry in users" :key="entry.id">
+        <div
+          v-else-if="users.length"
+          class="space-y-2"
+        >
+          <UCard
+            v-for="entry in users"
+            :key="entry.id"
+          >
             <div class="flex items-center justify-between gap-4">
               <div class="min-w-0">
-                <p class="font-medium truncate">{{ entry.name }}</p>
-                <p class="text-sm text-muted truncate">{{ entry.email }}</p>
+                <p class="font-medium truncate">
+                  {{ entry.name }}
+                </p>
+                <p class="text-sm text-muted truncate">
+                  {{ entry.email }}
+                </p>
               </div>
               <UBadge variant="subtle">
                 {{ roleLabels[entry.role] }}
@@ -116,12 +135,27 @@ async function clearCache() {
           description="Legen Sie den ersten Benutzer an."
         />
 
-        <form class="grid gap-4 md:grid-cols-2 border-t border-default pt-6" @submit.prevent="createUser">
-          <UFormField label="Name" class="md:col-span-2">
-            <UInput v-model="newUserName" placeholder="z.B. Max Mustermann" required />
+        <form
+          class="grid gap-4 md:grid-cols-2 border-t border-default pt-6"
+          @submit.prevent="createUser"
+        >
+          <UFormField
+            label="Name"
+            class="md:col-span-2"
+          >
+            <UInput
+              v-model="newUserName"
+              placeholder="z.B. Max Mustermann"
+              required
+            />
           </UFormField>
           <UFormField label="E-Mail">
-            <UInput v-model="newUserEmail" type="email" autocomplete="off" required />
+            <UInput
+              v-model="newUserEmail"
+              type="email"
+              autocomplete="off"
+              required
+            />
           </UFormField>
           <UFormField label="Passwort">
             <UInput
@@ -132,7 +166,10 @@ async function clearCache() {
               required
             />
           </UFormField>
-          <UFormField label="Rolle" class="md:col-span-2">
+          <UFormField
+            label="Rolle"
+            class="md:col-span-2"
+          >
             <USelect
               v-model="newUserRole"
               :items="[
@@ -142,7 +179,10 @@ async function clearCache() {
             />
           </UFormField>
           <div class="md:col-span-2">
-            <UButton type="submit" :loading="creatingUser">
+            <UButton
+              type="submit"
+              :loading="creatingUser"
+            >
               Benutzer anlegen
             </UButton>
           </div>
@@ -152,7 +192,9 @@ async function clearCache() {
 
     <UCard>
       <template #header>
-        <h2 class="font-medium">Darstellung</h2>
+        <h2 class="font-medium">
+          Darstellung
+        </h2>
       </template>
       <UFormField label="Farbschema">
         <USelect
@@ -168,7 +210,9 @@ async function clearCache() {
 
     <UCard>
       <template #header>
-        <h2 class="font-medium">Offline-Cache</h2>
+        <h2 class="font-medium">
+          Offline-Cache
+        </h2>
       </template>
       <div class="space-y-4">
         <p class="text-sm text-muted">
@@ -177,8 +221,15 @@ async function clearCache() {
         <p class="text-sm text-muted">
           {{ offlineCache.cachedServiceIds.length }} Gottesdienst(e) offline vorbereitet
         </p>
-        <UButton color="error" variant="outline" @click="clearCache">
-          <FontAwesomeIcon icon="trash" class="mr-2" />
+        <UButton
+          color="error"
+          variant="outline"
+          @click="clearCache"
+        >
+          <FontAwesomeIcon
+            icon="trash"
+            class="mr-2"
+          />
           Cache leeren
         </UButton>
       </div>

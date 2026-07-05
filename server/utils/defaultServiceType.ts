@@ -21,8 +21,8 @@ type ExistingItem = typeof schema.serviceTypeItems.$inferSelect
 function liturgyTrackByPositionKind(items: ExistingItem[]) {
   return new Map(
     items
-      .filter((item) => item.kind === 'liturgy' && item.defaultTrackId != null)
-      .map((item) => [`${item.position}:${item.kind}`, item.defaultTrackId] as const)
+      .filter(item => item.kind === 'liturgy' && item.defaultTrackId != null)
+      .map(item => [`${item.position}:${item.kind}`, item.defaultTrackId] as const)
   )
 }
 
@@ -34,7 +34,7 @@ async function insertDefaultItems(
   const preserved = liturgyTrackByPositionKind(preserveTracksFrom)
 
   await db.insert(schema.serviceTypeItems).values(
-    DEFAULT_SONNTAGS_GOTTESDIENST.items.map((item) => ({
+    DEFAULT_SONNTAGS_GOTTESDIENST.items.map(item => ({
       serviceTypeId,
       position: item.position,
       kind: item.kind,
@@ -81,7 +81,7 @@ export async function ensureDefaultServiceType(db: DbClient = useDb()) {
 
     await syncServicesFromTypeTemplate(
       existingByName.id,
-      DEFAULT_SONNTAGS_GOTTESDIENST.items.map((item) => ({
+      DEFAULT_SONNTAGS_GOTTESDIENST.items.map(item => ({
         ...item,
         defaultTrackId:
           item.kind === 'liturgy'

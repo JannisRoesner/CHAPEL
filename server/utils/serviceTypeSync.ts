@@ -47,13 +47,13 @@ export async function syncServicesFromTypeTemplate(
       .where(eq(schema.serviceItems.serviceId, service.id))
       .orderBy(asc(schema.serviceItems.position))
 
-    const oldByPosition = new Map(oldItems.map((item) => [item.position, item]))
+    const oldByPosition = new Map(oldItems.map(item => [item.position, item]))
 
     await db.delete(schema.serviceItems).where(eq(schema.serviceItems.serviceId, service.id))
 
     if (sortedTemplate.length) {
       await db.insert(schema.serviceItems).values(
-        sortedTemplate.map((templateItem) => ({
+        sortedTemplate.map(templateItem => ({
           serviceId: service.id,
           position: templateItem.position,
           kind: templateItem.kind,

@@ -19,7 +19,7 @@ async function login() {
     await fetchSession()
     await navigateTo(DEFAULT_ROUTE)
   } catch (e: unknown) {
-    const err = e as { data?: { message?: string }; statusMessage?: string }
+    const err = e as { data?: { message?: string }, statusMessage?: string }
     error.value = err.data?.message || err.statusMessage || 'Anmeldung fehlgeschlagen'
   } finally {
     loading.value = false
@@ -38,15 +38,37 @@ definePageMeta({
         <UiAppLogo size="lg" />
       </template>
 
-      <form class="space-y-4" @submit.prevent="login">
+      <form
+        class="space-y-4"
+        @submit.prevent="login"
+      >
         <UFormField label="E-Mail">
-          <UInput v-model="email" type="email" autocomplete="username" required />
+          <UInput
+            v-model="email"
+            type="email"
+            autocomplete="username"
+            required
+          />
         </UFormField>
         <UFormField label="Passwort">
-          <UInput v-model="password" type="password" autocomplete="current-password" required />
+          <UInput
+            v-model="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
         </UFormField>
-        <UAlert v-if="error" color="error" variant="subtle" :title="error" />
-        <UButton type="submit" block :loading="loading">
+        <UAlert
+          v-if="error"
+          color="error"
+          variant="subtle"
+          :title="error"
+        />
+        <UButton
+          type="submit"
+          block
+          :loading="loading"
+        >
           Anmelden
         </UButton>
       </form>
