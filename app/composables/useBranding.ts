@@ -28,16 +28,6 @@ export function useBranding() {
     fetchBranding()
   }
 
-  useHead(() => ({
-    link: [
-      {
-        rel: 'icon',
-        type: branding.value.faviconUrl.endsWith('.svg') ? 'image/svg+xml' : 'image/png',
-        href: branding.value.faviconUrl
-      }
-    ]
-  }))
-
   return {
     branding: readonly(branding),
     loaded: readonly(loaded),

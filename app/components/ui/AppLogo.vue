@@ -21,11 +21,9 @@ const { branding } = useBranding()
       class="rounded-md object-contain bg-elevated"
       :class="props.size === 'lg' ? 'h-10 w-10' : 'h-8 w-8'"
     >
-    <FontAwesomeIcon
+    <UiChapelIcon
       v-else
-      icon="church"
-      class="text-primary shrink-0"
-      :class="props.size === 'lg' ? 'text-2xl' : 'text-lg'"
+      :size="props.size"
     />
     <div class="leading-tight min-w-0">
       <div

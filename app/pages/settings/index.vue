@@ -285,10 +285,15 @@ async function submitResetPassword() {
 
         <div class="flex items-center gap-4">
           <img
+            v-if="branding.hasCustomLogo"
             :src="branding.logoUrl"
             alt="Aktuelles Logo"
             class="h-16 w-16 rounded-lg object-contain bg-elevated border border-default"
           >
+          <UiChapelIcon
+            v-else
+            size="xl"
+          />
           <div class="text-sm text-muted">
             {{ branding.hasCustomLogo ? 'Benutzerdefiniertes Logo aktiv' : 'Standard-Kirchen-Icon aktiv' }}
           </div>
