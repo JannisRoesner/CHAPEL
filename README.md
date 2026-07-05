@@ -58,16 +58,36 @@ Standard-Login (nach Seed): `admin@chapel.local` / `changeme` (siehe `.env`)
 
 ## Produktion (Docker)
 
+Ein Container enthält App und PostgreSQL — ideal für Unraid o. Ä.
+
 ```bash
 cp .env.example .env
-# NUXT_SESSION_PASSWORD und ADMIN_* anpassen
+# NUXT_SESSION_PASSWORD, POSTGRES_PASSWORD und ADMIN_* anpassen
 
 docker compose up --build -d
 ```
 
-App: http://localhost:3000
+App: http://localhost:2500
 
-Migrationen laufen beim Container-Start automatisch.
+Migrationen und DB-Initialisierung laufen beim Container-Start automatisch.
+
+### Unraid / manuelles Deployment
+
+| Host-Pfad | Container-Pfad | Zweck |
+|---|---|---|
+| `/mnt/user/appdata/chapel/postgres` | `/var/lib/postgresql/data` | PostgreSQL-Daten |
+| `/mnt/user/appdata/chapel/audio` | `/data/audio` | MP3-Bibliothek |
+
+Wichtige Umgebungsvariablen:
+
+| Variable | Pflicht | Beschreibung |
+|---|---|---|
+| `NUXT_SESSION_PASSWORD` | ja | Session-Geheimnis (mind. 32 Zeichen) |
+| `POSTGRES_PASSWORD` | empfohlen | DB-Passwort (Default: `chapel`) |
+| `ADMIN_EMAIL` | beim Erststart | Erster Admin (nur wenn DB leer) |
+| `ADMIN_PASSWORD` | beim Erststart | Admin-Passwort (nur wenn DB leer) |
+
+Port **2500** nach außen mappen. `DATABASE_URL` muss nicht gesetzt werden — wird intern aus `POSTGRES_*` gebaut.
 
 ## Projektstruktur
 
