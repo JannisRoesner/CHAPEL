@@ -25,3 +25,6 @@ logs
 
 # Uploaded audio (local dev)
 data/
+
+# Local test data (not for public repo)
+scripts/test-data/
