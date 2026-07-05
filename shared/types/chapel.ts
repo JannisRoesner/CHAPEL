@@ -7,6 +7,7 @@ export interface SessionUser {
   email: string
   name: string
   role: UserRole
+  mustChangePassword: boolean
 }
 
 export interface UserDto {
@@ -14,6 +15,7 @@ export interface UserDto {
   email: string
   name: string
   role: UserRole
+  mustChangePassword: boolean
   createdAt: string
 }
 

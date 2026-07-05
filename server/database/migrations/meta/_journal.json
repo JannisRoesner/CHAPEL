@@ -8,6 +8,13 @@
       "when": 1783247391081,
       "tag": "0000_flippant_chat",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1783285983336,
+      "tag": "0001_crazy_banshee",
+      "breakpoints": true
     }
   ]
 }

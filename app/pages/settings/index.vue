@@ -16,6 +16,17 @@ const newUserEmail = ref('')
 const newUserPassword = ref('')
 const newUserRole = ref<UserRole>('editor')
 
+const currentPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const changingPassword = ref(false)
+
+const resetUser = ref<UserDto | null>(null)
+const resetPasswordOpen = ref(false)
+const resetPassword = ref('')
+const resetMustChange = ref(true)
+const resettingPassword = ref(false)
+
 const isAdmin = computed(() => user.value?.role === 'admin')
 
 const roleLabels: Record<UserRole, string> = {
@@ -74,6 +85,70 @@ async function clearCache() {
   await offlineCache.clearCache()
   cacheSize.value = await offlineCache.getCacheSizeEstimate()
 }
+
+async function changePassword() {
+  changingPassword.value = true
+  try {
+    await $fetch('/api/auth/change-password', {
+      method: 'POST',
+      body: {
+        currentPassword: currentPassword.value,
+        newPassword: newPassword.value,
+        confirmPassword: confirmPassword.value
+      }
+    })
+    currentPassword.value = ''
+    newPassword.value = ''
+    confirmPassword.value = ''
+    toast.add({ title: 'Passwort geändert', color: 'success' })
+  } catch (e: unknown) {
+    const err = e as { data?: { message?: string }, statusMessage?: string }
+    toast.add({
+      title: 'Passwort konnte nicht geändert werden',
+      description: err.data?.message || err.statusMessage,
+      color: 'error'
+    })
+  } finally {
+    changingPassword.value = false
+  }
+}
+
+function openResetPassword(entry: UserDto) {
+  resetUser.value = entry
+  resetPassword.value = ''
+  resetMustChange.value = true
+  resetPasswordOpen.value = true
+}
+
+function closeResetPassword() {
+  resetPasswordOpen.value = false
+}
+
+async function submitResetPassword() {
+  if (!resetUser.value) return
+  resettingPassword.value = true
+  try {
+    const updated = await $fetch<UserDto>(`/api/users/${resetUser.value.id}/password`, {
+      method: 'PATCH',
+      body: {
+        password: resetPassword.value,
+        mustChangePassword: resetMustChange.value
+      }
+    })
+    users.value = users.value.map(entry => entry.id === updated.id ? updated : entry)
+    resetPasswordOpen.value = false
+    toast.add({ title: 'Passwort zurückgesetzt', color: 'success' })
+  } catch (e: unknown) {
+    const err = e as { data?: { message?: string }, statusMessage?: string }
+    toast.add({
+      title: 'Passwort konnte nicht zurückgesetzt werden',
+      description: err.data?.message || err.statusMessage,
+      color: 'error'
+    })
+  } finally {
+    resettingPassword.value = false
+  }
+}
 </script>
 
 <template>
@@ -123,9 +198,25 @@ async function clearCache() {
                   {{ entry.email }}
                 </p>
               </div>
-              <UBadge variant="subtle">
-                {{ roleLabels[entry.role] }}
-              </UBadge>
+              <div class="flex items-center gap-2 shrink-0">
+                <UBadge
+                  v-if="entry.mustChangePassword"
+                  color="warning"
+                  variant="subtle"
+                >
+                  Passwort ändern
+                </UBadge>
+                <UBadge variant="subtle">
+                  {{ roleLabels[entry.role] }}
+                </UBadge>
+                <UButton
+                  variant="outline"
+                  size="sm"
+                  @click="openResetPassword(entry)"
+                >
+                  Passwort zurücksetzen
+                </UButton>
+              </div>
             </div>
           </UCard>
         </div>
@@ -191,6 +282,56 @@ async function clearCache() {
       </div>
     </UCard>
 
+    <UCard v-if="!user?.mustChangePassword">
+      <template #header>
+        <h2 class="font-medium">
+          Passwort ändern
+        </h2>
+      </template>
+      <form
+        class="grid gap-4 md:grid-cols-2"
+        @submit.prevent="changePassword"
+      >
+        <UFormField
+          label="Aktuelles Passwort"
+          class="md:col-span-2"
+        >
+          <UInput
+            v-model="currentPassword"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+        </UFormField>
+        <UFormField label="Neues Passwort">
+          <UInput
+            v-model="newPassword"
+            type="password"
+            autocomplete="new-password"
+            minlength="8"
+            required
+          />
+        </UFormField>
+        <UFormField label="Passwort bestätigen">
+          <UInput
+            v-model="confirmPassword"
+            type="password"
+            autocomplete="new-password"
+            minlength="8"
+            required
+          />
+        </UFormField>
+        <div class="md:col-span-2">
+          <UButton
+            type="submit"
+            :loading="changingPassword"
+          >
+            Passwort speichern
+          </UButton>
+        </div>
+      </form>
+    </UCard>
+
     <UCard>
       <template #header>
         <h2 class="font-medium">
@@ -235,5 +376,58 @@ async function clearCache() {
         </UButton>
       </div>
     </UCard>
+
+    <UModal
+      v-model:open="resetPasswordOpen"
+    >
+      <template #content>
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              Passwort zurücksetzen
+            </h3>
+            <p
+              v-if="resetUser"
+              class="text-sm text-muted mt-1"
+            >
+              {{ resetUser.name }} ({{ resetUser.email }})
+            </p>
+          </template>
+
+          <div class="space-y-4">
+            <UFormField label="Neues Passwort">
+              <UInput
+                v-model="resetPassword"
+                type="password"
+                autocomplete="new-password"
+                minlength="8"
+                required
+              />
+            </UFormField>
+            <UCheckbox
+              v-model="resetMustChange"
+              label="Beim nächsten Login ändern erzwingen"
+            />
+          </div>
+
+          <template #footer>
+            <div class="flex justify-end gap-2">
+              <UButton
+                variant="ghost"
+                @click="closeResetPassword"
+              >
+                Abbrechen
+              </UButton>
+              <UButton
+                :loading="resettingPassword"
+                @click="submitResetPassword"
+              >
+                Passwort speichern
+              </UButton>
+            </div>
+          </template>
+        </UCard>
+      </template>
+    </UModal>
   </div>
 </template>

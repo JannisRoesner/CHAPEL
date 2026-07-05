@@ -17,6 +17,22 @@ export async function verifyUserPassword(
   return bcrypt.compare(password, passwordHash)
 }
 
+export function validatePassword(password: string): void {
+  if (password.length < 8) {
+    throw createError({ statusCode: 400, statusMessage: 'Passwort muss mindestens 8 Zeichen haben' })
+  }
+}
+
+export async function findUserById(id: number) {
+  const db = useDb()
+  const [user] = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.id, id))
+    .limit(1)
+  return user ?? null
+}
+
 export async function findUserByEmail(email: string) {
   const db = useDb()
   const [user] = await db
@@ -49,7 +65,8 @@ export function toSessionUser(user: typeof schema.users.$inferSelect): SessionUs
     id: user.id,
     email: user.email,
     name: user.name,
-    role: user.role
+    role: user.role,
+    mustChangePassword: user.mustChangePassword
   }
 }
 
@@ -59,6 +76,7 @@ export function toUserDto(user: typeof schema.users.$inferSelect): UserDto {
     email: user.email,
     name: user.name,
     role: user.role,
+    mustChangePassword: user.mustChangePassword,
     createdAt: user.createdAt.toISOString()
   }
 }
@@ -81,9 +99,7 @@ export async function createUser(input: {
   if (!email || !name || !input.password) {
     throw createError({ statusCode: 400, statusMessage: 'Alle Felder erforderlich' })
   }
-  if (input.password.length < 8) {
-    throw createError({ statusCode: 400, statusMessage: 'Passwort muss mindestens 8 Zeichen haben' })
-  }
+  validatePassword(input.password)
   if (await findUserByEmail(email)) {
     throw createError({ statusCode: 409, statusMessage: 'E-Mail-Adresse bereits vergeben' })
   }
@@ -93,10 +109,73 @@ export async function createUser(input: {
   const db = useDb()
   const [user] = await db
     .insert(schema.users)
-    .values({ email, name, passwordHash, role })
+    .values({ email, name, passwordHash, role, mustChangePassword: true })
     .returning()
 
   return toUserDto(user!)
+}
+
+export async function changeOwnPassword(
+  userId: number,
+  input: {
+    currentPassword?: string
+    newPassword: string
+    confirmPassword: string
+    skipCurrentCheck?: boolean
+  }
+): Promise<SessionUser> {
+  if (input.newPassword !== input.confirmPassword) {
+    throw createError({ statusCode: 400, statusMessage: 'Passwörter stimmen nicht überein' })
+  }
+  validatePassword(input.newPassword)
+
+  const user = await findUserById(userId)
+  if (!user) {
+    throw createError({ statusCode: 404, statusMessage: 'Benutzer nicht gefunden' })
+  }
+
+  const skipCurrentCheck = input.skipCurrentCheck ?? user.mustChangePassword
+  if (!skipCurrentCheck) {
+    if (!input.currentPassword) {
+      throw createError({ statusCode: 400, statusMessage: 'Aktuelles Passwort erforderlich' })
+    }
+    if (!(await verifyUserPassword(input.currentPassword, user.passwordHash))) {
+      throw createError({ statusCode: 401, statusMessage: 'Aktuelles Passwort ist falsch' })
+    }
+  }
+
+  const passwordHash = await hashUserPassword(input.newPassword)
+  const db = useDb()
+  const [updated] = await db
+    .update(schema.users)
+    .set({ passwordHash, mustChangePassword: false })
+    .where(eq(schema.users.id, userId))
+    .returning()
+
+  return toSessionUser(updated!)
+}
+
+export async function adminSetUserPassword(
+  targetUserId: number,
+  newPassword: string,
+  mustChangePassword = true
+): Promise<UserDto> {
+  validatePassword(newPassword)
+
+  const target = await findUserById(targetUserId)
+  if (!target) {
+    throw createError({ statusCode: 404, statusMessage: 'Benutzer nicht gefunden' })
+  }
+
+  const passwordHash = await hashUserPassword(newPassword)
+  const db = useDb()
+  const [updated] = await db
+    .update(schema.users)
+    .set({ passwordHash, mustChangePassword })
+    .where(eq(schema.users.id, targetUserId))
+    .returning()
+
+  return toUserDto(updated!)
 }
 
 export async function seedAdminIfNeeded() {

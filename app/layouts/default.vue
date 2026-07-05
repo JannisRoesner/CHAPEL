@@ -4,6 +4,7 @@ import { APP_NAV_ITEMS, DEFAULT_ROUTE } from '#shared/constants/app'
 const colorMode = useColorMode()
 const route = useRoute()
 const mobileMenuOpen = ref(false)
+const { user } = useUserSession()
 
 useHead({
   htmlAttrs: {
@@ -105,6 +106,8 @@ function openMobileMenu() {
       <main class="max-w-6xl mx-auto px-4 py-6">
         <slot />
       </main>
+
+      <AuthChangePasswordModal v-if="user?.mustChangePassword" />
     </div>
   </UApp>
 </template>
