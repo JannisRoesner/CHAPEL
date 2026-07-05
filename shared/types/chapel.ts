@@ -9,6 +9,14 @@ export interface SessionUser {
   role: UserRole
 }
 
+export interface UserDto {
+  id: number
+  email: string
+  name: string
+  role: UserRole
+  createdAt: string
+}
+
 export interface TrackDto {
   id: number
   title: string

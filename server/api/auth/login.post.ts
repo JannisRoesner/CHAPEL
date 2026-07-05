@@ -1,4 +1,4 @@
-import { findUserByEmail, toSessionUser, verifyPassword } from '../../utils/auth'
+import { findUserByEmail, toSessionUser, verifyUserPassword } from '../../utils/auth'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{ email?: string; password?: string }>(event)
