@@ -1,4 +1,4 @@
-import { buildChapelIconDataUrl, CHAPEL_ICON_BACKGROUND } from '#shared/constants/chapelIcon'
+import { buildChapelIconDataUrl } from '#shared/constants/chapelIcon'
 
 function readThemeColor(cssVar: string, fallback: string): string {
   if (!import.meta.client) return fallback
@@ -21,7 +21,7 @@ export function useThemedFavicon() {
     }
 
     const primaryColor = readThemeColor('--color-green-500', '#00C16A')
-    faviconHref.value = buildChapelIconDataUrl(primaryColor, CHAPEL_ICON_BACKGROUND)
+    faviconHref.value = buildChapelIconDataUrl(primaryColor)
   }
 
   if (import.meta.client) {
