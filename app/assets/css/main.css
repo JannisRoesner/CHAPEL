@@ -16,3 +16,59 @@
   --color-green-900: #0A5331;
   --color-green-950: #052E16;
 }
+
+[data-color-scheme="liturgical-blue"] {
+  --color-green-50: #EFF6FF;
+  --color-green-100: #DBEAFE;
+  --color-green-200: #BFDBFE;
+  --color-green-300: #93C5FD;
+  --color-green-400: #60A5FA;
+  --color-green-500: #2563EB;
+  --color-green-600: #1D4ED8;
+  --color-green-700: #1E40AF;
+  --color-green-800: #1E3A8A;
+  --color-green-900: #172554;
+  --color-green-950: #0F172A;
+}
+
+[data-color-scheme="golden-liturgy"] {
+  --color-green-50: #FFFBEB;
+  --color-green-100: #FEF3C7;
+  --color-green-200: #FDE68A;
+  --color-green-300: #FCD34D;
+  --color-green-400: #FBBF24;
+  --color-green-500: #D97706;
+  --color-green-600: #B45309;
+  --color-green-700: #92400E;
+  --color-green-800: #78350F;
+  --color-green-900: #451A03;
+  --color-green-950: #292524;
+}
+
+[data-color-scheme="advent-purple"] {
+  --color-green-50: #F5F3FF;
+  --color-green-100: #EDE9FE;
+  --color-green-200: #DDD6FE;
+  --color-green-300: #C4B5FD;
+  --color-green-400: #A78BFA;
+  --color-green-500: #7C3AED;
+  --color-green-600: #6D28D9;
+  --color-green-700: #5B21B6;
+  --color-green-800: #4C1D95;
+  --color-green-900: #2E1065;
+  --color-green-950: #1E1B4B;
+}
+
+[data-color-scheme="forest-calm"] {
+  --color-green-50: #F0FDFA;
+  --color-green-100: #CCFBF1;
+  --color-green-200: #99F6E4;
+  --color-green-300: #5EEAD4;
+  --color-green-400: #2DD4BF;
+  --color-green-500: #0D9488;
+  --color-green-600: #0F766E;
+  --color-green-700: #115E59;
+  --color-green-800: #134E4A;
+  --color-green-900: #042F2E;
+  --color-green-950: #022C22;
+}

@@ -15,6 +15,13 @@
       "when": 1783285983336,
       "tag": "0001_crazy_banshee",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783290000000,
+      "tag": "0002_user_preferences",
+      "breakpoints": true
     }
   ]
 }

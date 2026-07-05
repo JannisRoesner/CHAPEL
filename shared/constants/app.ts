@@ -11,7 +11,7 @@ export interface AppNavItem {
 
 export const APP_NAV_ITEMS: AppNavItem[] = [
   { to: '/library', label: 'Bibliothek', icon: 'book' },
-  { to: '/service-types', label: 'Typen', icon: 'list' },
+  { to: '/service-types', label: 'Vorlagen', icon: 'list' },
   { to: '/services', label: 'Gottesdienste', icon: 'calendar' },
   { to: '/playback', label: 'Wiedergabe', icon: 'play', primary: true },
   { to: '/settings', label: 'Einstellungen', icon: 'cog' }

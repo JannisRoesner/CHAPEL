@@ -5,6 +5,12 @@ import type { H3Event } from 'h3'
 import { useDb, schema } from '../database'
 
 import type { SessionUser, UserDto, UserRole } from '#shared/types/chapel'
+import {
+  DEFAULT_APPEARANCE_MODE,
+  DEFAULT_COLOR_SCHEME,
+  isAppearanceMode,
+  isColorSchemeId
+} from '#shared/constants/colorSchemes'
 
 export async function hashUserPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12)
@@ -66,7 +72,9 @@ export function toSessionUser(user: typeof schema.users.$inferSelect): SessionUs
     email: user.email,
     name: user.name,
     role: user.role,
-    mustChangePassword: user.mustChangePassword
+    mustChangePassword: user.mustChangePassword,
+    colorScheme: isColorSchemeId(user.colorScheme) ? user.colorScheme : DEFAULT_COLOR_SCHEME,
+    appearanceMode: isAppearanceMode(user.appearanceMode) ? user.appearanceMode : DEFAULT_APPEARANCE_MODE
   }
 }
 
@@ -202,4 +210,46 @@ export async function seedAdminIfNeeded() {
 
 export async function seedDefaultServiceTypeIfNeeded() {
   await ensureDefaultServiceType()
+}
+
+export async function updateUserPreferences(
+  userId: number,
+  input: {
+    colorScheme?: string
+    appearanceMode?: string
+  }
+): Promise<SessionUser> {
+  const updates: Partial<typeof schema.users.$inferInsert> = {}
+
+  if (input.colorScheme !== undefined) {
+    if (!isColorSchemeId(input.colorScheme)) {
+      throw createError({ statusCode: 400, statusMessage: 'Ungültiges Farbschema' })
+    }
+    updates.colorScheme = input.colorScheme
+  }
+
+  if (input.appearanceMode !== undefined) {
+    if (!isAppearanceMode(input.appearanceMode)) {
+      throw createError({ statusCode: 400, statusMessage: 'Ungültiger Darstellungsmodus' })
+    }
+    updates.appearanceMode = input.appearanceMode
+  }
+
+  if (!Object.keys(updates).length) {
+    throw createError({ statusCode: 400, statusMessage: 'Keine Einstellungen angegeben' })
+  }
+
+  const user = await findUserById(userId)
+  if (!user) {
+    throw createError({ statusCode: 404, statusMessage: 'Benutzer nicht gefunden' })
+  }
+
+  const db = useDb()
+  const [updated] = await db
+    .update(schema.users)
+    .set(updates)
+    .where(eq(schema.users.id, userId))
+    .returning()
+
+  return toSessionUser(updated!)
 }

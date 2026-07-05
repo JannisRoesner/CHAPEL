@@ -2,12 +2,16 @@ export type ItemKind = 'liturgy' | 'songSlot'
 export type TrackCategory = 'hymn' | 'liturgy'
 export type UserRole = 'admin' | 'editor'
 
+export type { AppearanceMode, ColorSchemeId } from '#shared/constants/colorSchemes'
+
 export interface SessionUser {
   id: number
   email: string
   name: string
   role: UserRole
   mustChangePassword: boolean
+  colorScheme: import('#shared/constants/colorSchemes').ColorSchemeId
+  appearanceMode: import('#shared/constants/colorSchemes').AppearanceMode
 }
 
 export interface UserDto {

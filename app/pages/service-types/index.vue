@@ -17,7 +17,7 @@ async function createType() {
     })
     servicesStore.upsertServiceType(type)
     newName.value = ''
-    toast.add({ title: 'Typ erstellt', color: 'success' })
+    toast.add({ title: 'Vorlage erstellt', color: 'success' })
     await navigateTo(`/service-types/${type.id}`)
   } finally {
     creating.value = false
@@ -35,10 +35,10 @@ async function deleteType(id: number, name: string) {
   <div class="space-y-6">
     <div>
       <h1 class="text-2xl font-semibold mb-1">
-        Gottesdienst-Typen
+        Gottesdienst-Vorlagen
       </h1>
       <p class="text-muted">
-        Vorlagen mit festen Liturgieelementen und Lied-Slots anlegen
+        Feste Liturgieelemente und Lied-Slots für wiederkehrende Gottesdienste
       </p>
     </div>
 
@@ -49,7 +49,7 @@ async function deleteType(id: number, name: string) {
       >
         <UInput
           v-model="newName"
-          placeholder="Neuer Typ, z.B. Sonntagsgottesdienst"
+          placeholder="Neue Vorlage, z.B. Sonntagsgottesdienst"
           class="flex-1"
         />
         <UButton
@@ -104,7 +104,7 @@ async function deleteType(id: number, name: string) {
 
     <UEmpty
       v-else
-      title="Keine Typen"
+      title="Keine Vorlagen"
       description="Erstellen Sie eine Vorlage für Ihren Gottesdienstablauf."
     />
   </div>

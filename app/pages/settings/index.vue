@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import type { UserDto, UserRole } from '#shared/types/chapel'
+import { COLOR_SCHEMES } from '#shared/constants/colorSchemes'
+import type { ColorSchemeId } from '#shared/constants/colorSchemes'
 
-const colorMode = useColorMode()
 const offlineCache = useOfflineCache()
 const { cachedServiceIds } = offlineCache
 const toast = useToast()
 const { user } = useUserSession()
+const { branding, fetchBranding } = useBranding()
+const { colorScheme, appearanceMode, colorMode, savePreferences } = useAppearance()
 
 const cacheSize = ref('…')
 const users = ref<UserDto[]>([])
@@ -27,6 +30,11 @@ const resetPassword = ref('')
 const resetMustChange = ref(true)
 const resettingPassword = ref(false)
 
+const uploadingLogo = ref(false)
+const removingLogo = ref(false)
+const logoDragOver = ref(false)
+const savingAppearance = ref(false)
+
 const isAdmin = computed(() => user.value?.role === 'admin')
 
 const roleLabels: Record<UserRole, string> = {
@@ -34,12 +42,113 @@ const roleLabels: Record<UserRole, string> = {
   editor: 'Benutzer'
 }
 
+const appearanceItems = [
+  { label: 'System', value: 'system' },
+  { label: 'Hell', value: 'light' },
+  { label: 'Dunkel', value: 'dark' }
+]
+
 onMounted(async () => {
   cacheSize.value = await offlineCache.getCacheSizeEstimate()
   if (isAdmin.value) {
     await fetchUsers()
   }
 })
+
+watch(() => colorMode.preference, async (value) => {
+  if (!user.value || savingAppearance.value) return
+  if (value === appearanceMode.value) return
+  await updateAppearanceMode(value as 'system' | 'light' | 'dark')
+})
+
+async function updateAppearanceMode(mode: 'system' | 'light' | 'dark') {
+  savingAppearance.value = true
+  try {
+    await savePreferences({ appearanceMode: mode })
+  } catch (e: unknown) {
+    const err = e as { data?: { message?: string }, statusMessage?: string }
+    toast.add({
+      title: 'Darstellung konnte nicht gespeichert werden',
+      description: err.data?.message || err.statusMessage,
+      color: 'error'
+    })
+  } finally {
+    savingAppearance.value = false
+  }
+}
+
+async function selectColorScheme(schemeId: ColorSchemeId) {
+  if (schemeId === colorScheme.value) return
+  savingAppearance.value = true
+  try {
+    await savePreferences({ colorScheme: schemeId })
+    toast.add({ title: 'Farbschema gespeichert', color: 'success' })
+  } catch (e: unknown) {
+    const err = e as { data?: { message?: string }, statusMessage?: string }
+    toast.add({
+      title: 'Farbschema konnte nicht gespeichert werden',
+      description: err.data?.message || err.statusMessage,
+      color: 'error'
+    })
+  } finally {
+    savingAppearance.value = false
+  }
+}
+
+async function uploadLogo(files: FileList | File[]) {
+  const file = Array.from(files)[0]
+  if (!file) return
+
+  uploadingLogo.value = true
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    await $fetch('/api/settings/logo', { method: 'POST', body: form })
+    await fetchBranding()
+    toast.add({ title: 'Logo gespeichert', color: 'success' })
+  } catch (e: unknown) {
+    const err = e as { data?: { message?: string }, statusMessage?: string }
+    toast.add({
+      title: 'Logo konnte nicht hochgeladen werden',
+      description: err.data?.message || err.statusMessage,
+      color: 'error'
+    })
+  } finally {
+    uploadingLogo.value = false
+  }
+}
+
+function onLogoFileChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  if (input.files?.length) uploadLogo(input.files)
+  input.value = ''
+}
+
+function onLogoDrop(event: DragEvent) {
+  logoDragOver.value = false
+  if (event.dataTransfer?.files?.length) {
+    uploadLogo(event.dataTransfer.files)
+  }
+}
+
+async function resetLogo() {
+  if (!confirm('Standard-Logo wiederherstellen?')) return
+  removingLogo.value = true
+  try {
+    await $fetch('/api/settings/logo', { method: 'DELETE' })
+    await fetchBranding()
+    toast.add({ title: 'Standard-Logo wiederhergestellt', color: 'success' })
+  } catch (e: unknown) {
+    const err = e as { data?: { message?: string }, statusMessage?: string }
+    toast.add({
+      title: 'Logo konnte nicht zurückgesetzt werden',
+      description: err.data?.message || err.statusMessage,
+      color: 'error'
+    })
+  } finally {
+    removingLogo.value = false
+  }
+}
 
 async function fetchUsers() {
   loadingUsers.value = true
@@ -161,6 +270,74 @@ async function submitResetPassword() {
         Darstellung, Benutzer und Offline-Speicher
       </p>
     </div>
+
+    <UCard v-if="isAdmin">
+      <template #header>
+        <h2 class="font-medium">
+          Branding
+        </h2>
+      </template>
+
+      <div class="space-y-4">
+        <p class="text-sm text-muted">
+          Eigenes Logo für alle Benutzer als Navigations-Icon und Favicon. Empfohlen: quadratisches PNG oder SVG (max. 2 MB).
+        </p>
+
+        <div class="flex items-center gap-4">
+          <img
+            :src="branding.logoUrl"
+            alt="Aktuelles Logo"
+            class="h-16 w-16 rounded-lg object-contain bg-elevated border border-default"
+          >
+          <div class="text-sm text-muted">
+            {{ branding.hasCustomLogo ? 'Benutzerdefiniertes Logo aktiv' : 'Standard-Kirchen-Icon aktiv' }}
+          </div>
+        </div>
+
+        <div
+          class="border-2 border-dashed rounded-lg p-6 text-center transition-colors"
+          :class="logoDragOver ? 'border-primary bg-primary/5' : 'border-default'"
+          @dragover.prevent="logoDragOver = true"
+          @dragleave="logoDragOver = false"
+          @drop.prevent="onLogoDrop"
+        >
+          <FontAwesomeIcon
+            icon="upload"
+            class="text-2xl text-muted mb-2"
+          />
+          <p class="text-sm text-muted mb-4">
+            Logo hier ablegen oder auswählen (PNG, JPEG, WebP, SVG)
+          </p>
+          <div class="flex flex-wrap items-center justify-center gap-3">
+            <label>
+              <UButton
+                as="span"
+                :loading="uploadingLogo"
+                :disabled="uploadingLogo || removingLogo"
+              >
+                Logo hochladen
+              </UButton>
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/svg+xml,.png,.jpg,.jpeg,.webp,.svg"
+                class="hidden"
+                @change="onLogoFileChange"
+              >
+            </label>
+            <UButton
+              v-if="branding.hasCustomLogo"
+              variant="outline"
+              color="error"
+              :loading="removingLogo"
+              :disabled="uploadingLogo || removingLogo"
+              @click="resetLogo"
+            >
+              Standard wiederherstellen
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </UCard>
 
     <UCard v-if="isAdmin">
       <template #header>
@@ -338,16 +515,50 @@ async function submitResetPassword() {
           Darstellung
         </h2>
       </template>
-      <UFormField label="Farbschema">
-        <USelect
-          v-model="colorMode.preference"
-          :items="[
-            { label: 'System', value: 'system' },
-            { label: 'Hell', value: 'light' },
-            { label: 'Dunkel', value: 'dark' }
-          ]"
-        />
-      </UFormField>
+
+      <div class="space-y-6">
+        <UFormField label="Modus">
+          <USelect
+            v-model="colorMode.preference"
+            :items="appearanceItems"
+            :disabled="savingAppearance"
+          />
+        </UFormField>
+
+        <div>
+          <p class="text-sm font-medium mb-3">
+            Farbschema
+          </p>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <button
+              v-for="scheme in COLOR_SCHEMES"
+              :key="scheme.id"
+              type="button"
+              class="rounded-lg border p-4 text-left transition-colors"
+              :class="colorScheme === scheme.id
+                ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                : 'border-default hover:bg-elevated/50'"
+              :disabled="savingAppearance"
+              @click="selectColorScheme(scheme.id)"
+            >
+              <div class="flex items-center gap-3 mb-2">
+                <span
+                  v-for="(color, index) in scheme.preview"
+                  :key="index"
+                  class="h-6 w-6 rounded-full border border-default"
+                  :style="{ backgroundColor: color }"
+                />
+              </div>
+              <p class="font-medium">
+                {{ scheme.name }}
+              </p>
+              <p class="text-sm text-muted mt-1">
+                {{ scheme.description }}
+              </p>
+            </button>
+          </div>
+        </div>
+      </div>
     </UCard>
 
     <UCard>

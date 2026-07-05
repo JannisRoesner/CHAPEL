@@ -3,6 +3,9 @@ export default defineEventHandler(async (event) => {
   if (path.startsWith('/api/auth/login') || path.startsWith('/api/auth/logout') || path.startsWith('/api/auth/me')) {
     return
   }
+  if (path.startsWith('/api/branding')) {
+    return
+  }
   if (path.startsWith('/api/') || path.startsWith('/ws/')) {
     if (path.startsWith('/ws/')) {
       return

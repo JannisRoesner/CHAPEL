@@ -1,33 +1,43 @@
 <script setup lang="ts">
 import { APP_NAME, APP_TAGLINE } from '#shared/constants/app'
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   size?: 'sm' | 'lg'
   showTagline?: boolean
 }>(), {
   size: 'sm',
   showTagline: true
 })
+
+const { branding } = useBranding()
 </script>
 
 <template>
   <div class="flex items-center gap-2 min-w-0">
+    <img
+      v-if="branding.hasCustomLogo"
+      :src="branding.logoUrl"
+      :alt="APP_NAME"
+      class="rounded-md object-contain bg-elevated"
+      :class="props.size === 'lg' ? 'h-10 w-10' : 'h-8 w-8'"
+    >
     <FontAwesomeIcon
+      v-else
       icon="church"
       class="text-primary shrink-0"
-      :class="size === 'lg' ? 'text-2xl' : 'text-lg'"
+      :class="props.size === 'lg' ? 'text-2xl' : 'text-lg'"
     />
     <div class="leading-tight min-w-0">
       <div
         class="font-semibold"
-        :class="size === 'lg' ? 'text-xl' : 'text-lg'"
+        :class="props.size === 'lg' ? 'text-xl' : 'text-lg'"
       >
         {{ APP_NAME }}
       </div>
       <p
-        v-if="showTagline"
+        v-if="props.showTagline"
         class="text-muted leading-snug"
-        :class="size === 'lg' ? 'text-sm' : 'text-[10px] sm:text-[11px]'"
+        :class="props.size === 'lg' ? 'text-sm' : 'text-[10px] sm:text-[11px]'"
       >
         {{ APP_TAGLINE }}
       </p>

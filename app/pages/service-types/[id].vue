@@ -21,6 +21,8 @@ const pickerOpen = ref(false)
 const pickerTargetIndex = ref<number | null>(null)
 const pickerFilter = ref<'hymn' | 'liturgy'>('hymn')
 
+const { toggle, isPlaying } = useTrackPreview()
+
 async function load() {
   loading.value = true
   try {
@@ -218,6 +220,15 @@ async function save() {
                 {{ item.defaultTrack?.title || 'Kein Track gewählt' }}
               </p>
               <UButton
+                v-if="item.defaultTrackId"
+                variant="outline"
+                size="sm"
+                :aria-label="isPlaying(item.defaultTrackId) ? 'Wiedergabe stoppen' : 'Probehören'"
+                @click="toggle(item.defaultTrackId)"
+              >
+                <FontAwesomeIcon :icon="isPlaying(item.defaultTrackId) ? 'stop' : 'play'" />
+              </UButton>
+              <UButton
                 size="sm"
                 variant="outline"
                 @click="openPicker(index, item.kind)"
@@ -228,13 +239,23 @@ async function save() {
 
             <div
               v-else
-              class="text-sm text-muted"
+              class="flex items-center gap-3 text-sm text-muted"
             >
-              Optional: {{ item.defaultTrack?.title || 'Kein Standard-Lied' }}
+              <p class="flex-1 truncate">
+                Optional: {{ item.defaultTrack?.title || 'Kein Standard-Lied' }}
+              </p>
+              <UButton
+                v-if="item.defaultTrackId"
+                variant="outline"
+                size="sm"
+                :aria-label="isPlaying(item.defaultTrackId) ? 'Wiedergabe stoppen' : 'Probehören'"
+                @click="toggle(item.defaultTrackId)"
+              >
+                <FontAwesomeIcon :icon="isPlaying(item.defaultTrackId) ? 'stop' : 'play'" />
+              </UButton>
               <UButton
                 size="xs"
                 variant="ghost"
-                class="ml-2"
                 @click="openPicker(index, item.kind)"
               >
                 Standard setzen

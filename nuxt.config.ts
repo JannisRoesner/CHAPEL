@@ -17,7 +17,10 @@ export default defineNuxtConfig({
       title: 'CHAPEL',
       meta: [
         { name: 'description', content: 'Church Hymn Audio Playlist Engine for Liturgy' },
-        { name: 'theme-color', content: '#1e293b' }
+        { name: 'theme-color', content: '#00A155' }
+      ],
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
       ]
     }
   },
@@ -75,8 +78,8 @@ export default defineNuxtConfig({
       name: 'CHAPEL',
       short_name: 'CHAPEL',
       description: 'Church Hymn Audio Playlist Engine for Liturgy',
-      theme_color: '#1e293b',
-      background_color: '#0f172a',
+      theme_color: '#00A155',
+      background_color: '#1e293b',
       display: 'standalone',
       lang: 'de',
       icons: [

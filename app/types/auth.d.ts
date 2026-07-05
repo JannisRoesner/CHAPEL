@@ -5,6 +5,8 @@ declare module '#auth-utils' {
     name: string
     role: 'admin' | 'editor'
     mustChangePassword: boolean
+    colorScheme: import('#shared/constants/colorSchemes').ColorSchemeId
+    appearanceMode: import('#shared/constants/colorSchemes').AppearanceMode
   }
 }
 

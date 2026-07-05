@@ -20,6 +20,8 @@ export const users = pgTable('users', {
   name: text('name').notNull(),
   role: userRoleEnum('role').notNull().default('editor'),
   mustChangePassword: boolean('must_change_password').notNull().default(false),
+  colorScheme: text('color_scheme').notNull().default('chapel-green'),
+  appearanceMode: text('appearance_mode').notNull().default('system'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 })
 
