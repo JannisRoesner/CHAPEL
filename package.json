@@ -1,0 +1,45 @@
+{
+  "name": "CHAPEL",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:push": "drizzle-kit push",
+    "icons": "node scripts/generate-icons.mjs"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.3.0",
+    "@fortawesome/free-solid-svg-icons": "^7.3.0",
+    "@fortawesome/vue-fontawesome": "^3.3.0",
+    "@iconify-json/lucide": "^1.2.114",
+    "@iconify-json/simple-icons": "^1.2.87",
+    "@nuxt/ui": "^4.9.0",
+    "@pinia/nuxt": "^0.11.3",
+    "@vite-pwa/nuxt": "^1.1.1",
+    "@vueuse/core": "^14.3.0",
+    "bcryptjs": "^3.0.3",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.2",
+    "music-metadata": "^11.13.0",
+    "nuxt": "^4.4.8",
+    "nuxt-auth-utils": "^0.5.29",
+    "pinia": "^3.0.4",
+    "postgres": "^3.4.9",
+    "tailwindcss": "^4.3.1"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.16.0",
+    "@types/bcryptjs": "^2.4.6",
+    "dotenv": "^17.4.2",
+    "eslint": "^10.6.0",
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.3.5"
+  }
+}
