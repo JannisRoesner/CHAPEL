@@ -75,18 +75,19 @@ function onSelectStep(index: number) {
 
 <template>
   <div class="min-h-screen flex flex-col">
-    <header class="flex items-center justify-between px-4 py-3 border-b border-default">
+    <header class="flex items-center justify-between px-4 py-3 border-b border-default overflow-x-clip">
       <UButton
         to="/playback"
         variant="ghost"
         size="sm"
+        class="shrink-0"
       >
         ← Auswahl
       </UButton>
-      <h1 class="font-semibold truncate px-4">
+      <h1 class="flex-1 min-w-0 font-semibold truncate px-4 text-center">
         {{ serviceName }}
       </h1>
-      <UiThemeToggle />
+      <UiThemeToggle class="shrink-0" />
     </header>
 
     <div

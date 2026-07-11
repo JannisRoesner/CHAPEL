@@ -68,11 +68,11 @@ const showProgress = computed(() => Boolean(props.step?.trackId))
       {{ formatDuration(elapsedMs) }} / {{ formatDuration(totalDurationMs) }}
     </p>
 
-    <div class="flex items-center justify-center gap-4">
+    <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
       <UButton
         size="xl"
         color="primary"
-        class="min-w-32 min-h-16 text-lg"
+        class="min-w-0 flex-1 sm:min-w-32 min-h-16 text-lg"
         :disabled="!step?.trackId"
         @click="$emit('togglePlay')"
       >
@@ -85,7 +85,7 @@ const showProgress = computed(() => Boolean(props.step?.trackId))
       <UButton
         size="xl"
         variant="outline"
-        class="min-w-32 min-h-16 text-lg"
+        class="min-w-0 flex-1 sm:min-w-32 min-h-16 text-lg"
         @click="$emit('next')"
       >
         <FontAwesomeIcon

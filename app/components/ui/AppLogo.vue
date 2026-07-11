@@ -4,9 +4,11 @@ import { APP_NAME, APP_TAGLINE } from '#shared/constants/app'
 const props = withDefaults(defineProps<{
   size?: 'sm' | 'lg'
   showTagline?: boolean
+  compact?: boolean
 }>(), {
   size: 'sm',
-  showTagline: true
+  showTagline: true,
+  compact: false
 })
 
 const { branding } = useBranding()
@@ -35,7 +37,10 @@ const { branding } = useBranding()
       <p
         v-if="props.showTagline"
         class="text-muted leading-snug"
-        :class="props.size === 'lg' ? 'text-sm' : 'text-[10px] sm:text-[11px]'"
+        :class="[
+          props.size === 'lg' ? 'text-sm' : 'text-[10px] sm:text-[11px]',
+          props.compact ? 'hidden md:block' : ''
+        ]"
       >
         {{ APP_TAGLINE }}
       </p>

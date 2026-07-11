@@ -6,6 +6,8 @@ const route = useRoute()
 const mobileMenuOpen = ref(false)
 const { user, loggedIn } = useUserSession()
 
+const mobileNavItemClass = 'justify-start gap-3 min-h-11 py-3 px-4 text-base'
+
 useHead({
   htmlAttrs: {
     lang: 'de'
@@ -17,25 +19,26 @@ watch(() => route.path, () => {
 })
 
 async function logout() {
+  mobileMenuOpen.value = false
   await $fetch('/api/auth/logout', { method: 'POST' })
   await navigateTo('/login')
 }
 
-function openMobileMenu() {
-  mobileMenuOpen.value = true
+function cycleTheme() {
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
 }
 </script>
 
 <template>
   <UApp :class="colorMode.value">
     <div class="min-h-screen bg-default text-default grid grid-rows-[auto_1fr_auto]">
-      <header class="border-b border-default bg-elevated/80 backdrop-blur sticky top-0 z-50">
-        <div class="w-full max-w-6xl mx-auto px-4 min-h-14 py-2 flex items-center justify-between gap-4">
+      <header class="border-b border-default bg-elevated/80 backdrop-blur sticky top-0 z-50 overflow-x-clip">
+        <div class="w-full max-w-6xl mx-auto px-4 min-h-14 py-2 flex flex-wrap items-center gap-x-4 gap-y-2">
           <NuxtLink
             :to="DEFAULT_ROUTE"
-            class="shrink-0 min-w-0"
+            class="flex-1 min-w-0"
           >
-            <UiAppLogo />
+            <UiAppLogo compact />
           </NuxtLink>
 
           <nav class="hidden md:flex items-center gap-1">
@@ -56,21 +59,13 @@ function openMobileMenu() {
             </UButton>
           </nav>
 
-          <div class="flex items-center gap-2 shrink-0">
-            <UButton
-              class="md:hidden"
-              variant="ghost"
-              size="sm"
-              aria-label="Menü öffnen"
-              @click="openMobileMenu"
-            >
-              <FontAwesomeIcon icon="bars" />
-            </UButton>
+          <div class="hidden md:flex items-center gap-2 shrink-0">
             <UiThemeToggle />
             <UButton
               v-if="loggedIn"
               variant="ghost"
               size="sm"
+              aria-label="Abmelden"
               @click="logout"
             >
               <FontAwesomeIcon icon="sign-out-alt" />
@@ -84,33 +79,69 @@ function openMobileMenu() {
               Anmelden
             </UButton>
           </div>
-        </div>
-      </header>
 
-      <USlideover
-        v-model:open="mobileMenuOpen"
-        title="Menü"
-      >
-        <template #body>
-          <nav class="flex flex-col gap-1">
+          <UiMobileNavPanel v-model:open="mobileMenuOpen">
             <UButton
               v-for="item in APP_NAV_ITEMS"
               :key="item.to"
               :to="item.to"
               variant="ghost"
               block
-              class="justify-start gap-3"
+              :class="mobileNavItemClass"
               :color="item.primary ? 'primary' : undefined"
             >
               <FontAwesomeIcon
                 :icon="item.icon"
-                class="size-4 shrink-0 opacity-70"
+                class="size-5 shrink-0 opacity-70"
               />
               {{ item.label }}
             </UButton>
-          </nav>
-        </template>
-      </USlideover>
+
+            <template #footer>
+              <UButton
+                variant="ghost"
+                block
+                :class="mobileNavItemClass"
+                :aria-label="colorMode.value === 'dark' ? 'Hellmodus' : 'Dunkelmodus'"
+                @click="cycleTheme"
+              >
+                <FontAwesomeIcon
+                  :icon="colorMode.value === 'dark' ? 'sun' : 'moon'"
+                  class="size-5 shrink-0 opacity-70"
+                />
+                {{ colorMode.value === 'dark' ? 'Hellmodus' : 'Dunkelmodus' }}
+              </UButton>
+              <UButton
+                v-if="loggedIn"
+                variant="ghost"
+                block
+                :class="mobileNavItemClass"
+                aria-label="Abmelden"
+                @click="logout"
+              >
+                <FontAwesomeIcon
+                  icon="sign-out-alt"
+                  class="size-5 shrink-0 opacity-70"
+                />
+                Abmelden
+              </UButton>
+              <UButton
+                v-else
+                to="/login"
+                variant="ghost"
+                block
+                :class="mobileNavItemClass"
+              >
+                <FontAwesomeIcon
+                  icon="sign-in-alt"
+                  class="size-5 shrink-0 opacity-70"
+                />
+                Anmelden
+              </UButton>
+            </template>
+          </UiMobileNavPanel>
+        </div>
+      </header>
 
       <main class="w-full max-w-6xl mx-auto px-4 py-6">
         <slot />
