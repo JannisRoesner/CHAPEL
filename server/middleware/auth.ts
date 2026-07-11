@@ -6,6 +6,9 @@ export default defineEventHandler(async (event) => {
   if (path.startsWith('/api/branding')) {
     return
   }
+  if (path.startsWith('/api/legal')) {
+    return
+  }
   if (path.startsWith('/api/') || path.startsWith('/ws/')) {
     if (path.startsWith('/ws/')) {
       return

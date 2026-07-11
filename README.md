@@ -2,7 +2,7 @@
 
 **Church Hymn Audio Playlist Engine for Liturgy**
 
-CHAPEL ist eine moderne Web-App zur Verwaltung und touch-gesteuerten Wiedergabe von Gottesdienst-Playlists. Liturgieelemente sind fix, Lieder frei austauschbar. Mehrere Nutzer können gleichzeitig an der Bibliothek arbeiten (Echtzeit-Sync).
+CHAPEL ist eine moderne Web-App zur Verwaltung und touch-gesteuerten Wiedergabe von Gottesdienst-Playlists. Liturgieelemente sind fix, Lieder frei austauschbar. Mehrere Nutzer können parallel arbeiten; die Audiobibliothek und Gottesdienst-Übersicht aktualisieren sich dabei automatisch.
 
 ## Funktionen
 
@@ -10,11 +10,13 @@ CHAPEL ist eine moderne Web-App zur Verwaltung und touch-gesteuerten Wiedergabe 
 - Gottesdienst-Typen als Vorlagen (Liturgie + Lied-Slots)
 - Konkrete Gottesdienste aus Vorlagen erstellen und Lied-Slots befüllen
 - Touch-minimale Wiedergabe: Play → Stopp nach Titel → nächster Titel per Knopf
-- Echtzeit-Updates via WebSocket
+- Automatische Listen-Aktualisierung via WebSocket (Bibliothek, Gottesdienst-Übersicht)
 - PWA mit Offline-Cache für Gottesdienste
 - Benutzerverwaltung (Admin: Anlegen und Rollen zuweisen)
 - Hell/Dunkel-Modus, Font Awesome Icons
 - Docker-Deployment (eine Gemeinde pro Installation)
+
+Detail-Ansichten (Gottesdienst-Editor, Vorlagen-Editor) laden Änderungen anderer Nutzer nicht live nach.
 
 ## Tech-Stack
 
@@ -61,7 +63,7 @@ npm run db:migrate
 npm run dev
 ```
 
-App: http://localhost:3000
+App: http://localhost:3001
 
 Standard-Login (nach Seed): Werte aus `ADMIN_EMAIL` und `ADMIN_PASSWORD` in `.env` (Default in `.env.example`: `admin@example.com` / `changeme`)
 
@@ -111,6 +113,7 @@ scripts/       # Migration, Icon-Generierung
 
 | Route | Beschreibung |
 |---|---|
+| `/` | Landing-Page (öffentlich; eingeloggte Nutzer → `/playback`) |
 | `/login` | Anmeldung |
 | `/library` | MP3-Bibliothek |
 | `/service-types` | Gottesdienst-Vorlagen |

@@ -66,6 +66,9 @@ const personalItems = computed(() =>
         <template #branding>
           <SettingsBrandingSection />
         </template>
+        <template #legal>
+          <SettingsLegalSection />
+        </template>
         <template #users>
           <SettingsUsersSection />
         </template>

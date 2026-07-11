@@ -5,6 +5,7 @@ export const SETTINGS_SECTION_IDS = {
   password: 'password',
   offline: 'offline',
   branding: 'branding',
+  legal: 'legal',
   users: 'users'
 } as const
 
@@ -42,6 +43,12 @@ export const ADMIN_SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
     value: SETTINGS_SECTION_IDS.branding,
     slot: SETTINGS_SECTION_IDS.branding,
     icon: 'i-lucide-image'
+  },
+  {
+    label: 'Rechtliches',
+    value: SETTINGS_SECTION_IDS.legal,
+    slot: SETTINGS_SECTION_IDS.legal,
+    icon: 'i-lucide-scale'
   },
   {
     label: 'Benutzerverwaltung',

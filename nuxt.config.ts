@@ -12,6 +12,10 @@ export default defineNuxtConfig({
     enabled: true
   },
 
+  devServer: {
+    port: 3001
+  },
+
   app: {
     head: {
       title: 'CHAPEL',
@@ -38,7 +42,10 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    '/': { ssr: true },
     '/login': { ssr: false },
+    '/impressum': { ssr: true },
+    '/datenschutz': { ssr: true },
     '/playback/**': { ssr: false }
   },
 

@@ -1,8 +1,10 @@
-export default defineNuxtRouteMiddleware(async (to) => {
-  if (to.path === '/login') return
+import { PUBLIC_PATHS } from '#shared/constants/legal'
 
+export default defineNuxtRouteMiddleware(async (to) => {
   const { loggedIn, fetch: fetchSession } = useUserSession()
   await fetchSession()
+
+  if (PUBLIC_PATHS.includes(to.path as typeof PUBLIC_PATHS[number])) return
 
   // #region agent log
   if (import.meta.client) {

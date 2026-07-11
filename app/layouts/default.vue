@@ -4,7 +4,7 @@ import { APP_NAV_ITEMS, DEFAULT_ROUTE } from '#shared/constants/app'
 const colorMode = useColorMode()
 const route = useRoute()
 const mobileMenuOpen = ref(false)
-const { user } = useUserSession()
+const { user, loggedIn } = useUserSession()
 
 useHead({
   htmlAttrs: {
@@ -28,9 +28,9 @@ function openMobileMenu() {
 
 <template>
   <UApp :class="colorMode.value">
-    <div class="min-h-screen bg-default text-default">
+    <div class="min-h-screen bg-default text-default grid grid-rows-[auto_1fr_auto]">
       <header class="border-b border-default bg-elevated/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 min-h-14 py-2 flex items-center justify-between gap-4">
+        <div class="w-full max-w-6xl mx-auto px-4 min-h-14 py-2 flex items-center justify-between gap-4">
           <NuxtLink
             :to="DEFAULT_ROUTE"
             class="shrink-0 min-w-0"
@@ -68,11 +68,20 @@ function openMobileMenu() {
             </UButton>
             <UiThemeToggle />
             <UButton
+              v-if="loggedIn"
               variant="ghost"
               size="sm"
               @click="logout"
             >
               <FontAwesomeIcon icon="sign-out-alt" />
+            </UButton>
+            <UButton
+              v-else
+              to="/login"
+              variant="ghost"
+              size="sm"
+            >
+              Anmelden
             </UButton>
           </div>
         </div>
@@ -103,9 +112,16 @@ function openMobileMenu() {
         </template>
       </USlideover>
 
-      <main class="max-w-6xl mx-auto px-4 py-6">
+      <main class="w-full max-w-6xl mx-auto px-4 py-6">
         <slot />
       </main>
+
+      <footer class="border-t border-default bg-elevated/30">
+        <div class="w-full max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted">
+          <p>© {{ new Date().getFullYear() }} CHAPEL</p>
+          <LegalFooterLinks />
+        </div>
+      </footer>
 
       <AuthChangePasswordModal v-if="user?.mustChangePassword" />
     </div>
