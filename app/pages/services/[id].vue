@@ -13,6 +13,7 @@ const saveState = ref<'idle' | 'saving' | 'saved' | 'error'>('idle')
 const pickerOpen = ref(false)
 const pickerItemId = ref<number | null>(null)
 const isCached = ref(false)
+const isCacheStaleFlag = ref(false)
 const trackPreview = useTrackPreview()
 
 let savedResetTimer: ReturnType<typeof setTimeout> | undefined
@@ -22,6 +23,11 @@ async function load() {
   try {
     service.value = await $fetch<ServiceDto>(`/api/services/${id}`)
     isCached.value = await isServiceCached(id)
+    if (isCached.value && service.value) {
+      isCacheStaleFlag.value = await offlineCache.isCacheStale(id, service.value.updatedAt)
+    } else {
+      isCacheStaleFlag.value = false
+    }
   } finally {
     loading.value = false
   }
@@ -66,9 +72,34 @@ async function onTrackSelected(track: TrackDto) {
 
 async function prepareOffline() {
   if (!service.value) return
-  await prepareService(id, service.value.name)
-  isCached.value = true
-  toast.add({ title: 'Offline vorbereitet', color: 'success' })
+  const result = await prepareService(
+    id,
+    service.value.name,
+    service.value.serviceDate,
+    service.value.updatedAt
+  )
+
+  if (result.success) {
+    isCached.value = true
+    isCacheStaleFlag.value = false
+    toast.add({ title: 'Offline vorbereitet', color: 'success' })
+  } else if (result.cachedTracks > 0) {
+    isCached.value = false
+    toast.add({
+      title: 'Teilweise vorbereitet',
+      description: `${result.cachedTracks} von ${result.totalTracks} Tracks zwischengespeichert`,
+      color: 'warning'
+    })
+  } else {
+    isCached.value = false
+    toast.add({
+      title: 'Vorbereitung fehlgeschlagen',
+      description: result.totalTracks > 0
+        ? 'Keine Audiodateien konnten gespeichert werden'
+        : undefined,
+      color: 'error'
+    })
+  }
 }
 </script>
 
@@ -124,12 +155,20 @@ async function prepareOffline() {
           Fehler beim Speichern
         </p>
         <UBadge
-          v-if="isCached"
+          v-if="isCached && !isCacheStaleFlag"
           color="success"
           variant="subtle"
           class="mt-2"
         >
           Offline bereit
+        </UBadge>
+        <UBadge
+          v-if="isCached && isCacheStaleFlag"
+          color="warning"
+          variant="subtle"
+          class="mt-2"
+        >
+          Cache veraltet — erneut vorbereiten
         </UBadge>
       </div>
       <div class="flex gap-2">

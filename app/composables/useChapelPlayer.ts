@@ -1,5 +1,7 @@
 import type { PlaylistStepDto } from '#shared/types/chapel'
 
+import { AUDIO_CACHE_NAME } from '~/composables/useOfflineCache'
+
 export type PlayerState = 'idle' | 'playing' | 'paused' | 'pausedAfterTrack'
 
 export function useChapelPlayer() {
@@ -59,7 +61,7 @@ export function useChapelPlayer() {
 
     if ('caches' in window) {
       try {
-        const cache = await caches.open('chapel-audio-v1')
+        const cache = await caches.open(AUDIO_CACHE_NAME)
         const cached = await cache.match(step.streamUrl)
         if (cached) {
           const blob = await cached.blob()

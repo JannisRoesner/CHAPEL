@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import type { PlaylistStepDto } from '#shared/types/chapel'
-
 definePageMeta({
   layout: 'playback'
 })
 
 const route = useRoute()
 const id = Number(route.params.id)
+const offlineCache = useOfflineCache()
 
 const {
   playlist,
@@ -25,7 +24,9 @@ const {
 } = useChapelPlayer()
 
 const loading = ref(true)
+const loadError = ref<string | null>(null)
 const serviceName = ref('')
+const offlineBanner = ref<string | null>(null)
 const playedIndices = ref<number[]>([])
 
 watch(lastFinishedIndex, (idx) => {
@@ -36,13 +37,30 @@ watch(lastFinishedIndex, (idx) => {
 
 async function load() {
   loading.value = true
+  loadError.value = null
+  offlineBanner.value = null
+
   try {
-    const [steps, service] = await Promise.all([
-      $fetch<PlaylistStepDto[]>(`/api/services/${id}/playlist`),
-      $fetch<{ name: string }>(`/api/services/${id}`)
-    ])
-    serviceName.value = service.name
-    await loadPlaylist(steps)
+    const result = await offlineCache.loadServiceForPlayback(id)
+
+    if (result.error) {
+      loadError.value = result.error
+      return
+    }
+
+    serviceName.value = result.serviceName
+    await loadPlaylist(result.playlist)
+
+    if (result.source === 'cache' && result.cachedAt) {
+      const date = new Date(result.cachedAt).toLocaleString('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+      offlineBanner.value = `Offline-Modus — vorbereitete Version vom ${date}`
+    }
   } finally {
     loading.value = false
   }
@@ -82,9 +100,30 @@ function onSelectStep(index: number) {
     </div>
 
     <div
+      v-else-if="loadError"
+      class="flex-1 flex items-center justify-center p-4"
+    >
+      <UEmpty
+        :title="loadError"
+        description="Öffnen Sie den Gottesdienst einmal online und nutzen Sie „Offline vorbereiten“."
+      >
+        <UButton to="/playback">
+          Zur Auswahl
+        </UButton>
+      </UEmpty>
+    </div>
+
+    <div
       v-else
       class="flex-1 flex flex-col gap-6 p-4 max-w-5xl mx-auto w-full"
     >
+      <UAlert
+        v-if="offlineBanner"
+        color="warning"
+        variant="subtle"
+        :description="offlineBanner"
+      />
+
       <PlaybackNowPlayingBar
         :step="currentStep"
         :state="state"

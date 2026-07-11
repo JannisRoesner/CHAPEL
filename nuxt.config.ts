@@ -104,13 +104,14 @@ export default defineNuxtConfig({
     },
     workbox: {
       globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-      navigateFallback: undefined,
+      navigateFallback: '/',
+      navigateFallbackDenylist: [/^\/api\//],
       runtimeCaching: [
         {
           urlPattern: /^\/api\/tracks\/\d+\/stream$/,
           handler: 'CacheFirst',
           options: {
-            cacheName: 'chapel-audio-v2',
+            cacheName: 'chapel-audio-v1',
             expiration: {
               maxEntries: 200,
               maxAgeSeconds: 60 * 60 * 24 * 30
