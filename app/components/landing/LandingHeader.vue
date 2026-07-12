@@ -4,6 +4,7 @@ import { DEFAULT_ROUTE } from '#shared/constants/app'
 const appearanceOpen = ref(false)
 const mobileMenuOpen = ref(false)
 const { loggedIn } = useUserSession()
+const { openLoginModal } = useLoginModal()
 
 const mobileNavItemClass = 'justify-start gap-3 min-h-11 py-3 px-4 text-base'
 
@@ -69,10 +70,10 @@ function scrollToSection(id: string) {
         </UButton>
         <UButton
           v-else
-          to="/login"
           color="primary"
           size="sm"
           class="justify-center"
+          @click="openLoginModal"
         >
           Anmelden
         </UButton>
@@ -134,11 +135,10 @@ function scrollToSection(id: string) {
           </UButton>
           <UButton
             v-else
-            to="/login"
             variant="ghost"
             block
             :class="mobileNavItemClass"
-            @click="closeMobileMenu"
+            @click="closeMobileMenu(); openLoginModal()"
           >
             <FontAwesomeIcon
               icon="sign-in-alt"

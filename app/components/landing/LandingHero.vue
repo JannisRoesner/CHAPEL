@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { LOGIN_PATH } from '#shared/constants/app'
+</script>
+
 <template>
   <section class="relative overflow-hidden py-20 md:py-28">
     <div
@@ -20,7 +24,7 @@
       </p>
 
       <UButton
-        to="/login"
+        :to="LOGIN_PATH"
         color="primary"
         size="xl"
         class="min-w-40 justify-center"

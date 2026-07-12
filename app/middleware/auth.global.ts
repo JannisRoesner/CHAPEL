@@ -1,4 +1,5 @@
 import { PUBLIC_PATHS } from '#shared/constants/legal'
+import { LOGIN_ROUTE } from '#shared/constants/app'
 
 const PLAYBACK_ROUTE = /^\/playback(\/\d+)?$/
 
@@ -20,7 +21,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     : true
 
   if (isOnline) {
-    return navigateTo('/login')
+    return navigateTo(LOGIN_ROUTE)
   }
 
   if (import.meta.client && PLAYBACK_ROUTE.test(to.path)) {
@@ -32,5 +33,5 @@ export default defineNuxtRouteMiddleware(async (to) => {
     if (hadSession()) return
   }
 
-  return navigateTo('/login')
+  return navigateTo(LOGIN_ROUTE)
 })

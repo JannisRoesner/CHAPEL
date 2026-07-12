@@ -39,7 +39,7 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': { ssr: true },
-    '/login': { ssr: false },
+    '/login': { redirect: { to: '/?login=1', statusCode: 302 } },
     '/impressum': { ssr: true },
     '/datenschutz': { ssr: true },
     '/playback/**': { ssr: false }

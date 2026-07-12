@@ -1,5 +1,10 @@
+import type { RouteLocationRaw } from 'vue-router'
+
 export const APP_NAME = 'CHAPEL'
 export const APP_TAGLINE = 'Church Hymn Audio Playlist Engine for Liturgy'
+export const LOGIN_QUERY = { login: '1' } as const
+export const LOGIN_PATH = '/?login=1'
+export const LOGIN_ROUTE: RouteLocationRaw = { path: '/', query: LOGIN_QUERY }
 export const DEFAULT_ROUTE = '/playback'
 
 export interface AppNavItem {

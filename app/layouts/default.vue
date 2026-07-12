@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { APP_NAV_ITEMS, DEFAULT_ROUTE } from '#shared/constants/app'
+import { APP_NAV_ITEMS, DEFAULT_ROUTE, LOGIN_PATH } from '#shared/constants/app'
 
 const colorMode = useColorMode()
 const route = useRoute()
@@ -22,7 +22,7 @@ async function logout() {
   mobileMenuOpen.value = false
   useOfflineSession().clearHadSession()
   await $fetch('/api/auth/logout', { method: 'POST' })
-  await navigateTo('/login')
+  await navigateTo('/')
 }
 
 function cycleTheme() {
@@ -73,7 +73,7 @@ function cycleTheme() {
             </UButton>
             <UButton
               v-else
-              to="/login"
+              :to="LOGIN_PATH"
               variant="ghost"
               size="sm"
             >
@@ -128,7 +128,7 @@ function cycleTheme() {
               </UButton>
               <UButton
                 v-else
-                to="/login"
+                :to="LOGIN_PATH"
                 variant="ghost"
                 block
                 :class="mobileNavItemClass"

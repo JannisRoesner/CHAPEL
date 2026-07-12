@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { LOGIN_PATH } from '#shared/constants/app'
+</script>
+
 <template>
   <section class="py-16 md:py-20 bg-elevated/30">
     <div class="max-w-6xl mx-auto px-4 text-center">
@@ -8,7 +12,7 @@
         Melden Sie sich an und starten Sie mit der Wiedergabe.
       </p>
       <UButton
-        to="/login"
+        :to="LOGIN_PATH"
         color="primary"
         size="xl"
         class="min-w-40 justify-center"

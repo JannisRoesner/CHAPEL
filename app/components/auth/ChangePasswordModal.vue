@@ -32,7 +32,7 @@ async function save() {
 
 async function logout() {
   await $fetch('/api/auth/logout', { method: 'POST' })
-  await navigateTo('/login')
+  await navigateTo('/')
 }
 </script>
 

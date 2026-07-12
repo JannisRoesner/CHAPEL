@@ -44,6 +44,8 @@ const previewById: Record<string, Component> = {
   'realtime': LandingPreviewRealtime,
   'offline': LandingPreviewOffline
 }
+
+const { open: loginOpen } = useLoginModal()
 </script>
 
 <template>
@@ -84,5 +86,7 @@ const previewById: Record<string, Component> = {
     <LandingFeatureGrid />
     <LandingWorkflow />
     <LandingCta />
+
+    <AuthLoginModal v-model:open="loginOpen" />
   </div>
 </template>
