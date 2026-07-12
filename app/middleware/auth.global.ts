@@ -27,6 +27,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const offlineCache = useOfflineCache()
     const cached = await offlineCache.getCachedServices()
     if (cached.length > 0) return
+
+    const { hadSession } = useOfflineSession()
+    if (hadSession()) return
   }
 
   return navigateTo('/login')

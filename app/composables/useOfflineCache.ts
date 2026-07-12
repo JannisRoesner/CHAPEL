@@ -4,7 +4,7 @@ export const AUDIO_CACHE_NAME = 'chapel-audio-v1'
 
 const DB_NAME = 'chapel-offline'
 const STORE_NAME = 'services'
-const DB_VERSION = 2
+const DB_VERSION = 3
 
 export interface OfflineServiceRecord {
   serviceId: number
@@ -13,6 +13,9 @@ export interface OfflineServiceRecord {
   updatedAt?: string
   cachedAt: string
   playlist: PlaylistStepDto[]
+  cachedTracks: number
+  totalTracks: number
+  isPartial: boolean
 }
 
 export interface CachedServiceSummary {
@@ -21,10 +24,14 @@ export interface CachedServiceSummary {
   serviceDate: string | null
   cachedAt: string
   updatedAt: string | null
+  cachedTracks: number
+  totalTracks: number
+  isPartial: boolean
 }
 
 export interface PrepareServiceResult {
   success: boolean
+  partial: boolean
   cachedTracks: number
   totalTracks: number
 }
@@ -36,6 +43,19 @@ export interface PlaybackLoadResult {
   source: 'api' | 'cache'
   cachedAt: string | null
   error: string | null
+  partial: boolean
+  cachedTracks: number
+  totalTracks: number
+}
+
+function normalizeRecord(record: OfflineServiceRecord): OfflineServiceRecord {
+  const trackCount = record.playlist.filter(step => step.streamUrl).length
+  return {
+    ...record,
+    cachedTracks: record.cachedTracks ?? trackCount,
+    totalTracks: record.totalTracks ?? trackCount,
+    isPartial: record.isPartial ?? false
+  }
 }
 
 function openDb(): Promise<IDBDatabase> {
@@ -59,7 +79,7 @@ async function getAllRecords(): Promise<OfflineServiceRecord[]> {
   const store = tx.objectStore(STORE_NAME)
   return new Promise((resolve, reject) => {
     const req = store.getAll()
-    req.onsuccess = () => resolve(req.result as OfflineServiceRecord[])
+    req.onsuccess = () => resolve((req.result as OfflineServiceRecord[]).map(normalizeRecord))
     req.onerror = () => reject(req.error)
   })
 }
@@ -71,7 +91,10 @@ async function getRecord(serviceId: number): Promise<OfflineServiceRecord | null
   const store = tx.objectStore(STORE_NAME)
   return new Promise((resolve, reject) => {
     const req = store.get(serviceId)
-    req.onsuccess = () => resolve((req.result as OfflineServiceRecord | undefined) ?? null)
+    req.onsuccess = () => {
+      const record = req.result as OfflineServiceRecord | undefined
+      resolve(record ? normalizeRecord(record) : null)
+    }
     req.onerror = () => reject(req.error)
   })
 }
@@ -84,6 +107,28 @@ async function putRecord(record: OfflineServiceRecord): Promise<void> {
     tx.oncomplete = () => resolve()
     tx.onerror = () => reject(tx.error)
   })
+}
+
+async function isStreamUrlCached(streamUrl: string): Promise<boolean> {
+  const cache = await caches.open(AUDIO_CACHE_NAME)
+  const match = await cache.match(streamUrl)
+  return match !== undefined
+}
+
+async function filterPlaylistToCachedTracks(playlist: PlaylistStepDto[]): Promise<PlaylistStepDto[]> {
+  const filtered: PlaylistStepDto[] = []
+
+  for (const step of playlist) {
+    if (!step.streamUrl) {
+      filtered.push(step)
+      continue
+    }
+    if (await isStreamUrlCached(step.streamUrl)) {
+      filtered.push(step)
+    }
+  }
+
+  return filtered
 }
 
 async function cachePlaylistAudio(
@@ -120,6 +165,28 @@ async function cachePlaylistAudio(
   return { cachedTracks, totalTracks }
 }
 
+function buildOfflineRecord(
+  serviceId: number,
+  serviceName: string,
+  serviceDate: string,
+  updatedAt: string,
+  playlist: PlaylistStepDto[],
+  cachedTracks: number,
+  totalTracks: number
+): OfflineServiceRecord {
+  return {
+    serviceId,
+    serviceName,
+    serviceDate,
+    updatedAt,
+    cachedAt: new Date().toISOString(),
+    playlist,
+    cachedTracks,
+    totalTracks,
+    isPartial: cachedTracks < totalTracks
+  }
+}
+
 export function useOfflineCache() {
   const preparing = ref(false)
   const progress = ref(0)
@@ -138,7 +205,10 @@ export function useOfflineCache() {
       serviceName: r.serviceName,
       serviceDate: r.serviceDate ?? null,
       cachedAt: r.cachedAt,
-      updatedAt: r.updatedAt ?? null
+      updatedAt: r.updatedAt ?? null,
+      cachedTracks: r.cachedTracks,
+      totalTracks: r.totalTracks,
+      isPartial: r.isPartial
     }))
   }
 
@@ -164,7 +234,7 @@ export function useOfflineCache() {
     updatedAt: string
   ): Promise<PrepareServiceResult> {
     if (!import.meta.client) {
-      return { success: false, cachedTracks: 0, totalTracks: 0 }
+      return { success: false, partial: false, cachedTracks: 0, totalTracks: 0 }
     }
 
     preparing.value = true
@@ -176,21 +246,23 @@ export function useOfflineCache() {
         progress.value = p
       })
 
-      const success = cachedTracks === totalTracks
+      const success = cachedTracks === totalTracks && totalTracks > 0
+      const partial = cachedTracks > 0 && !success
 
-      if (success) {
-        await putRecord({
+      if (cachedTracks > 0) {
+        await putRecord(buildOfflineRecord(
           serviceId,
           serviceName,
           serviceDate,
           updatedAt,
-          cachedAt: new Date().toISOString(),
-          playlist
-        })
+          playlist,
+          cachedTracks,
+          totalTracks
+        ))
         await refreshCachedList()
       }
 
-      return { success, cachedTracks, totalTracks }
+      return { success, partial, cachedTracks, totalTracks }
     } finally {
       preparing.value = false
       progress.value = 0
@@ -205,7 +277,10 @@ export function useOfflineCache() {
         serviceDate: null,
         source: 'cache',
         cachedAt: null,
-        error: 'Nur im Browser verfügbar'
+        error: 'Nur im Browser verfügbar',
+        partial: false,
+        cachedTracks: 0,
+        totalTracks: 0
       }
     }
 
@@ -219,15 +294,16 @@ export function useOfflineCache() {
         ])
 
         const { cachedTracks, totalTracks } = await cachePlaylistAudio(playlist)
-        if (cachedTracks === totalTracks) {
-          await putRecord({
+        if (cachedTracks > 0) {
+          await putRecord(buildOfflineRecord(
             serviceId,
-            serviceName: service.name,
-            serviceDate: service.serviceDate,
-            updatedAt: service.updatedAt,
-            cachedAt: new Date().toISOString(),
-            playlist
-          })
+            service.name,
+            service.serviceDate,
+            service.updatedAt,
+            playlist,
+            cachedTracks,
+            totalTracks
+          ))
           await refreshCachedList()
         }
 
@@ -237,7 +313,10 @@ export function useOfflineCache() {
           serviceDate: service.serviceDate,
           source: 'api',
           cachedAt: null,
-          error: null
+          error: null,
+          partial: false,
+          cachedTracks,
+          totalTracks
         }
       } catch {
         return null
@@ -255,17 +334,28 @@ export function useOfflineCache() {
         serviceDate: null,
         source: 'cache',
         cachedAt: null,
-        error: 'Gottesdienst nicht offline vorbereitet'
+        error: 'Gottesdienst nicht offline vorbereitet',
+        partial: false,
+        cachedTracks: 0,
+        totalTracks: 0
       }
     }
 
+    let playlist = record.playlist
+    if (record.isPartial) {
+      playlist = await filterPlaylistToCachedTracks(record.playlist)
+    }
+
     return {
-      playlist: record.playlist,
+      playlist,
       serviceName: record.serviceName,
       serviceDate: record.serviceDate ?? null,
       source: 'cache',
       cachedAt: record.cachedAt,
-      error: null
+      error: null,
+      partial: record.isPartial,
+      cachedTracks: record.cachedTracks,
+      totalTracks: record.totalTracks
     }
   }
 

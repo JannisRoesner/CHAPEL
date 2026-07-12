@@ -27,6 +27,7 @@ const loading = ref(true)
 const loadError = ref<string | null>(null)
 const serviceName = ref('')
 const offlineBanner = ref<string | null>(null)
+const partialBanner = ref<string | null>(null)
 const playedIndices = ref<number[]>([])
 
 watch(lastFinishedIndex, (idx) => {
@@ -39,6 +40,7 @@ async function load() {
   loading.value = true
   loadError.value = null
   offlineBanner.value = null
+  partialBanner.value = null
 
   try {
     const result = await offlineCache.loadServiceForPlayback(id)
@@ -60,6 +62,10 @@ async function load() {
         minute: '2-digit'
       })
       offlineBanner.value = `Offline-Modus — vorbereitete Version vom ${date}`
+    }
+
+    if (result.partial) {
+      partialBanner.value = `Nur ${result.cachedTracks} von ${result.totalTracks} Tracks offline verfügbar`
     }
   } finally {
     loading.value = false
@@ -123,6 +129,13 @@ function onSelectStep(index: number) {
         color="warning"
         variant="subtle"
         :description="offlineBanner"
+      />
+
+      <UAlert
+        v-if="partialBanner"
+        color="warning"
+        variant="subtle"
+        :description="partialBanner"
       />
 
       <PlaybackNowPlayingBar

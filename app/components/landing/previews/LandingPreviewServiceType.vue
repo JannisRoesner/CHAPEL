@@ -20,7 +20,10 @@ import { DEMO_SERVICE_TYPE_ITEMS } from '#shared/constants/landingDemo'
           disabled
           class="p-0.5 min-w-0"
         >
-          <FontAwesomeIcon icon="chevron-up" class="text-xs" />
+          <FontAwesomeIcon
+            icon="chevron-up"
+            class="text-xs"
+          />
         </UButton>
         <UButton
           variant="ghost"
@@ -28,7 +31,10 @@ import { DEMO_SERVICE_TYPE_ITEMS } from '#shared/constants/landingDemo'
           disabled
           class="p-0.5 min-w-0"
         >
-          <FontAwesomeIcon icon="chevron-down" class="text-xs" />
+          <FontAwesomeIcon
+            icon="chevron-down"
+            class="text-xs"
+          />
         </UButton>
       </div>
 

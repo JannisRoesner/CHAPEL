@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { ServiceDto } from '#shared/types/chapel'
+import { useOnline } from '@vueuse/core'
 
 const servicesStore = useServicesStore()
 const offlineCache = useOfflineCache()
+const online = useOnline()
 
 const loading = ref(true)
-const isOffline = ref(false)
 const cachedServices = ref<Awaited<ReturnType<typeof offlineCache.getCachedServices>>>([])
 
 interface PlaybackServiceItem {
@@ -13,42 +14,66 @@ interface PlaybackServiceItem {
   name: string
   serviceDate: string | null
   isCached: boolean
+  isPartial: boolean
+  playable: boolean
 }
 
+const isOffline = computed(() => !online.value)
+
 const displayServices = computed<PlaybackServiceItem[]>(() => {
+  const cachedById = new Map(cachedServices.value.map(c => [c.serviceId, c]))
+
   if (isOffline.value) {
     return cachedServices.value.map(c => ({
       id: c.serviceId,
       name: c.serviceName,
       serviceDate: c.serviceDate,
-      isCached: true
+      isCached: true,
+      isPartial: c.isPartial,
+      playable: true
     }))
   }
 
-  const cachedIds = new Set(cachedServices.value.map(c => c.serviceId))
-  return servicesStore.services.map((s: ServiceDto) => ({
-    id: s.id,
-    name: s.name,
-    serviceDate: s.serviceDate,
-    isCached: cachedIds.has(s.id)
-  }))
+  return servicesStore.services.map((s: ServiceDto) => {
+    const cached = cachedById.get(s.id)
+    return {
+      id: s.id,
+      name: s.name,
+      serviceDate: s.serviceDate,
+      isCached: !!cached,
+      isPartial: cached?.isPartial ?? false,
+      playable: true
+    }
+  })
 })
 
-onMounted(async () => {
-  loading.value = true
-  isOffline.value = typeof navigator !== 'undefined' && !navigator.onLine
-
+async function refreshCachedServices() {
   cachedServices.value = await offlineCache.getCachedServices()
+}
 
-  if (!isOffline.value) {
-    try {
-      await servicesStore.fetchServices()
-    } catch {
-      isOffline.value = true
-    }
+async function loadServices() {
+  if (!online.value) return
+  try {
+    await servicesStore.fetchServices()
+  } catch {
+    // Netzwerkfehler — cachedServices bleiben verfügbar
   }
+}
 
+async function initialize() {
+  loading.value = true
+  await refreshCachedServices()
+  await loadServices()
   loading.value = false
+}
+
+onMounted(initialize)
+
+watch(online, async (isNowOnline) => {
+  await refreshCachedServices()
+  if (isNowOnline) {
+    await loadServices()
+  }
 })
 </script>
 
@@ -91,18 +116,27 @@ onMounted(async () => {
         :key="service.id"
         :to="`/playback/${service.id}`"
         class="block rounded-xl border border-default bg-elevated/30 p-6 hover:bg-elevated/60 transition-colors touch-manipulation"
+        :class="{ 'opacity-50 pointer-events-none': !service.playable }"
       >
         <div class="flex items-start justify-between gap-2">
           <p class="font-semibold text-lg">
             {{ service.name }}
           </p>
           <UBadge
-            v-if="service.isCached"
+            v-if="service.isCached && !service.isPartial"
             color="success"
             variant="subtle"
             size="sm"
           >
             Offline bereit
+          </UBadge>
+          <UBadge
+            v-else-if="service.isCached && service.isPartial"
+            color="warning"
+            variant="subtle"
+            size="sm"
+          >
+            Teilweise offline
           </UBadge>
         </div>
         <p

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { DEFAULT_ROUTE } from '#shared/constants/app'
-
 const { data } = await useFetch<{ impressum: string, privacy: string }>('/api/legal', {
   key: 'legal-content'
 })

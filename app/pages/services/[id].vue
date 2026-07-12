@@ -5,7 +5,7 @@ const route = useRoute()
 const id = Number(route.params.id)
 const toast = useToast()
 const offlineCache = useOfflineCache()
-const { preparing, progress, prepareService, isServiceCached } = offlineCache
+const { preparing, progress, prepareService } = offlineCache
 
 const service = ref<ServiceDto | null>(null)
 const loading = ref(true)
@@ -13,6 +13,7 @@ const saveState = ref<'idle' | 'saving' | 'saved' | 'error'>('idle')
 const pickerOpen = ref(false)
 const pickerItemId = ref<number | null>(null)
 const isCached = ref(false)
+const isPartialCache = ref(false)
 const isCacheStaleFlag = ref(false)
 const trackPreview = useTrackPreview()
 
@@ -22,7 +23,9 @@ async function load() {
   loading.value = true
   try {
     service.value = await $fetch<ServiceDto>(`/api/services/${id}`)
-    isCached.value = await isServiceCached(id)
+    const cachedRecord = await offlineCache.getCachedService(id)
+    isCached.value = !!cachedRecord
+    isPartialCache.value = cachedRecord?.isPartial ?? false
     if (isCached.value && service.value) {
       isCacheStaleFlag.value = await offlineCache.isCacheStale(id, service.value.updatedAt)
     } else {
@@ -81,10 +84,13 @@ async function prepareOffline() {
 
   if (result.success) {
     isCached.value = true
+    isPartialCache.value = false
     isCacheStaleFlag.value = false
     toast.add({ title: 'Offline vorbereitet', color: 'success' })
-  } else if (result.cachedTracks > 0) {
-    isCached.value = false
+  } else if (result.partial) {
+    isCached.value = true
+    isPartialCache.value = true
+    isCacheStaleFlag.value = false
     toast.add({
       title: 'Teilweise vorbereitet',
       description: `${result.cachedTracks} von ${result.totalTracks} Tracks zwischengespeichert`,
@@ -92,6 +98,7 @@ async function prepareOffline() {
     })
   } else {
     isCached.value = false
+    isPartialCache.value = false
     toast.add({
       title: 'Vorbereitung fehlgeschlagen',
       description: result.totalTracks > 0
@@ -155,12 +162,20 @@ async function prepareOffline() {
           Fehler beim Speichern
         </p>
         <UBadge
-          v-if="isCached && !isCacheStaleFlag"
+          v-if="isCached && !isPartialCache && !isCacheStaleFlag"
           color="success"
           variant="subtle"
           class="mt-2"
         >
           Offline bereit
+        </UBadge>
+        <UBadge
+          v-if="isCached && isPartialCache && !isCacheStaleFlag"
+          color="warning"
+          variant="subtle"
+          class="mt-2"
+        >
+          Teilweise offline
         </UBadge>
         <UBadge
           v-if="isCached && isCacheStaleFlag"

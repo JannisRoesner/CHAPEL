@@ -9,12 +9,13 @@ const html = computed(() => renderMarkdown(props.content))
 </script>
 
 <template>
-  <!-- eslint-disable-next-line vue/no-v-html -->
+  <!-- eslint-disable vue/no-v-html -->
   <div
     v-if="html"
     class="markdown-content"
     v-html="html"
   />
+  <!-- eslint-enable vue/no-v-html -->
 </template>
 
 <style scoped>

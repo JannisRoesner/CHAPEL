@@ -12,10 +12,6 @@ export default defineNuxtConfig({
     enabled: true
   },
 
-  devServer: {
-    port: 3001
-  },
-
   app: {
     head: {
       title: 'CHAPEL',
@@ -47,6 +43,10 @@ export default defineNuxtConfig({
     '/impressum': { ssr: true },
     '/datenschutz': { ssr: true },
     '/playback/**': { ssr: false }
+  },
+
+  devServer: {
+    port: 3001
   },
 
   compatibilityDate: '2026-06-30',
@@ -81,6 +81,10 @@ export default defineNuxtConfig({
 
   pwa: {
     registerType: 'autoUpdate',
+    devOptions: {
+      enabled: true,
+      type: 'module'
+    },
     manifest: {
       name: 'CHAPEL',
       short_name: 'CHAPEL',
@@ -89,6 +93,8 @@ export default defineNuxtConfig({
       background_color: '#1e293b',
       display: 'standalone',
       lang: 'de',
+      start_url: '/playback',
+      scope: '/',
       icons: [
         {
           src: '/icons/icon-192.png',

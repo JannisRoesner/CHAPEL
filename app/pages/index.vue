@@ -14,10 +14,19 @@ definePageMeta({
 
 const { loggedIn, fetch: fetchSession } = useUserSession()
 
-await fetchSession()
+try {
+  await fetchSession()
+} catch {
+  // offline: bestehenden Session-State behalten
+}
 
 if (loggedIn.value) {
   await navigateTo(DEFAULT_ROUTE, { replace: true })
+} else if (import.meta.client && !navigator.onLine) {
+  const cached = await useOfflineCache().getCachedServices()
+  if (cached.length > 0) {
+    await navigateTo(DEFAULT_ROUTE, { replace: true })
+  }
 }
 
 useSeoMeta({
@@ -28,12 +37,12 @@ useSeoMeta({
 })
 
 const previewById: Record<string, Component> = {
-  library: LandingPreviewLibrary,
+  'library': LandingPreviewLibrary,
   'service-types': LandingPreviewServiceType,
-  services: LandingPreviewService,
-  playback: LandingPreviewPlayback,
-  realtime: LandingPreviewRealtime,
-  offline: LandingPreviewOffline
+  'services': LandingPreviewService,
+  'playback': LandingPreviewPlayback,
+  'realtime': LandingPreviewRealtime,
+  'offline': LandingPreviewOffline
 }
 </script>
 

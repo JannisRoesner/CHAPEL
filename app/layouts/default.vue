@@ -20,6 +20,7 @@ watch(() => route.path, () => {
 
 async function logout() {
   mobileMenuOpen.value = false
+  useOfflineSession().clearHadSession()
   await $fetch('/api/auth/logout', { method: 'POST' })
   await navigateTo('/login')
 }
