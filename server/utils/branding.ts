@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import { eq } from 'drizzle-orm'
 import sharp from 'sharp'
 
+import { COPYRIGHT_HOLDER_KEY, COPYRIGHT_HOLDER_MAX_LENGTH } from '#shared/constants/branding'
+
 import { useDb, schema } from '../database'
 
 export const CUSTOM_LOGO_KEY = 'custom_logo'
@@ -29,6 +31,43 @@ export async function ensureBrandingStorage(): Promise<string> {
 
 export function getBrandingFilePath(filename: string): string {
   return join(getBrandingStoragePath(), filename)
+}
+
+export async function getCopyrightHolder(): Promise<string> {
+  const db = useDb()
+  const [row] = await db
+    .select()
+    .from(schema.appSettings)
+    .where(eq(schema.appSettings.key, COPYRIGHT_HOLDER_KEY))
+    .limit(1)
+  return row?.value?.trim() ?? ''
+}
+
+export async function setCopyrightHolder(value: string): Promise<string> {
+  const trimmed = value.trim()
+  if (trimmed.length > COPYRIGHT_HOLDER_MAX_LENGTH) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `Copyright-Hinweis darf maximal ${COPYRIGHT_HOLDER_MAX_LENGTH} Zeichen lang sein`
+    })
+  }
+
+  const db = useDb()
+  if (trimmed) {
+    await db
+      .insert(schema.appSettings)
+      .values({ key: COPYRIGHT_HOLDER_KEY, value: trimmed })
+      .onConflictDoUpdate({
+        target: schema.appSettings.key,
+        set: { value: trimmed }
+      })
+  } else {
+    await db
+      .delete(schema.appSettings)
+      .where(eq(schema.appSettings.key, COPYRIGHT_HOLDER_KEY))
+  }
+
+  return trimmed
 }
 
 export async function getCustomLogoSetting(): Promise<string | null> {

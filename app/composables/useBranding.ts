@@ -2,12 +2,14 @@ export interface BrandingState {
   hasCustomLogo: boolean
   logoUrl: string
   faviconUrl: string
+  copyrightHolder: string
 }
 
 const defaultBranding: BrandingState = {
   hasCustomLogo: false,
   logoUrl: '/favicon.svg',
-  faviconUrl: '/favicon.svg'
+  faviconUrl: '/favicon.svg',
+  copyrightHolder: ''
 }
 
 export function useBranding() {

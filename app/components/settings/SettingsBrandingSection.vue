@@ -1,10 +1,49 @@
 <script setup lang="ts">
+import { COPYRIGHT_HOLDER_KEY, COPYRIGHT_HOLDER_MAX_LENGTH } from '#shared/constants/branding'
+import { formatCopyrightNotice } from '#shared/utils/copyright'
+
 const toast = useToast()
 const { branding, fetchBranding } = useBranding()
 
 const uploadingLogo = ref(false)
 const removingLogo = ref(false)
 const logoDragOver = ref(false)
+const copyrightHolder = ref('')
+const savingCopyright = ref(false)
+
+const copyrightPreview = computed(() => formatCopyrightNotice(copyrightHolder.value))
+
+watch(
+  () => branding.value.copyrightHolder,
+  (value) => {
+    copyrightHolder.value = value
+  },
+  { immediate: true }
+)
+
+async function saveCopyrightHolder() {
+  savingCopyright.value = true
+  try {
+    await $fetch('/api/settings', {
+      method: 'PATCH',
+      body: {
+        key: COPYRIGHT_HOLDER_KEY,
+        value: copyrightHolder.value.trim()
+      }
+    })
+    await fetchBranding()
+    toast.add({ title: 'Copyright-Hinweis gespeichert', color: 'success' })
+  } catch (e: unknown) {
+    const err = e as { data?: { message?: string }, statusMessage?: string }
+    toast.add({
+      title: 'Copyright-Hinweis konnte nicht gespeichert werden',
+      description: err.data?.message || err.statusMessage,
+      color: 'error'
+    })
+  } finally {
+    savingCopyright.value = false
+  }
+}
 
 async function uploadLogo(files: FileList | File[]) {
   const file = Array.from(files)[0]
@@ -63,10 +102,53 @@ async function resetLogo() {
 </script>
 
 <template>
-  <div class="space-y-4">
-    <p class="text-sm text-muted">
-      Eigenes Logo für alle Benutzer als Navigations-Icon und Favicon. Empfohlen: quadratisches PNG oder SVG (max. 2 MB).
-    </p>
+  <div class="space-y-8">
+    <div class="space-y-4">
+      <div>
+        <h3 class="text-sm font-medium">
+          Copyright-Hinweis
+        </h3>
+        <p class="text-sm text-muted mt-1">
+          Erscheint in der Fußzeile der Landing Page und der App. Leer lassen für den Standard „© {{ new Date().getFullYear() }} CHAPEL“.
+        </p>
+      </div>
+
+      <UFormField
+        label="Copyright-Inhaber"
+        hint="z. B. Gemeinde Name, Organisation oder leer für CHAPEL"
+      >
+        <UInput
+          v-model="copyrightHolder"
+          class="w-full"
+          :maxlength="COPYRIGHT_HOLDER_MAX_LENGTH"
+          placeholder="z. B. Evangelische Kirche Musterstadt"
+        />
+      </UFormField>
+
+      <p class="text-sm text-muted">
+        Vorschau: {{ copyrightPreview }}
+      </p>
+
+      <div>
+        <UButton
+          :loading="savingCopyright"
+          :disabled="savingCopyright || uploadingLogo || removingLogo"
+          @click="saveCopyrightHolder"
+        >
+          Copyright speichern
+        </UButton>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <h3 class="text-sm font-medium">
+          Logo
+        </h3>
+        <p class="text-sm text-muted mt-1">
+          Eigenes Logo für alle Benutzer als Navigations-Icon und Favicon. Empfohlen: quadratisches PNG oder SVG (max. 2 MB).
+        </p>
+      </div>
 
     <div class="flex items-center gap-4">
       <img
@@ -125,6 +207,7 @@ async function resetLogo() {
           Standard wiederherstellen
         </UButton>
       </div>
+    </div>
     </div>
   </div>
 </template>

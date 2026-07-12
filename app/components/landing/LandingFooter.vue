@@ -1,13 +1,7 @@
-<script setup lang="ts">
-const year = new Date().getFullYear()
-</script>
-
 <template>
   <footer class="border-t border-default bg-elevated/30">
     <div class="w-full max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted">
-      <p>
-        CHAPEL — Church Hymn Audio Playlist Engine for Liturgy · © {{ year }} Jannis Rösner
-      </p>
+      <UiCopyrightNotice show-tagline />
       <p>
         Lizenziert unter
         <a
