@@ -58,15 +58,25 @@ async function selectColorScheme(schemeId: ColorSchemeId) {
 <template>
   <div class="space-y-6">
     <UFormField label="Modus">
-      <USelect
-        v-model="colorMode.preference"
-        :items="appearanceItems"
-        :disabled="savingAppearance"
-      />
+      <div class="grid grid-cols-3 gap-2">
+        <button
+          v-for="item in appearanceItems"
+          :key="item.value"
+          type="button"
+          class="min-h-12 rounded-xl border px-3 font-medium transition-colors"
+          :class="colorMode.preference === item.value
+            ? 'border-primary bg-primary/10 text-primary'
+            : 'border-default text-muted hover:bg-elevated/60'"
+          :disabled="savingAppearance"
+          @click="colorMode.preference = item.value"
+        >
+          {{ item.label }}
+        </button>
+      </div>
     </UFormField>
 
     <div>
-      <p class="text-sm font-medium mb-3">
+      <p class="font-medium mb-3">
         Farbschema
       </p>
       <div class="grid gap-3 sm:grid-cols-2">
@@ -74,7 +84,7 @@ async function selectColorScheme(schemeId: ColorSchemeId) {
           v-for="scheme in COLOR_SCHEMES"
           :key="scheme.id"
           type="button"
-          class="rounded-lg border p-4 text-left transition-colors"
+          class="rounded-2xl border p-5 text-left transition-colors min-h-24"
           :class="colorScheme === scheme.id
             ? 'border-primary bg-primary/5 ring-1 ring-primary'
             : 'border-default hover:bg-elevated/50'"

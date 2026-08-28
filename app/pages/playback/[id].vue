@@ -85,12 +85,13 @@ function onSelectStep(index: number) {
       <UButton
         to="/playback"
         variant="ghost"
-        size="sm"
-        class="shrink-0"
+        color="neutral"
+        icon="i-lucide-arrow-left"
+        class="shrink-0 min-h-11"
       >
-        ← Auswahl
+        Auswahl
       </UButton>
-      <h1 class="flex-1 min-w-0 font-semibold truncate px-4 text-center">
+      <h1 class="flex-1 min-w-0 font-semibold text-lg truncate px-3 text-center">
         {{ serviceName }}
       </h1>
       <UiThemeToggle class="shrink-0" />
@@ -114,7 +115,10 @@ function onSelectStep(index: number) {
         :title="loadError"
         description="Öffnen Sie den Gottesdienst einmal online und nutzen Sie „Offline vorbereiten“."
       >
-        <UButton to="/playback">
+        <UButton
+          to="/playback"
+          class="min-h-12"
+        >
           Zur Auswahl
         </UButton>
       </UEmpty>
@@ -139,6 +143,7 @@ function onSelectStep(index: number) {
       />
 
       <PlaybackNowPlayingBar
+        class="order-last md:order-none sticky bottom-0 md:static z-20 -mx-4 px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-default/95 backdrop-blur md:bg-transparent md:backdrop-blur-none md:mx-0 md:px-0 md:pt-0 md:pb-0"
         :step="currentStep"
         :state="state"
         :progress="progress"

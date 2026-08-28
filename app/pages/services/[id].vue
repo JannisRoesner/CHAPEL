@@ -5,7 +5,7 @@ const route = useRoute()
 const id = Number(route.params.id)
 const toast = useToast()
 const offlineCache = useOfflineCache()
-const { preparing, progress, prepareService } = offlineCache
+const { preparing, progress, progressLabel, prepareService } = offlineCache
 
 const service = ref<ServiceDto | null>(null)
 const loading = ref(true)
@@ -91,9 +91,12 @@ async function prepareOffline() {
     isCached.value = true
     isPartialCache.value = true
     isCacheStaleFlag.value = false
+    const failedHint = result.failedTitles.length
+      ? ` Fehlgeschlagen: ${result.failedTitles.slice(0, 3).join(', ')}${result.failedTitles.length > 3 ? '…' : ''}`
+      : ''
     toast.add({
       title: 'Teilweise vorbereitet',
-      description: `${result.cachedTracks} von ${result.totalTracks} Tracks zwischengespeichert`,
+      description: `${result.cachedTracks} von ${result.totalTracks} Tracks zwischengespeichert.${failedHint}`,
       color: 'warning'
     })
   } else {
@@ -101,9 +104,7 @@ async function prepareOffline() {
     isPartialCache.value = false
     toast.add({
       title: 'Vorbereitung fehlgeschlagen',
-      description: result.totalTracks > 0
-        ? 'Keine Audiodateien konnten gespeichert werden'
-        : undefined,
+      description: result.errorMessage ?? undefined,
       color: 'error'
     })
   }
@@ -115,11 +116,11 @@ async function prepareOffline() {
     v-if="loading"
     class="space-y-3"
   >
-    <USkeleton class="h-8 w-64" />
+    <USkeleton class="h-8 w-64 rounded-xl" />
     <USkeleton
       v-for="i in 4"
       :key="i"
-      class="h-16 w-full"
+      class="h-24 w-full rounded-2xl"
     />
   </div>
 
@@ -127,68 +128,59 @@ async function prepareOffline() {
     v-else-if="service"
     class="space-y-6"
   >
-    <div class="flex flex-wrap items-start justify-between gap-4">
-      <div>
-        <UButton
-          to="/services"
-          variant="ghost"
-          size="sm"
-          class="mb-2"
-        >
-          ← Zurück
-        </UButton>
-        <h1 class="text-2xl font-semibold">
-          {{ service.name }}
-        </h1>
-        <p class="text-muted">
-          {{ formatServiceDate(service.serviceDate) }}
-        </p>
+    <UiPageHeader
+      :title="service.name"
+      :description="formatServiceDate(service.serviceDate)"
+      back-to="/services"
+      back-label="Zu Gottesdiensten"
+    >
+      <template #below>
         <p
           v-if="saveState === 'saving'"
-          class="text-sm text-muted mt-1"
+          class="text-muted"
         >
           Speichert…
         </p>
         <p
           v-else-if="saveState === 'saved'"
-          class="text-sm text-success mt-1"
+          class="text-success"
         >
           Gespeichert
         </p>
         <p
           v-else-if="saveState === 'error'"
-          class="text-sm text-error mt-1"
+          class="text-error"
         >
           Fehler beim Speichern
         </p>
-        <UBadge
-          v-if="isCached && !isPartialCache && !isCacheStaleFlag"
-          color="success"
-          variant="subtle"
-          class="mt-2"
-        >
-          Offline bereit
-        </UBadge>
-        <UBadge
-          v-if="isCached && isPartialCache && !isCacheStaleFlag"
-          color="warning"
-          variant="subtle"
-          class="mt-2"
-        >
-          Teilweise offline
-        </UBadge>
-        <UBadge
-          v-if="isCached && isCacheStaleFlag"
-          color="warning"
-          variant="subtle"
-          class="mt-2"
-        >
-          Cache veraltet — erneut vorbereiten
-        </UBadge>
-      </div>
-      <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2 mt-2">
+          <UBadge
+            v-if="isCached && !isPartialCache && !isCacheStaleFlag"
+            color="success"
+            variant="subtle"
+          >
+            Offline bereit
+          </UBadge>
+          <UBadge
+            v-if="isCached && isPartialCache && !isCacheStaleFlag"
+            color="warning"
+            variant="subtle"
+          >
+            Teilweise offline
+          </UBadge>
+          <UBadge
+            v-if="isCached && isCacheStaleFlag"
+            color="warning"
+            variant="subtle"
+          >
+            Cache veraltet — erneut vorbereiten
+          </UBadge>
+        </div>
+      </template>
+      <template #actions>
         <UButton
           variant="outline"
+          class="min-h-12 justify-center w-full sm:w-auto"
           :loading="preparing"
           @click="prepareOffline"
         >
@@ -201,19 +193,26 @@ async function prepareOffline() {
         <UButton
           :to="`/playback/${id}`"
           color="primary"
+          class="min-h-12 justify-center w-full sm:w-auto"
         >
           Zur Wiedergabe
         </UButton>
-      </div>
-    </div>
+      </template>
+    </UiPageHeader>
 
     <UProgress
       v-if="preparing"
       :model-value="progress"
       :max="100"
     />
+    <p
+      v-if="preparing && progressLabel"
+      class="text-muted"
+    >
+      Speichere: {{ progressLabel }} ({{ progress }}%)
+    </p>
 
-    <div class="divide-y divide-default rounded-lg border border-default overflow-hidden">
+    <div class="space-y-3">
       <ServicesServiceItemRow
         v-for="item in service.items"
         :key="item.id"

@@ -3,8 +3,12 @@ export function useLoginModal() {
   const router = useRouter()
 
   const open = computed({
-    get: () => route.path === '/' && route.query.login === '1',
+    get: () => {
+      if (import.meta.client && !navigator.onLine) return false
+      return route.path === '/' && route.query.login === '1'
+    },
     set: (value: boolean) => {
+      if (value && import.meta.client && !navigator.onLine) return
       const query = { ...route.query }
       if (value) {
         query.login = '1'
@@ -16,6 +20,7 @@ export function useLoginModal() {
   })
 
   function openLoginModal() {
+    if (import.meta.client && !navigator.onLine) return
     open.value = true
   }
 

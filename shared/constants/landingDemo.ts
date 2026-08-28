@@ -220,8 +220,8 @@ export const LANDING_FEATURES: LandingFeature[] = [
   {
     id: 'offline',
     title: 'Offline & PWA',
-    description: 'Installieren Sie CHAPEL als App und bereiten Sie Gottesdienste offline vor. Alle Audiodateien werden lokal zwischengespeichert — Wiedergabe auch ohne Netzwerk.',
-    hint: 'Offline-Wiedergabe gilt für zuvor vorbereitete Gottesdienste. Vorbereitung und Anmeldung erfordern einmal Netzwerk.'
+    description: 'Installieren Sie CHAPEL als App und bereiten Sie Gottesdienste offline vor. Audiodateien werden lokal gespeichert — die Wiedergabe startet auch ohne Netzwerk, ohne erneuten Login.',
+    hint: 'Einmal online anmelden und „Offline vorbereiten“ tippen. Danach öffnet die App offline direkt die Wiedergabe.'
   }
 ]
 

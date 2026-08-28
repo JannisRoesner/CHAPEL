@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { DropdownMenuItem } from '@nuxt/ui'
 import type { TrackDto } from '#shared/types/chapel'
 
 defineProps<{
@@ -6,12 +7,28 @@ defineProps<{
   loading?: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   edit: [track: TrackDto]
   delete: [track: TrackDto]
 }>()
 
 const { toggle, isPlaying } = useTrackPreview()
+
+function trackMenu(track: TrackDto): DropdownMenuItem[][] {
+  return [[
+    {
+      label: 'Bearbeiten',
+      icon: 'i-lucide-pencil',
+      onSelect: () => emit('edit', track)
+    },
+    {
+      label: 'Löschen',
+      icon: 'i-lucide-trash',
+      color: 'error',
+      onSelect: () => emit('delete', track)
+    }
+  ]]
+}
 </script>
 
 <template>
@@ -22,7 +39,7 @@ const { toggle, isPlaying } = useTrackPreview()
     <USkeleton
       v-for="i in 5"
       :key="i"
-      class="h-16 w-full"
+      class="h-20 w-full rounded-2xl"
     />
   </div>
 
@@ -35,61 +52,53 @@ const { toggle, isPlaying } = useTrackPreview()
 
   <div
     v-else
-    class="divide-y divide-default rounded-lg border border-default overflow-hidden"
+    class="space-y-3"
   >
     <div
       v-for="track in tracks"
       :key="track.id"
-      class="flex items-center gap-4 px-4 py-3 hover:bg-elevated/50"
+      class="rounded-2xl border border-default bg-elevated/40 p-4 flex items-center gap-3 sm:gap-4"
     >
-      <div class="shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+      <UButton
+        :variant="isPlaying(track.id) ? 'solid' : 'soft'"
+        :color="isPlaying(track.id) ? 'primary' : 'neutral'"
+        square
+        class="min-h-12 min-w-12 shrink-0"
+        :aria-label="isPlaying(track.id) ? 'Wiedergabe stoppen' : 'Probehören'"
+        @click="toggle(track.id)"
+      >
         <FontAwesomeIcon
-          icon="music"
-          class="text-primary"
+          :icon="isPlaying(track.id) ? 'stop' : 'play'"
+          class="text-lg"
         />
-      </div>
+      </UButton>
 
       <div class="flex-1 min-w-0">
-        <p class="font-medium truncate">
+        <p class="font-semibold truncate">
           {{ track.title }}
         </p>
-        <p class="text-sm text-muted truncate">
+        <p class="text-muted truncate mt-0.5">
           {{ track.composer || 'Unbekannt' }} · {{ formatDuration(track.durationMs) }}
         </p>
+        <UBadge
+          class="mt-2"
+          :color="track.category === 'liturgy' ? 'info' : 'neutral'"
+          variant="subtle"
+        >
+          {{ categoryLabel(track.category) }}
+        </UBadge>
       </div>
 
-      <UBadge
-        :color="track.category === 'liturgy' ? 'info' : 'neutral'"
-        variant="subtle"
-      >
-        {{ categoryLabel(track.category) }}
-      </UBadge>
-
-      <div class="flex gap-1 shrink-0">
+      <UDropdownMenu :items="trackMenu(track)">
         <UButton
           variant="ghost"
-          size="sm"
-          :aria-label="isPlaying(track.id) ? 'Wiedergabe stoppen' : 'Probehören'"
-          @click="toggle(track.id)"
-        >
-          <FontAwesomeIcon :icon="isPlaying(track.id) ? 'stop' : 'play'" />
-        </UButton>
-        <UButton
-          variant="ghost"
-          size="sm"
-          @click="$emit('edit', track)"
-        >
-          <FontAwesomeIcon icon="pen" />
-        </UButton>
-        <UButton
-          variant="ghost"
-          size="sm"
-          color="error"
-          @click="$emit('delete', track)"
-        >
-          <FontAwesomeIcon icon="trash" />
-        </UButton>
-      </div>
+          color="neutral"
+          icon="i-lucide-ellipsis-vertical"
+          square
+          class="min-h-12 min-w-12 shrink-0"
+          aria-label="Weitere Aktionen"
+        />
+      </UDropdownMenu>
     </div>
   </div>
 </template>

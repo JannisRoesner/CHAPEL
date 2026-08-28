@@ -8,8 +8,8 @@ const password = ref('')
 const error = ref('')
 const loading = ref(false)
 
-const { fetch: fetchSession } = useUserSession()
-const { markHadSession } = useOfflineSession()
+const { user, fetch: fetchSession } = useUserSession()
+const { saveLocalSession } = useLocalSession()
 
 async function login() {
   error.value = ''
@@ -20,7 +20,9 @@ async function login() {
       body: { email: email.value, password: password.value }
     })
     await fetchSession()
-    markHadSession()
+    if (user.value) {
+      saveLocalSession(user.value)
+    }
     open.value = false
     await navigateTo(DEFAULT_ROUTE)
   } catch (e: unknown) {
@@ -48,6 +50,7 @@ async function login() {
             <UInput
               v-model="email"
               class="w-full"
+              size="lg"
               type="email"
               autocomplete="username"
               required
@@ -57,6 +60,7 @@ async function login() {
             <UInput
               v-model="password"
               class="w-full"
+              size="lg"
               type="password"
               autocomplete="current-password"
               required
@@ -71,6 +75,8 @@ async function login() {
           <UButton
             type="submit"
             block
+            size="xl"
+            class="min-h-12"
             :loading="loading"
           >
             Anmelden

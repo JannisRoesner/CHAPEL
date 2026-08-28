@@ -43,6 +43,7 @@ function close() {
             <USelect
               :model-value="appearanceMode"
               :items="appearanceItems"
+              size="md"
               @update:model-value="onAppearanceChange"
             />
           </UFormField>

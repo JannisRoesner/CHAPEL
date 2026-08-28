@@ -1,7 +1,8 @@
 import { PUBLIC_PATHS } from '#shared/constants/legal'
-import { LOGIN_ROUTE } from '#shared/constants/app'
+import { DEFAULT_ROUTE, LOGIN_ROUTE } from '#shared/constants/app'
 
 const PLAYBACK_ROUTE = /^\/playback(\/\d+)?$/
+const OFFLINE_ALLOWED = /^\/(playback(\/\d+)?|settings)$/
 
 export default defineNuxtRouteMiddleware(async (to) => {
   if (PUBLIC_PATHS.includes(to.path as typeof PUBLIC_PATHS[number])) return
@@ -24,14 +25,24 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo(LOGIN_ROUTE)
   }
 
-  if (import.meta.client && PLAYBACK_ROUTE.test(to.path)) {
-    const offlineCache = useOfflineCache()
-    const cached = await offlineCache.getCachedServices()
-    if (cached.length > 0) return
-
-    const { hadSession } = useOfflineSession()
-    if (hadSession()) return
+  // Offline-Wiedergabe-Modus
+  if (!import.meta.client) {
+    return navigateTo(LOGIN_ROUTE)
   }
 
-  return navigateTo(LOGIN_ROUTE)
+  const { canUseOfflinePlayback } = useLocalSession()
+  const allowed = await canUseOfflinePlayback()
+
+  if (OFFLINE_ALLOWED.test(to.path)) {
+    if (allowed) return
+    return navigateTo('/offline')
+  }
+
+  // Andere geschützte Routen offline: zu Playback oder Hinweis
+  if (allowed) {
+    if (PLAYBACK_ROUTE.test(to.path)) return
+    return navigateTo(DEFAULT_ROUTE)
+  }
+
+  return navigateTo('/offline')
 })

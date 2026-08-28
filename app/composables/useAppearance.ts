@@ -18,14 +18,19 @@ function applyAppearanceMode(mode: AppearanceMode, colorMode: ReturnType<typeof 
 export function useAppearance() {
   const colorMode = useColorMode()
   const { user, fetch: refreshSession } = useUserSession()
+  const { getLocalSession } = useLocalSession()
+
+  const sessionUser = computed(() => {
+    return user.value ?? getLocalSession()?.user ?? null
+  })
 
   const colorScheme = computed<ColorSchemeId>(() => {
-    const value = user.value?.colorScheme
+    const value = sessionUser.value?.colorScheme
     return value && isColorSchemeId(value) ? value : DEFAULT_COLOR_SCHEME
   })
 
   const appearanceMode = computed<AppearanceMode>(() => {
-    const value = user.value?.appearanceMode
+    const value = sessionUser.value?.appearanceMode
     return value && isAppearanceMode(value) ? value : DEFAULT_APPEARANCE_MODE
   })
 
@@ -49,6 +54,9 @@ export function useAppearance() {
       body: input
     })
     await refreshSession()
+    if (user.value) {
+      useLocalSession().saveLocalSession(user.value)
+    }
     if (input.colorScheme) {
       applyColorScheme(input.colorScheme)
     }

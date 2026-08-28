@@ -79,21 +79,17 @@ watch(online, async (isNowOnline) => {
 
 <template>
   <div class="space-y-6">
-    <div>
-      <h1 class="text-2xl font-semibold mb-1">
-        Wiedergabe
-      </h1>
-      <p class="text-muted">
-        Gottesdienst für die Wiedergabe auswählen
-      </p>
-    </div>
+    <UiPageHeader
+      title="Wiedergabe"
+      description="Gottesdienst für die Wiedergabe auswählen"
+    />
 
     <UAlert
       v-if="isOffline"
       color="warning"
       variant="subtle"
-      title="Offline-Modus"
-      description="Es werden nur offline vorbereitete Gottesdienste angezeigt."
+      title="Offline-Modus — nur Wiedergabe"
+      description="Es werden nur offline vorbereitete Gottesdienste angezeigt. Verwaltung ist ohne Netzwerk nicht verfügbar."
     />
 
     <div
@@ -103,7 +99,7 @@ watch(online, async (isNowOnline) => {
       <USkeleton
         v-for="i in 2"
         :key="i"
-        class="h-24 w-full"
+        class="h-28 w-full rounded-2xl"
       />
     </div>
 
@@ -115,36 +111,42 @@ watch(online, async (isNowOnline) => {
         v-for="service in displayServices"
         :key="service.id"
         :to="`/playback/${service.id}`"
-        class="block rounded-xl border border-default bg-elevated/30 p-6 hover:bg-elevated/60 transition-colors touch-manipulation"
+        class="min-h-24 rounded-2xl border border-default bg-elevated/40 p-5 sm:p-6 hover:bg-elevated/70 transition-colors touch-manipulation flex items-center gap-4"
         :class="{ 'opacity-50 pointer-events-none': !service.playable }"
       >
-        <div class="flex items-start justify-between gap-2">
-          <p class="font-semibold text-lg">
-            {{ service.name }}
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <p class="font-semibold text-lg truncate">
+              {{ service.name }}
+            </p>
+            <UBadge
+              v-if="service.isCached && !service.isPartial"
+              color="success"
+              variant="subtle"
+            >
+              Offline bereit
+            </UBadge>
+            <UBadge
+              v-else-if="service.isCached && service.isPartial"
+              color="warning"
+              variant="subtle"
+            >
+              Teilweise offline
+            </UBadge>
+          </div>
+          <p
+            v-if="service.serviceDate"
+            class="text-muted mt-1"
+          >
+            {{ formatServiceDate(service.serviceDate) }}
           </p>
-          <UBadge
-            v-if="service.isCached && !service.isPartial"
-            color="success"
-            variant="subtle"
-            size="sm"
-          >
-            Offline bereit
-          </UBadge>
-          <UBadge
-            v-else-if="service.isCached && service.isPartial"
-            color="warning"
-            variant="subtle"
-            size="sm"
-          >
-            Teilweise offline
-          </UBadge>
         </div>
-        <p
-          v-if="service.serviceDate"
-          class="text-muted mt-1"
-        >
-          {{ formatServiceDate(service.serviceDate) }}
-        </p>
+        <div class="shrink-0 w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+          <FontAwesomeIcon
+            icon="play"
+            class="text-lg"
+          />
+        </div>
       </NuxtLink>
     </div>
 
@@ -159,7 +161,10 @@ watch(online, async (isNowOnline) => {
       title="Keine Gottesdienste"
       description="Erstellen Sie zuerst einen Gottesdienst."
     >
-      <UButton to="/services">
+      <UButton
+        to="/services"
+        class="min-h-12"
+      >
         Zu Gottesdiensten
       </UButton>
     </UEmpty>

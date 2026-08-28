@@ -118,42 +118,43 @@ async function submitResetPassword() {
 
     <div
       v-else-if="users.length"
-      class="space-y-2"
+      class="space-y-3"
     >
-      <UCard
+      <div
         v-for="entry in users"
         :key="entry.id"
+        class="rounded-2xl border border-default p-4 sm:p-5"
       >
-        <div class="flex items-center justify-between gap-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div class="min-w-0">
-            <p class="font-medium truncate">
+            <p class="font-semibold truncate">
               {{ entry.name }}
             </p>
-            <p class="text-sm text-muted truncate">
+            <p class="text-muted truncate mt-0.5">
               {{ entry.email }}
             </p>
+            <div class="flex flex-wrap gap-2 mt-2">
+              <UBadge
+                v-if="entry.mustChangePassword"
+                color="warning"
+                variant="subtle"
+              >
+                Passwort ändern
+              </UBadge>
+              <UBadge variant="subtle">
+                {{ roleLabels[entry.role] }}
+              </UBadge>
+            </div>
           </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <UBadge
-              v-if="entry.mustChangePassword"
-              color="warning"
-              variant="subtle"
-            >
-              Passwort ändern
-            </UBadge>
-            <UBadge variant="subtle">
-              {{ roleLabels[entry.role] }}
-            </UBadge>
-            <UButton
-              variant="outline"
-              size="sm"
-              @click="openResetPassword(entry)"
-            >
-              Passwort zurücksetzen
-            </UButton>
-          </div>
+          <UButton
+            variant="outline"
+            class="min-h-12 justify-center w-full sm:w-auto"
+            @click="openResetPassword(entry)"
+          >
+            Passwort zurücksetzen
+          </UButton>
         </div>
-      </UCard>
+      </div>
     </div>
 
     <UEmpty
@@ -208,6 +209,7 @@ async function submitResetPassword() {
       <div class="md:col-span-2">
         <UButton
           type="submit"
+          class="min-h-12"
           :loading="creatingUser"
         >
           Benutzer anlegen
@@ -247,14 +249,17 @@ async function submitResetPassword() {
           </div>
 
           <template #footer>
-            <div class="flex justify-end gap-2">
+            <div class="flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
               <UButton
                 variant="ghost"
+                color="neutral"
+                class="min-h-11 justify-center"
                 @click="closeResetPassword"
               >
                 Abbrechen
               </UButton>
               <UButton
+                class="min-h-11 justify-center"
                 :loading="resettingPassword"
                 @click="submitResetPassword"
               >

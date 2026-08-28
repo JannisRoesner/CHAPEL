@@ -11,7 +11,7 @@ CHAPEL ist eine moderne Web-App zur Verwaltung und touch-gesteuerten Wiedergabe 
 - Konkrete Gottesdienste aus Vorlagen erstellen und Lied-Slots befüllen
 - Touch-minimale Wiedergabe: Play → Stopp nach Titel → nächster Titel per Knopf
 - Automatische Listen-Aktualisierung via WebSocket (Bibliothek, Gottesdienst-Übersicht)
-- PWA mit Offline-Cache für Gottesdienste
+- PWA mit Offline-Cache: Gottesdienste vorbereiten, danach Wiedergabe auch ohne Netzwerk (ohne erneuten Login)
 - Benutzerverwaltung (Admin: Anlegen und Rollen zuweisen)
 - Hell/Dunkel-Modus, Font Awesome Icons
 - Docker-Deployment (eine Gemeinde pro Installation)
@@ -114,11 +114,12 @@ scripts/       # Migration, Icon-Generierung
 | Route | Beschreibung |
 |---|---|
 | `/` | Landing-Page (öffentlich; eingeloggte Nutzer → `/playback`) |
+| `/offline` | Hinweisseite ohne Offline-Daten |
 | `/login` | Anmeldung |
 | `/library` | MP3-Bibliothek |
 | `/service-types` | Gottesdienst-Vorlagen |
 | `/services` | Konkrete Gottesdienste |
-| `/playback` | Touch-Wiedergabe |
+| `/playback` | Touch-Wiedergabe (auch offline nach Vorbereitung) |
 | `/settings` | Theme, Offline-Cache & Benutzerverwaltung (Admin) |
 
 ## Skripte

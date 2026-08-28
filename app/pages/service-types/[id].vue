@@ -121,52 +121,46 @@ async function save() {
     v-if="loading"
     class="space-y-3"
   >
-    <USkeleton class="h-8 w-64" />
+    <USkeleton class="h-8 w-64 rounded-xl" />
     <USkeleton
       v-for="i in 4"
       :key="i"
-      class="h-20 w-full"
+      class="h-28 w-full rounded-2xl"
     />
   </div>
 
   <div
     v-else-if="serviceType"
-    class="space-y-6"
+    class="space-y-6 pb-24 md:pb-0"
   >
-    <div class="flex items-start justify-between gap-4">
-      <div>
+    <UiPageHeader
+      :title="serviceType.name"
+      description="Ablauf der Vorlage bearbeiten"
+      back-to="/service-types"
+      back-label="Zu Vorlagen"
+    >
+      <template #actions>
         <UButton
-          to="/service-types"
-          variant="ghost"
-          size="sm"
-          class="mb-2"
+          class="min-h-12 justify-center w-full sm:w-auto"
+          :loading="saving"
+          @click="save"
         >
-          ← Zurück
+          Speichern
         </UButton>
-        <h1 class="text-2xl font-semibold">
-          {{ serviceType.name }}
-        </h1>
-        <p class="text-muted">
-          Ablauf der Vorlage bearbeiten
-        </p>
-      </div>
-      <UButton
-        :loading="saving"
-        @click="save"
-      >
-        Speichern
-      </UButton>
-    </div>
+      </template>
+    </UiPageHeader>
 
-    <div class="flex gap-2">
+    <div class="flex flex-col sm:flex-row gap-2">
       <UButton
         variant="outline"
+        class="min-h-12 justify-center w-full sm:w-auto"
         @click="addItem('liturgy')"
       >
         + Liturgieelement
       </UButton>
       <UButton
         variant="outline"
+        class="min-h-12 justify-center w-full sm:w-auto"
         @click="addItem('songSlot')"
       >
         + Lied-Slot
@@ -174,105 +168,104 @@ async function save() {
     </div>
 
     <div class="space-y-3">
-      <UCard
+      <div
         v-for="(item, index) in items"
         :key="`${item.position}-${index}`"
+        class="rounded-2xl border border-default bg-elevated/40 p-4 sm:p-5"
       >
-        <div class="flex flex-wrap items-start gap-3">
-          <div class="flex flex-col gap-1 shrink-0">
+        <div class="flex items-start gap-3">
+          <div class="flex flex-col gap-2 shrink-0">
             <UButton
-              size="xs"
               variant="ghost"
+              color="neutral"
+              square
+              class="min-h-11 min-w-11"
               :disabled="index === 0"
+              aria-label="Nach oben"
               @click="moveItem(index, -1)"
             >
-              ↑
+              <FontAwesomeIcon icon="chevron-up" />
             </UButton>
             <UButton
-              size="xs"
               variant="ghost"
+              color="neutral"
+              square
+              class="min-h-11 min-w-11"
               :disabled="index === items.length - 1"
+              aria-label="Nach unten"
               @click="moveItem(index, 1)"
             >
-              ↓
+              <FontAwesomeIcon icon="chevron-down" />
             </UButton>
           </div>
 
-          <div class="flex-1 min-w-0 space-y-3">
-            <div class="flex flex-wrap gap-3 items-center">
+          <div class="flex-1 min-w-0 space-y-4">
+            <div class="flex flex-col gap-3">
               <UBadge
                 :color="item.kind === 'liturgy' ? 'info' : 'neutral'"
                 variant="subtle"
+                class="self-start"
               >
                 {{ kindLabel(item.kind) }}
               </UBadge>
               <UInput
                 v-model="item.label"
-                class="flex-1 min-w-48"
+                class="w-full"
               />
             </div>
 
-            <div
-              v-if="item.kind === 'liturgy'"
-              class="flex items-center gap-3"
-            >
-              <p class="text-sm flex-1 truncate">
-                {{ item.defaultTrack?.title || 'Kein Track gewählt' }}
+            <div class="flex flex-col gap-2">
+              <p class="text-muted truncate">
+                <template v-if="item.kind === 'liturgy'">
+                  {{ item.defaultTrack?.title || 'Kein Track gewählt' }}
+                </template>
+                <template v-else>
+                  Optional: {{ item.defaultTrack?.title || 'Kein Standard-Lied' }}
+                </template>
               </p>
-              <UButton
-                v-if="item.defaultTrackId"
-                variant="outline"
-                size="sm"
-                :aria-label="isPlaying(item.defaultTrackId) ? 'Wiedergabe stoppen' : 'Probehören'"
-                @click="toggle(item.defaultTrackId)"
-              >
-                <FontAwesomeIcon :icon="isPlaying(item.defaultTrackId) ? 'stop' : 'play'" />
-              </UButton>
-              <UButton
-                size="sm"
-                variant="outline"
-                @click="openPicker(index, item.kind)"
-              >
-                {{ item.defaultTrackId ? 'Track ändern' : 'Track wählen' }}
-              </UButton>
-            </div>
-
-            <div
-              v-else
-              class="flex items-center gap-3 text-sm text-muted"
-            >
-              <p class="flex-1 truncate">
-                Optional: {{ item.defaultTrack?.title || 'Kein Standard-Lied' }}
-              </p>
-              <UButton
-                v-if="item.defaultTrackId"
-                variant="outline"
-                size="sm"
-                :aria-label="isPlaying(item.defaultTrackId) ? 'Wiedergabe stoppen' : 'Probehören'"
-                @click="toggle(item.defaultTrackId)"
-              >
-                <FontAwesomeIcon :icon="isPlaying(item.defaultTrackId) ? 'stop' : 'play'" />
-              </UButton>
-              <UButton
-                size="xs"
-                variant="ghost"
-                @click="openPicker(index, item.kind)"
-              >
-                Standard setzen
-              </UButton>
+              <div class="flex flex-col sm:flex-row gap-2">
+                <UButton
+                  v-if="item.defaultTrackId"
+                  variant="soft"
+                  color="neutral"
+                  class="min-h-12 justify-center w-full sm:w-auto"
+                  :aria-label="isPlaying(item.defaultTrackId) ? 'Wiedergabe stoppen' : 'Probehören'"
+                  @click="toggle(item.defaultTrackId)"
+                >
+                  <FontAwesomeIcon
+                    :icon="isPlaying(item.defaultTrackId) ? 'stop' : 'play'"
+                    class="mr-2"
+                  />
+                  {{ isPlaying(item.defaultTrackId) ? 'Stoppen' : 'Probehören' }}
+                </UButton>
+                <UButton
+                  variant="outline"
+                  class="min-h-12 justify-center w-full sm:w-auto"
+                  @click="openPicker(index, item.kind)"
+                >
+                  <template v-if="item.kind === 'liturgy'">
+                    {{ item.defaultTrackId ? 'Track ändern' : 'Track wählen' }}
+                  </template>
+                  <template v-else>
+                    Standard setzen
+                  </template>
+                </UButton>
+              </div>
             </div>
           </div>
 
           <UButton
             variant="ghost"
             color="error"
-            size="sm"
+            square
+            class="min-h-11 min-w-11 shrink-0"
+            aria-label="Schritt entfernen"
             @click="removeItem(index)"
           >
             <FontAwesomeIcon icon="trash" />
           </UButton>
         </div>
-      </UCard>
+      </div>
     </div>
 
     <UEmpty
@@ -286,5 +279,20 @@ async function save() {
       :category-filter="pickerFilter"
       @pick="onTrackPicked"
     />
+
+    <div
+      class="md:hidden fixed inset-x-0 z-30 border-t border-default bg-elevated/95 backdrop-blur px-4 py-3"
+      :style="{ bottom: 'calc(5.25rem + env(safe-area-inset-bottom))' }"
+    >
+      <UButton
+        block
+        size="lg"
+        class="min-h-12"
+        :loading="saving"
+        @click="save"
+      >
+        Speichern
+      </UButton>
+    </div>
   </div>
 </template>

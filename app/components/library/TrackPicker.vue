@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TrackDto } from '#shared/types/chapel'
+import { useMediaQuery } from '@vueuse/core'
 
 const props = defineProps<{
   open: boolean
@@ -13,6 +14,7 @@ const emit = defineEmits<{
 
 const libraryStore = useLibraryStore()
 const search = ref('')
+const isMobile = useMediaQuery('(max-width: 767px)')
 
 const filtered = computed(() => {
   let list = libraryStore.tracks
@@ -52,12 +54,13 @@ function chooseTrack(track: TrackDto) {
 <template>
   <UModal
     :open="open"
+    :fullscreen="isMobile"
     @update:open="emit('update:open', $event)"
   >
     <template #content>
-      <UCard class="max-h-[70vh] flex flex-col">
+      <UCard class="max-h-[85vh] sm:max-h-[70vh] flex flex-col">
         <template #header>
-          <h3 class="font-semibold">
+          <h3 class="text-lg font-semibold">
             Track auswählen
           </h3>
         </template>
@@ -66,33 +69,36 @@ function chooseTrack(track: TrackDto) {
           v-model="search"
           placeholder="Suchen…"
           icon="i-lucide-search"
+          size="lg"
           class="mb-4"
         />
 
-        <div class="overflow-y-auto flex-1 divide-y divide-default">
+        <div class="overflow-y-auto flex-1 -mx-1">
           <button
             v-for="track in filtered"
             :key="track.id"
             type="button"
-            class="w-full text-left px-3 py-3 hover:bg-elevated/50 flex items-center gap-3"
+            class="w-full text-left px-4 py-4 rounded-xl hover:bg-elevated/50 flex items-center gap-4 min-h-16"
             @click="chooseTrack(track)"
           >
-            <FontAwesomeIcon
-              icon="music"
-              class="text-muted"
-            />
+            <div class="shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <FontAwesomeIcon
+                icon="music"
+                class="text-primary"
+              />
+            </div>
             <div class="min-w-0">
-              <p class="font-medium truncate">
+              <p class="font-semibold truncate">
                 {{ track.title }}
               </p>
-              <p class="text-sm text-muted truncate">
+              <p class="text-muted truncate mt-0.5">
                 {{ track.composer || 'Unbekannt' }}
               </p>
             </div>
           </button>
           <p
             v-if="!filtered.length"
-            class="text-center text-muted py-8"
+            class="text-center text-muted py-10"
           >
             Keine Tracks gefunden
           </p>

@@ -13,6 +13,8 @@ definePageMeta({
 })
 
 const { loggedIn, fetch: fetchSession } = useUserSession()
+const isOfflineClient = import.meta.client && !navigator.onLine
+const showOfflineHint = ref(false)
 
 try {
   await fetchSession()
@@ -22,10 +24,12 @@ try {
 
 if (loggedIn.value) {
   await navigateTo(DEFAULT_ROUTE, { replace: true })
-} else if (import.meta.client && !navigator.onLine) {
-  const cached = await useOfflineCache().getCachedServices()
-  if (cached.length > 0) {
+} else if (isOfflineClient) {
+  const allowed = await useLocalSession().canUseOfflinePlayback()
+  if (allowed) {
     await navigateTo(DEFAULT_ROUTE, { replace: true })
+  } else {
+    showOfflineHint.value = true
   }
 }
 
@@ -46,10 +50,39 @@ const previewById: Record<string, Component> = {
 }
 
 const { open: loginOpen } = useLoginModal()
+
+// Offline ohne Cache: kein Login-Modal öffnen
+if (showOfflineHint.value) {
+  loginOpen.value = false
+}
 </script>
 
 <template>
-  <div v-if="!loggedIn">
+  <div
+    v-if="showOfflineHint"
+    class="min-h-[70vh] flex items-center justify-center px-4"
+  >
+    <div class="max-w-md w-full text-center space-y-6">
+      <UiAppLogo size="lg" />
+      <div class="space-y-2">
+        <h1 class="text-2xl font-semibold">
+          Offline — keine vorbereiteten Gottesdienste
+        </h1>
+        <p class="text-muted">
+          Melden Sie sich einmal online an und bereiten Sie einen Gottesdienst vor.
+          Danach startet die Wiedergabe auch ohne Netzwerk direkt.
+        </p>
+      </div>
+      <UAlert
+        color="info"
+        variant="subtle"
+        title="Tipp"
+        description="Installieren Sie CHAPEL als App (PWA), damit die Oberfläche offline verfügbar bleibt."
+      />
+    </div>
+  </div>
+
+  <div v-else-if="!loggedIn">
     <LandingHero />
 
     <section

@@ -71,6 +71,7 @@ async function changePassword() {
     <div class="md:col-span-2">
       <UButton
         type="submit"
+        class="min-h-12"
         :loading="changingPassword"
       >
         Passwort speichern

@@ -15,6 +15,7 @@ export interface LegalContent {
 
 export const PUBLIC_PATHS = [
   '/',
+  '/offline',
   LEGAL_ROUTES.impressum,
   LEGAL_ROUTES.privacy
 ] as const

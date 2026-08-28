@@ -80,16 +80,19 @@ async function logout() {
             variant="subtle"
             :title="error"
           />
-          <div class="flex justify-end gap-2">
+          <div class="flex flex-col-reverse sm:flex-row justify-end gap-2">
             <UButton
               variant="ghost"
+              color="neutral"
               type="button"
+              class="min-h-11 justify-center"
               @click="logout"
             >
               Abmelden
             </UButton>
             <UButton
               type="submit"
+              class="min-h-11 justify-center"
               :loading="saving"
             >
               Passwort speichern

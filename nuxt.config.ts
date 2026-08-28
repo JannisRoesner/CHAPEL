@@ -17,7 +17,8 @@ export default defineNuxtConfig({
       title: 'CHAPEL',
       meta: [
         { name: 'description', content: 'Church Hymn Audio Playlist Engine for Liturgy' },
-        { name: 'theme-color', content: '#00A155' }
+        { name: 'theme-color', content: '#00A155' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' }
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
@@ -30,9 +31,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     session: {
       password: process.env.NUXT_SESSION_PASSWORD || 'dev-session-password-min-32-characters-long',
+      maxAge: 60 * 60 * 24 * 90,
       cookie: {
         sameSite: 'lax',
-        secure: false
+        secure: false,
+        maxAge: 60 * 60 * 24 * 90
       }
     }
   },
@@ -114,7 +117,8 @@ export default defineNuxtConfig({
       navigateFallbackDenylist: [/^\/api\//],
       runtimeCaching: [
         {
-          urlPattern: /^\/api\/tracks\/\d+\/stream$/,
+          // Match pathname only — Workbox tests against the full request URL
+          urlPattern: /\/api\/tracks\/\d+\/stream$/,
           handler: 'CacheFirst',
           options: {
             cacheName: 'chapel-audio-v1',

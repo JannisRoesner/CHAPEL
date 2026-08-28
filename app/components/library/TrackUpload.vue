@@ -61,56 +61,58 @@ function onDrop(event: DragEvent) {
 </script>
 
 <template>
-  <UCard>
-    <div
-      class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
-      :class="dragOver ? 'border-primary bg-primary/5' : 'border-default'"
-      @dragover.prevent="dragOver = true"
-      @dragleave="dragOver = false"
-      @drop.prevent="onDrop"
-    >
+  <div
+    class="rounded-2xl border-2 border-dashed p-6 sm:p-8 text-center transition-colors"
+    :class="dragOver ? 'border-primary bg-primary/5' : 'border-default bg-elevated/30'"
+    @dragover.prevent="dragOver = true"
+    @dragleave="dragOver = false"
+    @drop.prevent="onDrop"
+  >
+    <div class="mx-auto mb-4 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
       <FontAwesomeIcon
         icon="upload"
-        class="text-3xl text-muted mb-3"
-      />
-      <p class="mb-4 text-muted">
-        Audiodateien (MP3, WAV, FLAC, OGG) hier ablegen oder auswählen
-      </p>
-
-      <div class="flex flex-wrap items-center justify-center gap-3 mb-4">
-        <USelect
-          v-model="category"
-          :items="[
-            { label: 'Lied', value: 'hymn' },
-            { label: 'Liturgie', value: 'liturgy' }
-          ]"
-          class="w-40"
-        />
-        <label>
-          <UButton
-            as="span"
-            :loading="uploading"
-            :disabled="uploading"
-          >
-            Dateien wählen
-          </UButton>
-          <input
-            type="file"
-            :accept="AUDIO_FILE_ACCEPT"
-            multiple
-            class="hidden"
-            @change="onFileChange"
-          >
-        </label>
-      </div>
-
-      <UAlert
-        v-if="error"
-        color="error"
-        variant="subtle"
-        :title="error"
-        class="mt-4"
+        class="text-xl text-primary"
       />
     </div>
-  </UCard>
+    <p class="mb-5 text-muted leading-relaxed">
+      Audiodateien (MP3, WAV, FLAC, OGG) hier ablegen oder auswählen
+    </p>
+
+    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-3 mb-2">
+      <USelect
+        v-model="category"
+        :items="[
+          { label: 'Lied', value: 'hymn' },
+          { label: 'Liturgie', value: 'liturgy' }
+        ]"
+        class="w-full sm:w-44"
+      />
+      <label class="w-full sm:w-auto">
+        <UButton
+          as="span"
+          size="lg"
+          class="min-h-12 w-full justify-center"
+          :loading="uploading"
+          :disabled="uploading"
+        >
+          Dateien wählen
+        </UButton>
+        <input
+          type="file"
+          :accept="AUDIO_FILE_ACCEPT"
+          multiple
+          class="hidden"
+          @change="onFileChange"
+        >
+      </label>
+    </div>
+
+    <UAlert
+      v-if="error"
+      color="error"
+      variant="subtle"
+      :title="error"
+      class="mt-4 text-left"
+    />
+  </div>
 </template>

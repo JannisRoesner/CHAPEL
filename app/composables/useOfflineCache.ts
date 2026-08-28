@@ -34,6 +34,8 @@ export interface PrepareServiceResult {
   partial: boolean
   cachedTracks: number
   totalTracks: number
+  failedTitles: string[]
+  errorMessage: string | null
 }
 
 export interface PlaybackLoadResult {
@@ -133,36 +135,42 @@ async function filterPlaylistToCachedTracks(playlist: PlaylistStepDto[]): Promis
 
 async function cachePlaylistAudio(
   playlist: PlaylistStepDto[],
-  onProgress?: (percent: number) => void
-): Promise<{ cachedTracks: number, totalTracks: number }> {
+  onProgress?: (percent: number, label?: string) => void
+): Promise<{ cachedTracks: number, totalTracks: number, failedTitles: string[] }> {
   const tracksWithUrls = playlist.filter(step => step.streamUrl)
   const totalTracks = tracksWithUrls.length
   let cachedTracks = 0
+  const failedTitles: string[] = []
 
   if (totalTracks === 0) {
     onProgress?.(100)
-    return { cachedTracks: 0, totalTracks: 0 }
+    return { cachedTracks: 0, totalTracks: 0, failedTitles }
   }
 
   const cache = await caches.open(AUDIO_CACHE_NAME)
 
   for (let i = 0; i < tracksWithUrls.length; i++) {
     const step = tracksWithUrls[i]!
+    const label = step.title || step.label || `Track ${i + 1}`
+    onProgress?.(Math.round((i / totalTracks) * 100), label)
+
     if (step.streamUrl) {
       try {
         const response = await fetch(step.streamUrl, { credentials: 'include' })
         if (response.ok) {
           await cache.put(step.streamUrl, response.clone())
           cachedTracks++
+        } else {
+          failedTitles.push(label)
         }
       } catch {
-        // track download failed
+        failedTitles.push(label)
       }
     }
-    onProgress?.(Math.round(((i + 1) / totalTracks) * 100))
+    onProgress?.(Math.round(((i + 1) / totalTracks) * 100), label)
   }
 
-  return { cachedTracks, totalTracks }
+  return { cachedTracks, totalTracks, failedTitles }
 }
 
 function buildOfflineRecord(
@@ -190,6 +198,7 @@ function buildOfflineRecord(
 export function useOfflineCache() {
   const preparing = ref(false)
   const progress = ref(0)
+  const progressLabel = ref('')
   const cachedServiceIds = ref<number[]>([])
 
   async function refreshCachedList() {
@@ -234,17 +243,29 @@ export function useOfflineCache() {
     updatedAt: string
   ): Promise<PrepareServiceResult> {
     if (!import.meta.client) {
-      return { success: false, partial: false, cachedTracks: 0, totalTracks: 0 }
+      return {
+        success: false,
+        partial: false,
+        cachedTracks: 0,
+        totalTracks: 0,
+        failedTitles: [],
+        errorMessage: 'Nur im Browser verfügbar'
+      }
     }
 
     preparing.value = true
     progress.value = 0
+    progressLabel.value = 'Playlist wird geladen…'
 
     try {
       const playlist = await $fetch<PlaylistStepDto[]>(`/api/services/${serviceId}/playlist`)
-      const { cachedTracks, totalTracks } = await cachePlaylistAudio(playlist, (p) => {
-        progress.value = p
-      })
+      const { cachedTracks, totalTracks, failedTitles } = await cachePlaylistAudio(
+        playlist,
+        (p, label) => {
+          progress.value = p
+          if (label) progressLabel.value = label
+        }
+      )
 
       const success = cachedTracks === totalTracks && totalTracks > 0
       const partial = cachedTracks > 0 && !success
@@ -262,10 +283,29 @@ export function useOfflineCache() {
         await refreshCachedList()
       }
 
-      return { success, partial, cachedTracks, totalTracks }
+      let errorMessage: string | null = null
+      if (!success && !partial) {
+        if (totalTracks === 0) {
+          errorMessage = 'Dieser Gottesdienst hat noch keine Audiodateien'
+        } else {
+          errorMessage = 'Keine Audiodateien konnten gespeichert werden — prüfen Sie die Netzwerkverbindung'
+        }
+      }
+
+      return { success, partial, cachedTracks, totalTracks, failedTitles, errorMessage }
+    } catch {
+      return {
+        success: false,
+        partial: false,
+        cachedTracks: 0,
+        totalTracks: 0,
+        failedTitles: [],
+        errorMessage: 'Playlist konnte nicht geladen werden — sind Sie online und angemeldet?'
+      }
     } finally {
       preparing.value = false
       progress.value = 0
+      progressLabel.value = ''
     }
   }
 
@@ -385,6 +425,7 @@ export function useOfflineCache() {
   return {
     preparing,
     progress,
+    progressLabel,
     cachedServiceIds,
     getCachedServices,
     getCachedService,

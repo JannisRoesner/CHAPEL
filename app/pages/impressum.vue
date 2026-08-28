@@ -13,8 +13,8 @@ useHead({
 </script>
 
 <template>
-  <div class="max-w-3xl mx-auto px-4 py-12">
-    <h1 class="text-3xl font-semibold mb-8">
+  <div class="max-w-3xl mx-auto px-4 py-4 md:py-8">
+    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight mb-8">
       Impressum
     </h1>
 

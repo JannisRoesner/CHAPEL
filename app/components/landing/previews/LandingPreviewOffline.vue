@@ -21,6 +21,15 @@
       </p>
     </div>
 
+    <div class="rounded-lg border border-warning/40 bg-warning/5 p-4">
+      <p class="font-medium text-sm">
+        Offline-Wiedergabe-Modus
+      </p>
+      <p class="text-xs text-muted mt-0.5">
+        Ohne Netzwerk startet CHAPEL direkt bei der Wiedergabe — kein Login nötig
+      </p>
+    </div>
+
     <div class="flex items-center gap-3 rounded-lg border border-dashed border-primary/40 bg-primary/5 p-4">
       <div class="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
         <FontAwesomeIcon

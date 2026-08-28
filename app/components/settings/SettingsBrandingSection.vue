@@ -10,6 +10,7 @@ const removingLogo = ref(false)
 const logoDragOver = ref(false)
 const copyrightHolder = ref('')
 const savingCopyright = ref(false)
+const resetLogoOpen = ref(false)
 
 const copyrightPreview = computed(() => formatCopyrightNotice(copyrightHolder.value))
 
@@ -81,13 +82,17 @@ function onLogoDrop(event: DragEvent) {
   }
 }
 
-async function resetLogo() {
-  if (!confirm('Standard-Logo wiederherstellen?')) return
+function requestResetLogo() {
+  resetLogoOpen.value = true
+}
+
+async function confirmResetLogo() {
   removingLogo.value = true
   try {
     await $fetch('/api/settings/logo', { method: 'DELETE' })
     await fetchBranding()
     toast.add({ title: 'Standard-Logo wiederhergestellt', color: 'success' })
+    resetLogoOpen.value = false
   } catch (e: unknown) {
     const err = e as { data?: { message?: string }, statusMessage?: string }
     toast.add({
@@ -150,64 +155,74 @@ async function resetLogo() {
         </p>
       </div>
 
-    <div class="flex items-center gap-4">
-      <img
-        v-if="branding.hasCustomLogo"
-        :src="branding.logoUrl"
-        alt="Aktuelles Logo"
-        class="h-16 w-16 rounded-lg object-contain bg-elevated border border-default"
+      <div class="flex items-center gap-4">
+        <img
+          v-if="branding.hasCustomLogo"
+          :src="branding.logoUrl"
+          alt="Aktuelles Logo"
+          class="h-16 w-16 rounded-lg object-contain bg-elevated border border-default"
+        >
+        <UiChapelIcon
+          v-else
+          size="xl"
+        />
+        <div class="text-sm text-muted">
+          {{ branding.hasCustomLogo ? 'Benutzerdefiniertes Logo aktiv' : 'Standard-Kirchen-Icon aktiv' }}
+        </div>
+      </div>
+
+      <div
+        class="border-2 border-dashed rounded-lg p-6 text-center transition-colors"
+        :class="logoDragOver ? 'border-primary bg-primary/5' : 'border-default'"
+        @dragover.prevent="logoDragOver = true"
+        @dragleave="logoDragOver = false"
+        @drop.prevent="onLogoDrop"
       >
-      <UiChapelIcon
-        v-else
-        size="xl"
-      />
-      <div class="text-sm text-muted">
-        {{ branding.hasCustomLogo ? 'Benutzerdefiniertes Logo aktiv' : 'Standard-Kirchen-Icon aktiv' }}
+        <FontAwesomeIcon
+          icon="upload"
+          class="text-2xl text-muted mb-2"
+        />
+        <p class="text-sm text-muted mb-4">
+          Logo hier ablegen oder auswählen (PNG, JPEG, WebP, SVG)
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <label>
+            <UButton
+              as="span"
+              :loading="uploadingLogo"
+              :disabled="uploadingLogo || removingLogo"
+            >
+              Logo hochladen
+            </UButton>
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml,.png,.jpg,.jpeg,.webp,.svg"
+              class="hidden"
+              @change="onLogoFileChange"
+            >
+          </label>
+          <UButton
+            v-if="branding.hasCustomLogo"
+            variant="outline"
+            color="error"
+            class="min-h-12"
+            :loading="removingLogo"
+            :disabled="uploadingLogo || removingLogo"
+            @click="requestResetLogo"
+          >
+            Standard wiederherstellen
+          </UButton>
+        </div>
       </div>
     </div>
 
-    <div
-      class="border-2 border-dashed rounded-lg p-6 text-center transition-colors"
-      :class="logoDragOver ? 'border-primary bg-primary/5' : 'border-default'"
-      @dragover.prevent="logoDragOver = true"
-      @dragleave="logoDragOver = false"
-      @drop.prevent="onLogoDrop"
-    >
-      <FontAwesomeIcon
-        icon="upload"
-        class="text-2xl text-muted mb-2"
-      />
-      <p class="text-sm text-muted mb-4">
-        Logo hier ablegen oder auswählen (PNG, JPEG, WebP, SVG)
-      </p>
-      <div class="flex flex-wrap items-center justify-center gap-3">
-        <label>
-          <UButton
-            as="span"
-            :loading="uploadingLogo"
-            :disabled="uploadingLogo || removingLogo"
-          >
-            Logo hochladen
-          </UButton>
-          <input
-            type="file"
-            accept="image/png,image/jpeg,image/webp,image/svg+xml,.png,.jpg,.jpeg,.webp,.svg"
-            class="hidden"
-            @change="onLogoFileChange"
-          >
-        </label>
-        <UButton
-          v-if="branding.hasCustomLogo"
-          variant="outline"
-          color="error"
-          :loading="removingLogo"
-          :disabled="uploadingLogo || removingLogo"
-          @click="resetLogo"
-        >
-          Standard wiederherstellen
-        </UButton>
-      </div>
-    </div>
-    </div>
+    <UiConfirmModal
+      v-model:open="resetLogoOpen"
+      title="Logo zurücksetzen"
+      description="Standard-Logo wiederherstellen?"
+      confirm-label="Zurücksetzen"
+      :loading="removingLogo"
+      @confirm="confirmResetLogo"
+    />
   </div>
 </template>

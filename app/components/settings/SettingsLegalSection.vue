@@ -101,12 +101,12 @@ onMounted(loadLegal)
 
     <template v-else>
       <div class="space-y-3">
-        <div class="flex items-center justify-between gap-4">
-          <h3 class="text-sm font-medium">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h3 class="font-medium">
             Impressum
           </h3>
           <UButton
-            size="sm"
+            class="min-h-11 justify-center w-full sm:w-auto"
             :loading="savingImpressum"
             :disabled="savingImpressum || savingPrivacy"
             @click="saveImpressum"
@@ -121,12 +121,12 @@ onMounted(loadLegal)
       </div>
 
       <div class="space-y-3">
-        <div class="flex items-center justify-between gap-4">
-          <h3 class="text-sm font-medium">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h3 class="font-medium">
             Datenschutzerklärung
           </h3>
           <UButton
-            size="sm"
+            class="min-h-11 justify-center w-full sm:w-auto"
             :loading="savingPrivacy"
             :disabled="savingImpressum || savingPrivacy"
             @click="savePrivacy"

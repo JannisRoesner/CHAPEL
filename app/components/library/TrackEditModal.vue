@@ -56,7 +56,7 @@ async function save() {
     <template #content>
       <UCard>
         <template #header>
-          <h3 class="font-semibold">
+          <h3 class="text-lg font-semibold">
             Track bearbeiten
           </h3>
         </template>
@@ -65,15 +65,20 @@ async function save() {
           <UFormField label="Titel">
             <UInput
               v-model="title"
+              class="w-full"
               required
             />
           </UFormField>
           <UFormField label="Komponist">
-            <UInput v-model="composer" />
+            <UInput
+              v-model="composer"
+              class="w-full"
+            />
           </UFormField>
           <UFormField label="Kategorie">
             <USelect
               v-model="category"
+              class="w-full"
               :items="[
                 { label: 'Lied', value: 'hymn' },
                 { label: 'Liturgie', value: 'liturgy' }
@@ -83,14 +88,17 @@ async function save() {
         </div>
 
         <template #footer>
-          <div class="flex justify-end gap-2">
+          <div class="flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
             <UButton
               variant="ghost"
+              color="neutral"
+              class="min-h-11 justify-center"
               @click="emit('update:open', false)"
             >
               Abbrechen
             </UButton>
             <UButton
+              class="min-h-11 justify-center"
               :loading="saving"
               @click="save"
             >

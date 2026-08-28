@@ -9,7 +9,8 @@ function cycleTheme() {
 <template>
   <UButton
     variant="ghost"
-    size="sm"
+    color="neutral"
+    class="min-h-11 min-w-11"
     :aria-label="colorMode.value === 'dark' ? 'Hellmodus' : 'Dunkelmodus'"
     @click="cycleTheme"
   >

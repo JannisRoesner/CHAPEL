@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import type { DropdownMenuItem } from '@nuxt/ui'
+
 const servicesStore = useServicesStore()
 const toast = useToast()
 const creating = ref(false)
 const newName = ref('')
+const deleteOpen = ref(false)
+const deleteTarget = ref<{ id: number, name: string } | null>(null)
 
 onMounted(() => servicesStore.fetchServiceTypes())
 
@@ -24,88 +28,107 @@ async function createType() {
   }
 }
 
-async function deleteType(id: number, name: string) {
-  if (!confirm(`"${name}" wirklich löschen?`)) return
-  await $fetch(`/api/service-types/${id}`, { method: 'DELETE' })
-  servicesStore.removeServiceType(id)
+function requestDelete(id: number, name: string) {
+  deleteTarget.value = { id, name }
+  deleteOpen.value = true
+}
+
+async function confirmDelete() {
+  if (!deleteTarget.value) return
+  await $fetch(`/api/service-types/${deleteTarget.value.id}`, { method: 'DELETE' })
+  servicesStore.removeServiceType(deleteTarget.value.id)
+  deleteOpen.value = false
+  deleteTarget.value = null
+}
+
+function typeMenu(id: number, name: string): DropdownMenuItem[][] {
+  return [[
+    {
+      label: 'Bearbeiten',
+      icon: 'i-lucide-pencil',
+      to: `/service-types/${id}`
+    },
+    {
+      label: 'Löschen',
+      icon: 'i-lucide-trash',
+      color: 'error',
+      onSelect: () => requestDelete(id, name)
+    }
+  ]]
 }
 </script>
 
 <template>
   <div class="space-y-6">
-    <div>
-      <h1 class="text-2xl font-semibold mb-1">
-        Gottesdienst-Vorlagen
-      </h1>
-      <p class="text-muted">
-        Feste Liturgieelemente und Lied-Slots für wiederkehrende Gottesdienste
-      </p>
-    </div>
+    <UiPageHeader
+      title="Gottesdienst-Vorlagen"
+      description="Feste Liturgieelemente und Lied-Slots für wiederkehrende Gottesdienste"
+    />
 
-    <UCard>
-      <form
-        class="flex gap-3"
-        @submit.prevent="createType"
+    <form
+      class="flex flex-col sm:flex-row gap-3 rounded-2xl border border-default bg-elevated/40 p-4 sm:p-5"
+      @submit.prevent="createType"
+    >
+      <UInput
+        v-model="newName"
+        placeholder="Neue Vorlage, z.B. Sonntagsgottesdienst"
+        class="flex-1"
+        size="lg"
+      />
+      <UButton
+        type="submit"
+        class="min-h-12 justify-center"
+        :loading="creating"
       >
-        <UInput
-          v-model="newName"
-          placeholder="Neue Vorlage, z.B. Sonntagsgottesdienst"
-          class="flex-1"
-        />
-        <UButton
-          type="submit"
-          :loading="creating"
-        >
-          Anlegen
-        </UButton>
-      </form>
-    </UCard>
+        Anlegen
+      </UButton>
+    </form>
 
     <div
       v-if="servicesStore.serviceTypes.length"
-      class="space-y-2"
+      class="space-y-3"
     >
-      <UCard
+      <UiListCard
         v-for="type in servicesStore.serviceTypes"
         :key="type.id"
-        class="hover:bg-elevated/30 transition-colors"
+        :title="type.name"
+        :meta="type.description || undefined"
+        :to="`/service-types/${type.id}`"
       >
-        <div class="flex items-center justify-between gap-4">
-          <NuxtLink
+        <template #actions>
+          <UButton
             :to="`/service-types/${type.id}`"
-            class="flex-1 min-w-0"
+            variant="soft"
+            class="min-h-12 flex-1 sm:flex-none justify-center"
           >
-            <p class="font-medium">{{ type.name }}</p>
-            <p
-              v-if="type.description"
-              class="text-sm text-muted truncate"
-            >{{ type.description }}</p>
-          </NuxtLink>
-          <div class="flex gap-2 shrink-0">
-            <UButton
-              :to="`/service-types/${type.id}`"
-              variant="ghost"
-              size="sm"
-            >
-              Bearbeiten
-            </UButton>
+            Bearbeiten
+          </UButton>
+          <UDropdownMenu :items="typeMenu(type.id, type.name)">
             <UButton
               variant="ghost"
-              size="sm"
-              color="error"
-              @click="deleteType(type.id, type.name)"
-            >
-              <FontAwesomeIcon icon="trash" />
-            </UButton>
-          </div>
-        </div>
-      </UCard>
+              color="neutral"
+              icon="i-lucide-ellipsis-vertical"
+              square
+              class="min-h-12 min-w-12"
+              aria-label="Weitere Aktionen"
+            />
+          </UDropdownMenu>
+        </template>
+      </UiListCard>
     </div>
 
     <UEmpty
       v-else
       title="Keine Vorlagen"
       description="Erstellen Sie eine Vorlage für Ihren Gottesdienstablauf."
+    />
+
+    <UiConfirmModal
+      v-model:open="deleteOpen"
+      title="Vorlage löschen"
+      :description="deleteTarget ? `„${deleteTarget.name}“ wirklich löschen?` : undefined"
+      confirm-label="Löschen"
+      @confirm="confirmDelete"
     />
   </div>
 </template>
