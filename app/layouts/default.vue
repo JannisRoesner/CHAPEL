@@ -154,7 +154,7 @@ const accountItems = computed<DropdownMenuItem[][]>(() => {
         </div>
       </div>
 
-      <main class="w-full max-w-6xl mx-auto px-4 py-6 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:pb-6">
+      <main class="w-full min-w-0 max-w-6xl mx-auto px-4 py-6 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:pb-6">
         <slot />
       </main>
 

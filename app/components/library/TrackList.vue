@@ -52,12 +52,12 @@ function trackMenu(track: TrackDto): DropdownMenuItem[][] {
 
   <div
     v-else
-    class="space-y-3"
+    class="space-y-3 min-w-0 max-w-full"
   >
     <div
       v-for="track in tracks"
       :key="track.id"
-      class="rounded-2xl border border-default bg-elevated/40 p-4 flex items-center gap-3 sm:gap-4"
+      class="rounded-2xl border border-default bg-elevated/40 p-4 flex items-center gap-3 sm:gap-4 min-w-0 max-w-full"
     >
       <UButton
         :variant="isPlaying(track.id) ? 'solid' : 'soft'"

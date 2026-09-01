@@ -6,6 +6,7 @@ definePageMeta({
 const route = useRoute()
 const id = Number(route.params.id)
 const offlineCache = useOfflineCache()
+const playbackProgress = usePlaybackProgress(id)
 
 const {
   playlist,
@@ -29,6 +30,7 @@ const serviceName = ref('')
 const offlineBanner = ref<string | null>(null)
 const partialBanner = ref<string | null>(null)
 const playedIndices = ref<number[]>([])
+const progressReady = ref(false)
 
 watch(lastFinishedIndex, (idx) => {
   if (idx !== null && !playedIndices.value.includes(idx)) {
@@ -36,11 +38,36 @@ watch(lastFinishedIndex, (idx) => {
   }
 })
 
+watch(
+  [currentIndex, playedIndices],
+  () => {
+    if (!progressReady.value) return
+    playbackProgress.save(currentIndex.value, playedIndices.value)
+  },
+  { deep: true }
+)
+
+onMounted(() => {
+  window.addEventListener('pagehide', persistProgress)
+  void load()
+})
+
+onBeforeUnmount(() => {
+  persistProgress()
+  window.removeEventListener('pagehide', persistProgress)
+})
+
+function persistProgress() {
+  if (!progressReady.value) return
+  playbackProgress.save(currentIndex.value, playedIndices.value)
+}
+
 async function load() {
   loading.value = true
   loadError.value = null
   offlineBanner.value = null
   partialBanner.value = null
+  progressReady.value = false
 
   try {
     const result = await offlineCache.loadServiceForPlayback(id)
@@ -51,7 +78,12 @@ async function load() {
     }
 
     serviceName.value = result.serviceName
-    await loadPlaylist(result.playlist)
+    const saved = playbackProgress.load()
+    const stepCount = result.playlist.length
+    if (saved) {
+      playedIndices.value = saved.playedIndices.filter(i => i >= 0 && i < stepCount)
+    }
+    await loadPlaylist(result.playlist, saved?.currentIndex)
 
     if (result.source === 'cache' && result.cachedAt) {
       const date = new Date(result.cachedAt).toLocaleString('de-DE', {
@@ -67,12 +99,12 @@ async function load() {
     if (result.partial) {
       partialBanner.value = `Nur ${result.cachedTracks} von ${result.totalTracks} Tracks offline verfügbar`
     }
+
+    progressReady.value = true
   } finally {
     loading.value = false
   }
 }
-
-onMounted(load)
 
 function onSelectStep(index: number) {
   selectStep(index)

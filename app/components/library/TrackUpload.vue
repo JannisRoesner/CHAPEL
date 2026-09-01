@@ -62,7 +62,7 @@ function onDrop(event: DragEvent) {
 
 <template>
   <div
-    class="rounded-2xl border-2 border-dashed p-6 sm:p-8 text-center transition-colors"
+    class="w-full min-w-0 max-w-full rounded-2xl border-2 border-dashed p-4 sm:p-8 text-center transition-colors"
     :class="dragOver ? 'border-primary bg-primary/5' : 'border-default bg-elevated/30'"
     @dragover.prevent="dragOver = true"
     @dragleave="dragOver = false"
@@ -74,20 +74,22 @@ function onDrop(event: DragEvent) {
         class="text-xl text-primary"
       />
     </div>
-    <p class="mb-5 text-muted leading-relaxed">
+    <p class="mb-5 text-muted leading-relaxed break-words">
       Audiodateien (MP3, WAV, FLAC, OGG) hier ablegen oder auswählen
     </p>
 
-    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-3 mb-2">
-      <USelect
-        v-model="category"
-        :items="[
-          { label: 'Lied', value: 'hymn' },
-          { label: 'Liturgie', value: 'liturgy' }
-        ]"
-        class="w-full sm:w-44"
-      />
-      <label class="w-full sm:w-auto">
+    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-3 mb-2 min-w-0">
+      <div class="w-full min-w-0 sm:w-44">
+        <USelect
+          v-model="category"
+          :items="[
+            { label: 'Lied', value: 'hymn' },
+            { label: 'Liturgie', value: 'liturgy' }
+          ]"
+          class="w-full"
+        />
+      </div>
+      <label class="w-full min-w-0 sm:w-auto">
         <UButton
           as="span"
           size="lg"

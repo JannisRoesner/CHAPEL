@@ -58,7 +58,7 @@ function onSaved(track: TrackDto) {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 min-w-0 max-w-full overflow-x-clip">
     <UiPageHeader
       title="Bibliothek"
       description="Audiodateien verwalten und kategorisieren"
@@ -69,20 +69,20 @@ function onSaved(track: TrackDto) {
       @duplicate="onDuplicate"
     />
 
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-3 min-w-0">
       <UInput
         v-model="libraryStore.search"
         placeholder="Suchen…"
         icon="i-lucide-search"
         size="lg"
-        class="w-full"
+        class="w-full min-w-0 max-w-full"
       />
-      <div class="grid grid-cols-3 gap-2">
+      <div class="grid grid-cols-3 gap-2 min-w-0">
         <button
           v-for="item in categoryItems"
           :key="item.value"
           type="button"
-          class="min-h-12 rounded-xl border px-3 font-medium transition-colors"
+          class="min-h-12 min-w-0 rounded-xl border px-2 sm:px-3 font-medium text-sm sm:text-base leading-tight text-center transition-colors"
           :class="libraryStore.categoryFilter === item.value
             ? 'border-primary bg-primary/10 text-primary'
             : 'border-default text-muted hover:bg-elevated/60'"

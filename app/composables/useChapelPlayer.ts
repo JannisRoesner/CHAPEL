@@ -49,11 +49,12 @@ export function useChapelPlayer() {
     audio?.pause()
   })
 
-  async function loadPlaylist(steps: PlaylistStepDto[]) {
+  async function loadPlaylist(steps: PlaylistStepDto[], startIndex = 0) {
     resetPlayback()
     lastFinishedIndex.value = null
     playlist.value = steps
-    currentIndex.value = 0
+    const last = Math.max(0, steps.length - 1)
+    currentIndex.value = Math.min(Math.max(0, startIndex), last)
   }
 
   async function resolveStreamUrl(step: PlaylistStepDto): Promise<string | null> {
