@@ -11,13 +11,12 @@ export interface AppNavItem {
   to: string
   label: string
   icon: string
-  primary?: boolean
 }
 
 export const APP_NAV_ITEMS: AppNavItem[] = [
   { to: '/library', label: 'Bibliothek', icon: 'book' },
   { to: '/service-types', label: 'Vorlagen', icon: 'list' },
   { to: '/services', label: 'Gottesdienste', icon: 'calendar' },
-  { to: '/playback', label: 'Wiedergabe', icon: 'play', primary: true },
+  { to: '/playback', label: 'Wiedergabe', icon: 'play' },
   { to: '/settings', label: 'Einstellungen', icon: 'cog' }
 ]

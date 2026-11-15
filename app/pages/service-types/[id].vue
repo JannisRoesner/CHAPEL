@@ -305,7 +305,7 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
           <div class="flex-1 min-w-0 space-y-3">
             <div class="flex items-center gap-2">
               <UBadge
-                :color="item.kind === 'liturgy' ? 'info' : 'primary'"
+                :color="item.kind === 'liturgy' ? 'secondary' : 'primary'"
                 variant="subtle"
                 class="shrink-0"
               >

@@ -39,7 +39,7 @@ import { DEMO_SERVICE_TYPE_ITEMS } from '#shared/constants/landingDemo'
       </div>
 
       <UBadge
-        :color="item.kind === 'liturgy' ? 'info' : 'neutral'"
+        :color="item.kind === 'liturgy' ? 'secondary' : 'primary'"
         variant="subtle"
         class="shrink-0 text-xs"
       >

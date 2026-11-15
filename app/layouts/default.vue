@@ -82,7 +82,7 @@ const accountItems = computed<DropdownMenuItem[][]>(() => {
               :key="item.to"
               :to="item.to"
               :variant="isNavActive(item.to) ? 'soft' : 'ghost'"
-              :color="isNavActive(item.to) || item.primary ? 'primary' : 'neutral'"
+              :color="isNavActive(item.to) ? 'primary' : 'neutral'"
               class="gap-2 min-h-11"
             >
               <FontAwesomeIcon

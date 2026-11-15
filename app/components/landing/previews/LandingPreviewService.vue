@@ -30,7 +30,7 @@ import { DEMO_SERVICE_ITEMS } from '#shared/constants/landingDemo'
         class="flex items-center gap-3 px-3 py-2.5"
       >
         <UBadge
-          :color="item.kind === 'liturgy' ? 'info' : 'neutral'"
+          :color="item.kind === 'liturgy' ? 'secondary' : 'primary'"
           variant="subtle"
           class="shrink-0 text-xs"
         >

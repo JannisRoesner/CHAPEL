@@ -24,6 +24,19 @@ html {
   --color-green-800: #016538;
   --color-green-900: #0A5331;
   --color-green-950: #052E16;
+
+  /* Liturgie = Schemafarbe, mit Grau gedämpft → bleibt im Farbton jedes Schemas */
+  --color-liturgy-50: color-mix(in oklab, var(--color-green-50) 42%, var(--color-slate-50));
+  --color-liturgy-100: color-mix(in oklab, var(--color-green-100) 42%, var(--color-slate-100));
+  --color-liturgy-200: color-mix(in oklab, var(--color-green-200) 42%, var(--color-slate-200));
+  --color-liturgy-300: color-mix(in oklab, var(--color-green-300) 42%, var(--color-slate-300));
+  --color-liturgy-400: color-mix(in oklab, var(--color-green-400) 42%, var(--color-slate-400));
+  --color-liturgy-500: color-mix(in oklab, var(--color-green-500) 42%, var(--color-slate-500));
+  --color-liturgy-600: color-mix(in oklab, var(--color-green-600) 42%, var(--color-slate-600));
+  --color-liturgy-700: color-mix(in oklab, var(--color-green-700) 42%, var(--color-slate-700));
+  --color-liturgy-800: color-mix(in oklab, var(--color-green-800) 42%, var(--color-slate-800));
+  --color-liturgy-900: color-mix(in oklab, var(--color-green-900) 42%, var(--color-slate-900));
+  --color-liturgy-950: color-mix(in oklab, var(--color-green-950) 42%, var(--color-slate-950));
 }
 
 [data-color-scheme="liturgical-blue"] {
@@ -148,10 +161,16 @@ html {
   --ui-text-highlighted: rgb(255 255 255 / 0.94);
   --ui-text-inverted: #1c1c1e;
 
-  /* Akzentfarbe einen Ton ruhiger als das leuchtende 400er */
-  --ui-primary: var(--ui-color-primary-500);
+  /* Akzentfarbe: helle 400er-Stufe, damit dunkle Töne (Violett, Blau) sichtbar bleiben */
+  --ui-primary: var(--ui-color-primary-400);
 
   color-scheme: dark;
+}
+
+/* Chapel-Grün ist als 400er grell – im Dunkeln eine Stufe ruhiger */
+.dark:not([data-color-scheme]),
+.dark[data-color-scheme="chapel-green"] {
+  --ui-primary: var(--ui-color-primary-500);
 }
 
 /* Sanfter Wechsel zwischen Hell und Dunkel statt hartem Helligkeitssprung */
