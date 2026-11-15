@@ -20,9 +20,7 @@ ENV NODE_ENV=production
 ENV PORT=2500
 ENV PGDATA=/var/lib/postgresql/data
 ENV POSTGRES_USER=chapel
-ENV POSTGRES_PASSWORD=chapel
 ENV POSTGRES_DB=chapel
-ENV DATABASE_URL=postgresql://chapel:chapel@127.0.0.1:5432/chapel
 ENV AUDIO_STORAGE_PATH=/data/audio
 ENV BRANDING_STORAGE_PATH=/data/branding
 
