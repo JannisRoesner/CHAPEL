@@ -3,8 +3,7 @@ import { COLOR_SCHEMES } from '#shared/constants/colorSchemes'
 import type { ColorSchemeId } from '#shared/constants/colorSchemes'
 
 const toast = useToast()
-const { user } = useUserSession()
-const { colorScheme, appearanceMode, colorMode, savePreferences } = useAppearance()
+const { colorScheme, colorMode, savePreferences, setAppearanceMode } = useAppearance()
 
 const savingAppearance = ref(false)
 
@@ -14,23 +13,10 @@ const appearanceItems = [
   { label: 'Dunkel', value: 'dark' }
 ]
 
-watch(() => colorMode.preference, async (value) => {
-  if (!user.value || savingAppearance.value) return
-  if (value === appearanceMode.value) return
-  await updateAppearanceMode(value as 'system' | 'light' | 'dark')
-})
-
 async function updateAppearanceMode(mode: 'system' | 'light' | 'dark') {
   savingAppearance.value = true
   try {
-    await savePreferences({ appearanceMode: mode })
-  } catch (e: unknown) {
-    const err = e as { data?: { message?: string }, statusMessage?: string }
-    toast.add({
-      title: 'Darstellung konnte nicht gespeichert werden',
-      description: err.data?.message || err.statusMessage,
-      color: 'error'
-    })
+    await setAppearanceMode(mode)
   } finally {
     savingAppearance.value = false
   }
@@ -68,7 +54,7 @@ async function selectColorScheme(schemeId: ColorSchemeId) {
             ? 'border-primary bg-primary/10 text-primary'
             : 'border-default text-muted hover:bg-elevated/60'"
           :disabled="savingAppearance"
-          @click="colorMode.preference = item.value"
+          @click="updateAppearanceMode(item.value as 'system' | 'light' | 'dark')"
         >
           {{ item.label }}
         </button>

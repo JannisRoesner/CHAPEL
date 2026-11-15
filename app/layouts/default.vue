@@ -31,16 +31,14 @@ async function logout() {
   await navigateTo('/')
 }
 
-function cycleTheme() {
-  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-}
+const { toggleDarkMode } = useAppearance()
 
 const accountItems = computed<DropdownMenuItem[][]>(() => {
   const items: DropdownMenuItem[] = [
     {
       label: colorMode.value === 'dark' ? 'Hellmodus' : 'Dunkelmodus',
       icon: colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon',
-      onSelect: () => cycleTheme()
+      onSelect: () => void toggleDarkMode()
     }
   ]
 

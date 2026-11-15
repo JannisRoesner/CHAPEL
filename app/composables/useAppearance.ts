@@ -39,12 +39,6 @@ export function useAppearance() {
     applyAppearanceMode(appearanceMode.value, colorMode)
   }
 
-  if (import.meta.client) {
-    watch([colorScheme, appearanceMode], () => {
-      applyFromSession()
-    }, { immediate: true })
-  }
-
   async function savePreferences(input: {
     colorScheme?: ColorSchemeId
     appearanceMode?: AppearanceMode
@@ -66,11 +60,32 @@ export function useAppearance() {
     return updated
   }
 
+  /**
+   * Einziger Weg, den Modus zu ändern: sofort anwenden und – wenn angemeldet – im Profil
+   * speichern. Sonst würde der gespeicherte Wert beim nächsten Seitenwechsel zurückspringen.
+   */
+  async function setAppearanceMode(mode: AppearanceMode) {
+    applyAppearanceMode(mode, colorMode)
+    if (!user.value || mode === appearanceMode.value) return
+    try {
+      await savePreferences({ appearanceMode: mode })
+    } catch {
+      useToast().add({ title: 'Darstellung konnte nicht gespeichert werden', color: 'error' })
+    }
+  }
+
+  /** Sonne/Mond: zwischen Hell und Dunkel wechseln (ausgehend vom aktuell sichtbaren Modus) */
+  function toggleDarkMode() {
+    return setAppearanceMode(colorMode.value === 'dark' ? 'light' : 'dark')
+  }
+
   return {
     colorScheme,
     appearanceMode,
     colorMode,
     applyFromSession,
-    savePreferences
+    savePreferences,
+    setAppearanceMode,
+    toggleDarkMode
   }
 }

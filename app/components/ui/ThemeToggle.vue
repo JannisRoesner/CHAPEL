@@ -1,9 +1,6 @@
 <script setup lang="ts">
 const colorMode = useColorMode()
-
-function cycleTheme() {
-  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-}
+const { toggleDarkMode } = useAppearance()
 </script>
 
 <template>
@@ -12,7 +9,7 @@ function cycleTheme() {
     color="neutral"
     class="min-h-11 min-w-11"
     :aria-label="colorMode.value === 'dark' ? 'Hellmodus' : 'Dunkelmodus'"
-    @click="cycleTheme"
+    @click="toggleDarkMode"
   >
     <FontAwesomeIcon :icon="colorMode.value === 'dark' ? 'sun' : 'moon'" />
   </UButton>
