@@ -246,17 +246,17 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
       <li
         v-for="(item, index) in items"
         :key="item.uid"
-        class="sortable-item relative rounded-2xl border bg-default p-3 sm:p-4"
+        class="sortable-item relative rounded-2xl border bg-elevated p-3 sm:p-4"
         :class="sortable.dragIndex.value === index
-          ? 'border-primary/60 shadow-xl shadow-black/15'
-          : 'border-default'"
+          ? 'border-primary ring-2 ring-primary/40 shadow-2xl shadow-black/25'
+          : 'border-accented shadow-sm shadow-black/5'"
         :style="sortable.itemStyle(index)"
       >
         <div class="flex items-start gap-2 sm:gap-3">
           <button
             type="button"
             data-drag-handle
-            class="drag-handle shrink-0 -my-1 -ml-1 flex min-h-12 w-10 items-center justify-center rounded-xl text-dimmed hover:text-default hover:bg-elevated focus-visible:outline-2 focus-visible:outline-primary"
+            class="drag-handle shrink-0 -my-1 -ml-1 flex min-h-12 w-10 items-center justify-center rounded-xl text-dimmed hover:text-default hover:bg-accented focus-visible:outline-2 focus-visible:outline-primary"
             :aria-label="`${item.label} verschieben (Pfeiltasten)`"
             @pointerdown="sortable.onHandlePointerDown($event, index)"
             @keydown="sortable.onHandleKeydown($event, index)"
@@ -281,7 +281,7 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
               :aria-label="`Bezeichnung Schritt ${index + 1}`"
             />
 
-            <div class="flex items-center gap-2 rounded-xl bg-elevated/60 p-1.5 pl-3">
+            <div class="flex items-center gap-2 rounded-xl bg-default/70 p-1.5 pl-3">
               <FontAwesomeIcon
                 icon="music"
                 class="text-dimmed shrink-0"

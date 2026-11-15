@@ -91,7 +91,7 @@ function onSelectStep(index: number) {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="min-h-screen flex flex-col w-full min-w-0 overflow-x-clip">
     <header class="flex items-center justify-between px-4 py-3 border-b border-default overflow-x-clip">
       <UButton
         to="/playback"
@@ -137,7 +137,7 @@ function onSelectStep(index: number) {
 
     <div
       v-else
-      class="flex-1 flex flex-col gap-6 p-4 max-w-5xl mx-auto w-full"
+      class="flex-1 flex flex-col gap-6 p-4 max-w-5xl mx-auto w-full min-w-0"
     >
       <PlaybackNowPlayingBar
         class="order-last md:order-none sticky bottom-0 md:static z-20 -mx-4 px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-default/95 backdrop-blur md:bg-transparent md:backdrop-blur-none md:mx-0 md:px-0 md:pt-0 md:pb-0"

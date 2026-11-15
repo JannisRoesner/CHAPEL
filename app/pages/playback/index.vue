@@ -20,7 +20,7 @@ onMounted(async () => {
 
     <div
       v-if="loading"
-      class="grid gap-3 md:grid-cols-2"
+      class="grid grid-cols-1 gap-3 md:grid-cols-2"
     >
       <USkeleton
         v-for="i in 2"
@@ -31,13 +31,13 @@ onMounted(async () => {
 
     <div
       v-else-if="servicesStore.services.length"
-      class="grid gap-3 md:grid-cols-2"
+      class="grid grid-cols-1 gap-3 md:grid-cols-2"
     >
       <NuxtLink
         v-for="service in servicesStore.services"
         :key="service.id"
         :to="`/playback/${service.id}`"
-        class="press min-h-24 rounded-2xl border border-default bg-elevated/40 p-5 sm:p-6 hover:bg-elevated/70 flex items-center gap-4"
+        class="press min-w-0 min-h-24 rounded-2xl border border-default bg-elevated/40 p-5 sm:p-6 hover:bg-elevated/70 flex items-center gap-4"
       >
         <div class="flex-1 min-w-0">
           <p class="font-semibold text-lg truncate">

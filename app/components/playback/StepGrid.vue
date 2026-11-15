@@ -13,12 +13,12 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="grid grid-cols-1 min-[400px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+  <div class="grid w-full min-w-0 grid-cols-1 min-[400px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
     <button
       v-for="(step, index) in steps"
       :key="step.id"
       type="button"
-      class="rounded-2xl border-2 p-4 min-h-28 text-left transition-all touch-manipulation"
+      class="block w-full min-w-0 max-w-full overflow-hidden rounded-2xl border-2 p-4 min-h-28 text-left transition-all touch-manipulation"
       :class="[
         index === currentIndex
           ? 'border-primary bg-primary/10 scale-[1.02]'
@@ -27,7 +27,7 @@ const emit = defineEmits<{
       ]"
       @click="emit('select', index)"
     >
-      <p class="text-sm text-muted mb-1">
+      <p class="text-sm text-muted mb-1 truncate">
         {{ step.label }}
       </p>
       <p class="font-semibold text-base truncate">

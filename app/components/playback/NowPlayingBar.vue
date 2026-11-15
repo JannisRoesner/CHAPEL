@@ -40,7 +40,7 @@ const showProgress = computed(() => Boolean(props.step?.trackId))
 
 <template>
   <div class="rounded-2xl border border-default bg-elevated/50 p-6 space-y-4">
-    <div class="text-center min-h-16">
+    <div class="text-center min-h-16 min-w-0">
       <p class="text-sm text-muted">
         {{ step?.label || '—' }}
       </p>
@@ -49,7 +49,7 @@ const showProgress = computed(() => Boolean(props.step?.trackId))
       </h2>
       <p
         v-if="step?.composer"
-        class="text-muted mt-1"
+        class="text-muted mt-1 truncate"
       >
         {{ step.composer }}
       </p>
