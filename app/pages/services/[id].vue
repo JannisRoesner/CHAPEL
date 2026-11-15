@@ -192,6 +192,20 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
 
     <UiFloatingBar>
       <UButton
+        to="/services"
+        variant="ghost"
+        color="neutral"
+        square
+        icon="i-lucide-arrow-left"
+        class="press size-11 shrink-0 justify-center rounded-full"
+        aria-label="Zu Gottesdiensten"
+        title="Zu Gottesdiensten"
+      />
+      <span
+        class="h-6 w-px shrink-0 bg-border"
+        aria-hidden="true"
+      />
+      <UButton
         :to="`/playback/${id}`"
         class="press min-h-11 rounded-full px-5"
       >

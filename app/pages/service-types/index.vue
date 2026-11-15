@@ -16,6 +16,19 @@ function renameType(id: number, current: string) {
   })
 }
 
+function editTypeDescription(id: number) {
+  const current = servicesStore.serviceTypes.find(t => t.id === id)?.description ?? ''
+  nameDialog.ask({
+    title: 'Beschreibung bearbeiten',
+    description: 'Leer lassen, um sie zu entfernen.',
+    initialName: current,
+    multiline: true,
+    optional: true
+  }, async (description) => {
+    servicesStore.upsertServiceType(await $fetch<ServiceTypeDto>(`/api/service-types/${id}`, { method: 'PATCH', body: { description: description || null } }))
+  })
+}
+
 function duplicateType(id: number, current: string) {
   nameDialog.ask({ title: 'Vorlage duplizieren', initialName: `${current} (Kopie)`, confirmLabel: 'Duplizieren' }, async (name) => {
     const copy = await $fetch<ServiceTypeDto>(`/api/service-types/${id}/duplicate`, { method: 'POST', body: { name } })
@@ -68,6 +81,11 @@ function typeMenu(id: number, name: string): DropdownMenuItem[][] {
       label: 'Umbenennen',
       icon: 'i-lucide-text-cursor-input',
       onSelect: () => renameType(id, name)
+    },
+    {
+      label: 'Beschreibung bearbeiten',
+      icon: 'i-lucide-text',
+      onSelect: () => editTypeDescription(id)
     },
     {
       label: 'Duplizieren',
@@ -156,6 +174,9 @@ function typeMenu(id: number, name: string): DropdownMenuItem[][] {
       :description="nameDialog.state.description"
       :initial-name="nameDialog.state.initialName"
       :confirm-label="nameDialog.state.confirmLabel"
+      :multiline="nameDialog.state.multiline"
+      :optional="nameDialog.state.optional"
+      :placeholder="nameDialog.state.placeholder"
       :loading="nameDialog.state.loading"
       @confirm="nameDialog.confirm"
     />

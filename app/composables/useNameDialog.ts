@@ -3,6 +3,9 @@ interface NameDialogOptions {
   description?: string
   initialName?: string
   confirmLabel?: string
+  multiline?: boolean
+  optional?: boolean
+  placeholder?: string
 }
 
 /** Zustand + Ablauf für `UiNameDialog` (Umbenennen, Duplizieren). */
@@ -14,7 +17,10 @@ export function useNameDialog() {
     title: '',
     description: undefined as string | undefined,
     initialName: '',
-    confirmLabel: 'Speichern'
+    confirmLabel: 'Speichern',
+    multiline: false,
+    optional: false,
+    placeholder: undefined as string | undefined
   })
   let handler: ((name: string) => Promise<void>) | null = null
 
@@ -23,6 +29,9 @@ export function useNameDialog() {
       description: undefined,
       initialName: '',
       confirmLabel: 'Speichern',
+      multiline: false,
+      optional: false,
+      placeholder: undefined,
       ...options,
       open: true,
       loading: false

@@ -92,7 +92,7 @@ function onSelectStep(index: number) {
 
 <template>
   <div class="min-h-screen flex flex-col w-full min-w-0 overflow-x-clip">
-    <header class="flex items-center justify-between px-4 py-3 border-b border-default overflow-x-clip">
+    <header class="sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b border-default bg-default/85 backdrop-blur-xl overflow-x-clip">
       <UButton
         to="/playback"
         variant="ghost"

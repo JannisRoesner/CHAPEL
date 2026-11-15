@@ -169,6 +169,25 @@ function rename() {
   })
 }
 
+function editDescription() {
+  if (!serviceType.value) return
+  nameDialog.ask({
+    title: 'Beschreibung bearbeiten',
+    description: 'Erscheint unter dem Namen der Vorlage. Leer lassen, um sie zu entfernen.',
+    initialName: serviceType.value.description ?? '',
+    multiline: true,
+    optional: true,
+    placeholder: 'z. B. Ablauf für den Sonntagvormittag'
+  }, async (description) => {
+    const updated = await $fetch<ServiceTypeDto>(`/api/service-types/${id}`, {
+      method: 'PATCH',
+      body: { description: description || null }
+    })
+    serviceType.value = { ...serviceType.value!, description: updated.description }
+    servicesStore.upsertServiceType(updated)
+  })
+}
+
 function duplicate() {
   if (!serviceType.value) return
   nameDialog.ask({
@@ -186,6 +205,7 @@ function duplicate() {
 
 const headerMenu = computed<DropdownMenuItem[][]>(() => [[
   { label: 'Umbenennen', icon: 'i-lucide-pencil', onSelect: rename },
+  { label: 'Beschreibung bearbeiten', icon: 'i-lucide-text', onSelect: editDescription },
   { label: 'Duplizieren', icon: 'i-lucide-copy', onSelect: duplicate }
 ]])
 </script>
@@ -209,10 +229,28 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
   >
     <UiPageHeader
       :title="serviceType.name"
-      description="Ablauf der Vorlage – Reihenfolge per Griff ziehen"
       back-to="/service-types"
       back-label="Zu Vorlagen"
     >
+      <template #below>
+        <button
+          type="button"
+          class="press group -ml-2 flex max-w-full items-start gap-2 rounded-lg px-2 py-1 text-left text-muted hover:bg-elevated hover:text-default"
+          @click="editDescription"
+        >
+          <span
+            class="whitespace-pre-line leading-relaxed"
+            :class="serviceType.description ? '' : 'italic text-dimmed'"
+          >{{ serviceType.description || 'Beschreibung hinzufügen' }}</span>
+          <UIcon
+            name="i-lucide-pencil"
+            class="mt-1 size-3.5 shrink-0 opacity-60 group-hover:opacity-100"
+          />
+        </button>
+        <p class="mt-1 text-sm text-dimmed">
+          Reihenfolge per Griff ⋮⋮ ziehen
+        </p>
+      </template>
       <template #actions>
         <div class="flex gap-2">
           <UButton
@@ -365,11 +403,28 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
       :description="nameDialog.state.description"
       :initial-name="nameDialog.state.initialName"
       :confirm-label="nameDialog.state.confirmLabel"
+      :multiline="nameDialog.state.multiline"
+      :optional="nameDialog.state.optional"
+      :placeholder="nameDialog.state.placeholder"
       :loading="nameDialog.state.loading"
       @confirm="nameDialog.confirm"
     />
 
     <UiFloatingBar>
+      <UButton
+        to="/service-types"
+        variant="ghost"
+        color="neutral"
+        square
+        icon="i-lucide-arrow-left"
+        class="press size-11 shrink-0 justify-center rounded-full"
+        aria-label="Zu Vorlagen"
+        title="Zu Vorlagen"
+      />
+      <span
+        class="h-6 w-px shrink-0 bg-border"
+        aria-hidden="true"
+      />
       <UButton
         variant="ghost"
         color="neutral"
@@ -400,7 +455,7 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
           v-if="!saving"
           icon="floppy-disk"
         />
-        <span>Speichern</span>
+        <span class="hidden min-[440px]:inline">Speichern</span>
         <span
           v-if="dirty"
           class="size-2 rounded-full bg-current opacity-90"

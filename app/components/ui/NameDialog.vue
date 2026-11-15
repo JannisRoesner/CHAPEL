@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/** Kleiner Dialog für Umbenennen / Duplizieren mit Namenseingabe. */
+/** Kleiner Dialog für Umbenennen / Duplizieren / Beschreibung – einzeilig oder mehrzeilig. */
 const open = defineModel<boolean>('open', { default: false })
 
 const props = withDefaults(defineProps<{
@@ -8,7 +8,15 @@ const props = withDefaults(defineProps<{
   initialName?: string
   confirmLabel?: string
   loading?: boolean
+  /** Mehrzeiliges Textfeld statt Eingabezeile */
+  multiline?: boolean
+  /** Leere Eingabe erlauben (z. B. Beschreibung entfernen) */
+  optional?: boolean
+  placeholder?: string
 }>(), {
+  multiline: false,
+  optional: false,
+  placeholder: undefined,
   description: undefined,
   initialName: '',
   confirmLabel: 'Speichern',
@@ -20,18 +28,19 @@ const emit = defineEmits<{
 }>()
 
 const name = ref('')
-const inputRef = useTemplateRef<{ inputRef?: HTMLInputElement }>('input')
+const inputRef = useTemplateRef<{ inputRef?: HTMLInputElement, textareaRef?: HTMLTextAreaElement }>('input')
 
 watch(open, async (isOpen) => {
   if (!isOpen) return
   name.value = props.initialName
   await nextTick()
   inputRef.value?.inputRef?.select()
+  inputRef.value?.textareaRef?.focus()
 })
 
 function submit() {
   const trimmed = name.value.trim()
-  if (trimmed) emit('confirm', trimmed)
+  if (trimmed || props.optional) emit('confirm', trimmed)
 }
 </script>
 
@@ -46,13 +55,26 @@ function submit() {
         id="name-dialog-form"
         @submit.prevent="submit"
       >
+        <UTextarea
+          v-if="multiline"
+          ref="input"
+          v-model="name"
+          size="xl"
+          class="w-full"
+          :rows="3"
+          autoresize
+          :maxrows="8"
+          :placeholder="placeholder"
+        />
         <UInput
+          v-else
           ref="input"
           v-model="name"
           size="xl"
           class="w-full"
           autofocus
           enterkeyhint="done"
+          :placeholder="placeholder"
         />
       </form>
     </template>
@@ -71,7 +93,7 @@ function submit() {
           form="name-dialog-form"
           class="min-h-11 justify-center"
           :loading="loading"
-          :disabled="!name.trim()"
+          :disabled="!optional && !name.trim()"
         >
           {{ confirmLabel }}
         </UButton>
