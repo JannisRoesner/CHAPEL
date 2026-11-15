@@ -445,7 +445,6 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
       </UButton>
       <UButton
         class="press min-h-11 rounded-full px-4 sm:px-5"
-        :class="dirty ? '' : 'opacity-80'"
         :loading="saving"
         :aria-label="dirty ? 'Speichern (ungespeicherte Änderungen)' : 'Speichern'"
         title="Speichern (Strg/⌘ + S)"

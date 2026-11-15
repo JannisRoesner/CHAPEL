@@ -122,3 +122,40 @@ html {
     transform: none;
   }
 }
+
+/*
+ * Dunkelmodus im Apple-Stil: neutrale, leicht angehobene Grautöne statt Fast-Schwarz mit
+ * Blaustich, gedämpfte Textfarben statt Reinweiß, Haarlinien statt harter Rahmen.
+ * Werte angelehnt an die iOS-Systemfarben (systemBackground elevated, secondarySystemBackground,
+ * label / secondaryLabel / tertiaryLabel, separator).
+ */
+.dark {
+  --ui-bg: #1c1c1e;
+  --ui-bg-muted: #232325;
+  --ui-bg-elevated: #2c2c2e;
+  --ui-bg-accented: #3a3a3c;
+  --ui-bg-inverted: #f2f2f7;
+
+  --ui-border: rgb(255 255 255 / 0.09);
+  --ui-border-muted: rgb(255 255 255 / 0.06);
+  --ui-border-accented: rgb(255 255 255 / 0.15);
+  --ui-border-inverted: #f2f2f7;
+
+  --ui-text-dimmed: rgb(235 235 245 / 0.36);
+  --ui-text-muted: rgb(235 235 245 / 0.6);
+  --ui-text-toned: rgb(235 235 245 / 0.78);
+  --ui-text: rgb(255 255 255 / 0.88);
+  --ui-text-highlighted: rgb(255 255 255 / 0.94);
+  --ui-text-inverted: #1c1c1e;
+
+  /* Akzentfarbe einen Ton ruhiger als das leuchtende 400er */
+  --ui-primary: var(--ui-color-primary-500);
+
+  color-scheme: dark;
+}
+
+/* Sanfter Wechsel zwischen Hell und Dunkel statt hartem Helligkeitssprung */
+html.theme-transition,
+html.theme-transition * {
+  transition: background-color 250ms ease, border-color 250ms ease, color 250ms ease !important;
+}
