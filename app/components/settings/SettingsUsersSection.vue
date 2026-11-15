@@ -165,6 +165,7 @@ async function submitResetPassword() {
 
     <form
       class="grid gap-4 md:grid-cols-2 border-t border-default pt-6"
+      aria-label="Neuen Benutzer anlegen"
       @submit.prevent="createUser"
     >
       <UFormField
@@ -173,6 +174,7 @@ async function submitResetPassword() {
       >
         <UInput
           v-model="newUserName"
+          class="w-full"
           placeholder="z.B. Max Mustermann"
           required
         />
@@ -180,6 +182,7 @@ async function submitResetPassword() {
       <UFormField label="E-Mail">
         <UInput
           v-model="newUserEmail"
+          class="w-full"
           type="email"
           autocomplete="off"
           required
@@ -188,6 +191,7 @@ async function submitResetPassword() {
       <UFormField label="Passwort">
         <UInput
           v-model="newUserPassword"
+          class="w-full"
           type="password"
           autocomplete="new-password"
           minlength="8"
@@ -200,6 +204,7 @@ async function submitResetPassword() {
       >
         <USelect
           v-model="newUserRole"
+          class="w-full"
           :items="[
             { label: 'Benutzer', value: 'editor' },
             { label: 'Administrator', value: 'admin' }
@@ -209,7 +214,8 @@ async function submitResetPassword() {
       <div class="md:col-span-2">
         <UButton
           type="submit"
-          class="min-h-12"
+          icon="i-lucide-user-plus"
+          class="min-h-12 w-full sm:w-auto justify-center"
           :loading="creatingUser"
         >
           Benutzer anlegen

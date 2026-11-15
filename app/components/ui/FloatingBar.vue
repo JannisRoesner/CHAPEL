@@ -29,24 +29,24 @@
   }
 }
 
-/* Hell: deckend weiß, klar abgesetzt durch Haarlinie + weichen, tiefen Schatten */
+/*
+ * Klar vom Seitenhintergrund abgesetzt (auch für ältere Augen): getönte, deckende Fläche
+ * in der Akzentfarbe, sichtbarer Rand und tiefer Schatten – im Hell- und Dunkelmodus.
+ */
 .floating-material {
-  background: #fff;
-  border: 0.5px solid rgb(0 0 0 / 0.1);
+  background: color-mix(in oklab, var(--ui-primary) 14%, #fff);
+  border: 1.5px solid color-mix(in oklab, var(--ui-primary) 50%, #fff);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.9),
-    0 1px 2px rgb(0 0 0 / 0.06),
-    0 10px 30px -6px rgb(0 0 0 / 0.22);
+    0 2px 4px rgb(0 0 0 / 0.08),
+    0 12px 32px -6px rgb(0 0 0 / 0.3);
 }
 
-/* Dunkel: Material eine Stufe heller als Karten (#2c2c2e), Lichtkante oben, Schatten nach unten */
 .dark .floating-material {
-  background: #3a3a3c;
-  border-color: rgb(255 255 255 / 0.12);
+  background: color-mix(in oklab, var(--ui-primary) 22%, #3a3a3c);
+  border-color: color-mix(in oklab, var(--ui-primary) 55%, #3a3a3c);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.1),
-    0 0 0 0.5px rgb(0 0 0 / 0.5),
-    0 12px 36px -6px rgb(0 0 0 / 0.65);
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 12px 36px -6px rgb(0 0 0 / 0.7);
 }
 
 /* Text etwas kräftiger statt flachem Grau */
@@ -75,12 +75,8 @@
 
 @media (prefers-contrast: more) {
   .floating-material {
-    background: #fff;
-    border: 1px solid rgb(0 0 0 / 0.5);
+    border: 2px solid var(--ui-text-highlighted);
   }
 
-  .dark .floating-material {
-    border-color: rgb(255 255 255 / 0.5);
-  }
 }
 </style>

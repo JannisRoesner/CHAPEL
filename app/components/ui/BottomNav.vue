@@ -16,7 +16,7 @@ const columnCount = computed(() => Math.max(props.items.length, 1))
 
 <template>
   <nav
-    class="md:hidden fixed inset-x-0 bottom-0 z-40 border-t border-default bg-elevated/95 backdrop-blur"
+    class="md:hidden fixed inset-x-0 bottom-0 z-40 border-t-2 border-accented bg-elevated shadow-[0_-4px_16px_rgb(0_0_0/0.08)]"
     :style="{ paddingBottom: 'env(safe-area-inset-bottom)' }"
     aria-label="Hauptnavigation"
   >

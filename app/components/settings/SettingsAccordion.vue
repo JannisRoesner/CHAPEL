@@ -31,7 +31,7 @@ defineProps<{
       <template
         v-for="item in items"
         :key="item.value"
-        #[item.slot]
+        #[`${item.slot}-body`]
       >
         <slot :name="item.slot" />
       </template>
