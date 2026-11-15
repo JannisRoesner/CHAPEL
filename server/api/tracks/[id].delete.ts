@@ -23,10 +23,13 @@ export default defineEventHandler(async (event) => {
 
   await db.delete(schema.tracks).where(eq(schema.tracks.id, id))
 
-  try {
-    await unlink(getAudioFilePath(existing.storageKey))
-  } catch {
-    // file may already be missing
+  // Tempo-Varianten teilen die Datei des Originals – nur Originale löschen die Datei
+  if (!existing.parentTrackId) {
+    try {
+      await unlink(getAudioFilePath(existing.storageKey))
+    } catch {
+      // file may already be missing
+    }
   }
 
   broadcastEvent({ type: 'track.deleted', payload: { id } })

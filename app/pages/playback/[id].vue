@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import type { PlaylistStepDto, ServiceDto } from '#shared/types/chapel'
+
 definePageMeta({
   layout: 'playback'
 })
 
 const route = useRoute()
 const id = Number(route.params.id)
-const offlineCache = useOfflineCache()
 const playbackProgress = usePlaybackProgress(id)
 
 const {
@@ -27,8 +28,6 @@ const {
 const loading = ref(true)
 const loadError = ref<string | null>(null)
 const serviceName = ref('')
-const offlineBanner = ref<string | null>(null)
-const partialBanner = ref<string | null>(null)
 const playedIndices = ref<number[]>([])
 const progressReady = ref(false)
 
@@ -65,42 +64,22 @@ function persistProgress() {
 async function load() {
   loading.value = true
   loadError.value = null
-  offlineBanner.value = null
-  partialBanner.value = null
   progressReady.value = false
 
   try {
-    const result = await offlineCache.loadServiceForPlayback(id)
-
-    if (result.error) {
-      loadError.value = result.error
-      return
-    }
-
-    serviceName.value = result.serviceName
-    const saved = playbackProgress.load()
-    const stepCount = result.playlist.length
-    if (saved) {
-      playedIndices.value = saved.playedIndices.filter(i => i >= 0 && i < stepCount)
-    }
-    await loadPlaylist(result.playlist, saved?.currentIndex)
-
-    if (result.source === 'cache' && result.cachedAt) {
-      const date = new Date(result.cachedAt).toLocaleString('de-DE', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-      offlineBanner.value = `Offline-Modus — vorbereitete Version vom ${date}`
-    }
-
-    if (result.partial) {
-      partialBanner.value = `Nur ${result.cachedTracks} von ${result.totalTracks} Tracks offline verfügbar`
-    }
-
+    const [service, steps] = await Promise.all([
+      $fetch<ServiceDto>(`/api/services/${id}`),
+      $fetch<PlaylistStepDto[]>(`/api/services/${id}/playlist`)
+    ])
+    serviceName.value = service.name
+    const saved = playbackProgress.load(steps)
+    playedIndices.value = saved
+      ? saved.playedIndices.filter(i => i >= 0 && i < steps.length)
+      : []
+    await loadPlaylist(steps, saved?.currentIndex)
     progressReady.value = true
+  } catch {
+    loadError.value = 'Gottesdienst konnte nicht geladen werden'
   } finally {
     loading.value = false
   }
@@ -145,7 +124,7 @@ function onSelectStep(index: number) {
     >
       <UEmpty
         :title="loadError"
-        description="Öffnen Sie den Gottesdienst einmal online und nutzen Sie „Offline vorbereiten“."
+        description="Bitte Netzwerkverbindung prüfen und erneut versuchen."
       >
         <UButton
           to="/playback"
@@ -160,20 +139,6 @@ function onSelectStep(index: number) {
       v-else
       class="flex-1 flex flex-col gap-6 p-4 max-w-5xl mx-auto w-full"
     >
-      <UAlert
-        v-if="offlineBanner"
-        color="warning"
-        variant="subtle"
-        :description="offlineBanner"
-      />
-
-      <UAlert
-        v-if="partialBanner"
-        color="warning"
-        variant="subtle"
-        :description="partialBanner"
-      />
-
       <PlaybackNowPlayingBar
         class="order-last md:order-none sticky bottom-0 md:static z-20 -mx-4 px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-default/95 backdrop-blur md:bg-transparent md:backdrop-blur-none md:mx-0 md:px-0 md:pt-0 md:pb-0"
         :step="currentStep"

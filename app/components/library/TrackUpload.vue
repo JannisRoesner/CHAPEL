@@ -2,12 +2,21 @@
 import { AUDIO_FILE_ACCEPT } from '#shared/constants/audio'
 import type { TrackDto } from '#shared/types/chapel'
 
+const props = withDefaults(defineProps<{
+  defaultCategory?: 'hymn' | 'liturgy'
+  /** Einzeldatei-Modus (z. B. im Auswahl-Dialog) */
+  single?: boolean
+}>(), {
+  defaultCategory: 'hymn',
+  single: false
+})
+
 const emit = defineEmits<{
   uploaded: [track: TrackDto]
   duplicate: [existing: TrackDto]
 }>()
 
-const category = ref<'hymn' | 'liturgy'>('hymn')
+const category = ref<'hymn' | 'liturgy'>(props.defaultCategory)
 const uploading = ref(false)
 const dragOver = ref(false)
 const error = ref('')
@@ -62,7 +71,7 @@ function onDrop(event: DragEvent) {
 
 <template>
   <div
-    class="w-full min-w-0 max-w-full rounded-2xl border-2 border-dashed p-4 sm:p-8 text-center transition-colors"
+    class="w-full min-w-0 max-w-full rounded-2xl border-2 border-dashed p-5 sm:p-8 text-center transition-colors"
     :class="dragOver ? 'border-primary bg-primary/5' : 'border-default bg-elevated/30'"
     @dragover.prevent="dragOver = true"
     @dragleave="dragOver = false"
@@ -97,12 +106,12 @@ function onDrop(event: DragEvent) {
           :loading="uploading"
           :disabled="uploading"
         >
-          Dateien wählen
+          {{ single ? 'Datei wählen' : 'Dateien wählen' }}
         </UButton>
         <input
           type="file"
           :accept="AUDIO_FILE_ACCEPT"
-          multiple
+          :multiple="!single"
           class="hidden"
           @change="onFileChange"
         >

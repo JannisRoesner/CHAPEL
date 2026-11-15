@@ -34,20 +34,29 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Gottesdienst-Typ nicht gefunden' })
   }
 
-  const templateItems = body.items.map(item => ({
-    position: item.position,
-    kind: item.kind,
-    label: item.label.trim(),
-    defaultTrackId: item.defaultTrackId ?? null
-  }))
+  const result = await db.transaction(async (tx) => {
+    // Bisherige Positionen der Schritte merken, damit Lieder beim Umsortieren mitwandern
+    const previous = await tx
+      .select({ id: schema.serviceTypeItems.id, position: schema.serviceTypeItems.position })
+      .from(schema.serviceTypeItems)
+      .where(eq(schema.serviceTypeItems.serviceTypeId, serviceTypeId))
+    const previousPosition = new Map(previous.map(item => [item.id, item.position]))
 
-  const updatedServiceIds = await db.transaction(async (tx) => {
+    const templateItems = body.items.map(item => ({
+      position: item.position,
+      kind: item.kind,
+      label: item.label.trim(),
+      defaultTrackId: item.defaultTrackId ?? null,
+      sourcePosition: item.id != null ? previousPosition.get(item.id) ?? null : null
+    }))
+
     await tx
       .delete(schema.serviceTypeItems)
       .where(eq(schema.serviceTypeItems.serviceTypeId, serviceTypeId))
 
+    let inserted: Array<{ id: number, position: number }> = []
     if (templateItems.length) {
-      await tx.insert(schema.serviceTypeItems).values(
+      inserted = await tx.insert(schema.serviceTypeItems).values(
         templateItems.map(item => ({
           serviceTypeId,
           position: item.position,
@@ -55,7 +64,7 @@ export default defineEventHandler(async (event) => {
           label: item.label,
           defaultTrackId: item.defaultTrackId
         }))
-      )
+      ).returning({ id: schema.serviceTypeItems.id, position: schema.serviceTypeItems.position })
     }
 
     await tx
@@ -63,12 +72,15 @@ export default defineEventHandler(async (event) => {
       .set({ updatedAt: new Date() })
       .where(eq(schema.serviceTypes.id, serviceTypeId))
 
-    return syncServicesFromTypeTemplate(serviceTypeId, templateItems, tx)
+    const updatedServiceIds = await syncServicesFromTypeTemplate(serviceTypeId, templateItems, tx)
+    return { updatedServiceIds, inserted }
   })
+  const { updatedServiceIds, inserted } = result
 
   broadcastEvent({ type: 'serviceType.updated', payload: { id: serviceTypeId } })
   for (const serviceId of updatedServiceIds) {
     broadcastEvent({ type: 'service.updated', payload: { id: serviceId } })
   }
-  return { ok: true }
+  // Neue IDs in Positionsreihenfolge – der Editor braucht sie für den nächsten Speichervorgang
+  return { ok: true, itemIds: inserted.sort((a, b) => a.position - b.position).map(item => item.id) }
 })

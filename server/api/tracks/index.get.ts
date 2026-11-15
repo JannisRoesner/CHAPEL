@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, or } from 'drizzle-orm'
+import { and, asc, desc, eq, ilike, or } from 'drizzle-orm'
 
 import { useDb, schema } from '../../database'
 import type { TrackDto } from '#shared/types/chapel'
@@ -15,6 +15,8 @@ export function toTrackDto(track: typeof schema.tracks.$inferSelect): TrackDto {
     originalFilename: track.originalFilename,
     mimeType: track.mimeType,
     fileSizeBytes: track.fileSizeBytes,
+    parentTrackId: track.parentTrackId,
+    playbackRate: track.playbackRate,
     createdAt: track.createdAt.toISOString(),
     updatedAt: track.updatedAt.toISOString()
   }
@@ -46,7 +48,7 @@ export default defineEventHandler(async (event) => {
     .select()
     .from(schema.tracks)
     .where(conditions.length ? and(...conditions) : undefined)
-    .orderBy(desc(schema.tracks.updatedAt))
+    .orderBy(desc(schema.tracks.updatedAt), asc(schema.tracks.playbackRate))
 
   return rows.map(toTrackDto)
 })

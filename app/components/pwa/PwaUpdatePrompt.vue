@@ -20,8 +20,8 @@ async function updateApp() {
         v-if="$pwa?.offlineReady"
         color="success"
         variant="subtle"
-        title="App-Shell bereit"
-        description="CHAPEL ist installierbar und die Oberfläche ist lokal zwischengespeichert. Für Gottesdienste zusätzlich „Offline vorbereiten“ nutzen."
+        title="App bereit"
+        description="CHAPEL kann jetzt als App installiert werden."
       >
         <template #actions>
           <UButton

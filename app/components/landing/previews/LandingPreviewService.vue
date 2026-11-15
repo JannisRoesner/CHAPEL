@@ -20,17 +20,6 @@ import { DEMO_SERVICE_ITEMS } from '#shared/constants/landingDemo'
         >
           Gespeichert
         </UBadge>
-        <UButton
-          variant="outline"
-          size="sm"
-          disabled
-        >
-          <FontAwesomeIcon
-            icon="download"
-            class="mr-1.5"
-          />
-          Offline vorbereiten
-        </UButton>
       </div>
     </div>
 

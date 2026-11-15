@@ -3,7 +3,6 @@ import type { AccordionItem } from '@nuxt/ui'
 export const SETTINGS_SECTION_IDS = {
   appearance: 'appearance',
   password: 'password',
-  offline: 'offline',
   branding: 'branding',
   legal: 'legal',
   users: 'users'
@@ -28,12 +27,6 @@ export const PERSONAL_SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
     value: SETTINGS_SECTION_IDS.password,
     slot: SETTINGS_SECTION_IDS.password,
     icon: 'i-lucide-key'
-  },
-  {
-    label: 'Offline-Cache',
-    value: SETTINGS_SECTION_IDS.offline,
-    slot: SETTINGS_SECTION_IDS.offline,
-    icon: 'i-lucide-cloud-download'
   }
 ]
 

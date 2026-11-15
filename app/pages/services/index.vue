@@ -11,6 +11,26 @@ const serviceName = ref('')
 const serviceDate = ref(new Date().toISOString().slice(0, 10))
 const deleteOpen = ref(false)
 const deleteTarget = ref<{ id: number, name: string } | null>(null)
+const nameDialog = useNameDialog()
+
+function renameService(service: ServiceDto) {
+  nameDialog.ask({ title: 'Gottesdienst umbenennen', initialName: service.name }, async (name) => {
+    servicesStore.upsertService(await $fetch<ServiceDto>(`/api/services/${service.id}`, { method: 'PATCH', body: { name } }))
+  })
+}
+
+function duplicateService(service: ServiceDto) {
+  nameDialog.ask({
+    title: 'Gottesdienst duplizieren',
+    description: 'Ablauf und Liedauswahl werden übernommen.',
+    initialName: `${service.name} (Kopie)`,
+    confirmLabel: 'Duplizieren'
+  }, async (name) => {
+    const copy = await $fetch<ServiceDto>(`/api/services/${service.id}/duplicate`, { method: 'POST', body: { name } })
+    servicesStore.upsertService(copy)
+    toast.add({ title: 'Gottesdienst dupliziert', color: 'success' })
+  })
+}
 
 onMounted(async () => {
   await Promise.all([servicesStore.fetchServices(), servicesStore.fetchServiceTypes()])
@@ -71,6 +91,17 @@ function serviceMenu(service: ServiceDto): DropdownMenuItem[][] {
       icon: 'i-lucide-pencil',
       to: `/services/${service.id}`
     },
+    {
+      label: 'Umbenennen',
+      icon: 'i-lucide-text-cursor-input',
+      onSelect: () => renameService(service)
+    },
+    {
+      label: 'Duplizieren',
+      icon: 'i-lucide-copy',
+      onSelect: () => duplicateService(service)
+    }
+  ], [
     {
       label: 'Löschen',
       icon: 'i-lucide-trash',
@@ -199,6 +230,16 @@ function serviceMenu(service: ServiceDto): DropdownMenuItem[][] {
         </UCard>
       </template>
     </UModal>
+
+    <UiNameDialog
+      v-model:open="nameDialog.state.open"
+      :title="nameDialog.state.title"
+      :description="nameDialog.state.description"
+      :initial-name="nameDialog.state.initialName"
+      :confirm-label="nameDialog.state.confirmLabel"
+      :loading="nameDialog.state.loading"
+      @confirm="nameDialog.confirm"
+    />
 
     <UiConfirmModal
       v-model:open="deleteOpen"

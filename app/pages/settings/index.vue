@@ -19,10 +19,6 @@ const isAdmin = computed(() => {
 
 const personalItems = computed(() =>
   PERSONAL_SETTINGS_SECTIONS.filter((item) => {
-    if (!online.value) {
-      return item.value === SETTINGS_SECTION_IDS.offline
-        || item.value === SETTINGS_SECTION_IDS.appearance
-    }
     if (item.value === SETTINGS_SECTION_IDS.password) {
       return !user.value?.mustChangePassword
     }
@@ -37,15 +33,7 @@ const showAdmin = computed(() => isAdmin.value && online.value)
   <div class="space-y-8">
     <UiPageHeader
       title="Einstellungen"
-      description="Darstellung, Benutzer und Offline-Speicher"
-    />
-
-    <UAlert
-      v-if="!online"
-      color="warning"
-      variant="subtle"
-      title="Offline-Modus"
-      description="Nur Darstellung und Offline-Cache sind ohne Netzwerk verfügbar."
+      description="Darstellung, Benutzer und Branding"
     />
 
     <div class="space-y-3">
@@ -54,16 +42,13 @@ const showAdmin = computed(() => isAdmin.value && online.value)
       </p>
       <SettingsAccordion
         :items="personalItems"
-        :default-open="online ? DEFAULT_OPEN_PERSONAL_SECTIONS : [SETTINGS_SECTION_IDS.offline]"
+        :default-open="DEFAULT_OPEN_PERSONAL_SECTIONS"
       >
         <template #appearance>
           <SettingsAppearanceSection />
         </template>
         <template #password>
           <SettingsPasswordSection />
-        </template>
-        <template #offline>
-          <SettingsOfflineCacheSection />
         </template>
       </SettingsAccordion>
     </div>

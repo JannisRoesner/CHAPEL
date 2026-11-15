@@ -38,3 +38,8 @@ export function isAllowedAudioExtension(filename: string): boolean {
 export function isAllowedAudioMime(mimeType: string): boolean {
   return (ALLOWED_AUDIO_MIMES as readonly string[]).includes(mimeType)
 }
+
+/** Grenzen für nicht-destruktive Tempo-Varianten (Faktor, 1 = Original) */
+export const PLAYBACK_RATE_MIN = 0.5
+export const PLAYBACK_RATE_MAX = 1.5
+export const PLAYBACK_RATE_STEP = 0.01

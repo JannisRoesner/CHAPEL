@@ -2,7 +2,6 @@
 import { DEFAULT_ROUTE } from '#shared/constants/app'
 import { LANDING_FEATURES } from '#shared/constants/landingDemo'
 import LandingPreviewLibrary from '~/components/landing/previews/LandingPreviewLibrary.vue'
-import LandingPreviewOffline from '~/components/landing/previews/LandingPreviewOffline.vue'
 import LandingPreviewPlayback from '~/components/landing/previews/LandingPreviewPlayback.vue'
 import LandingPreviewRealtime from '~/components/landing/previews/LandingPreviewRealtime.vue'
 import LandingPreviewService from '~/components/landing/previews/LandingPreviewService.vue'
@@ -13,8 +12,6 @@ definePageMeta({
 })
 
 const { loggedIn, fetch: fetchSession } = useUserSession()
-const isOfflineClient = import.meta.client && !navigator.onLine
-const showOfflineHint = ref(false)
 
 try {
   await fetchSession()
@@ -24,18 +21,11 @@ try {
 
 if (loggedIn.value) {
   await navigateTo(DEFAULT_ROUTE, { replace: true })
-} else if (isOfflineClient) {
-  const allowed = await useLocalSession().canUseOfflinePlayback()
-  if (allowed) {
-    await navigateTo(DEFAULT_ROUTE, { replace: true })
-  } else {
-    showOfflineHint.value = true
-  }
 }
 
 useSeoMeta({
   title: 'CHAPEL — Liturgie-Audio einfach steuern',
-  description: 'CHAPEL verwaltet Gottesdienst-Playlists: Liturgieelemente sind fix, Lieder frei wählbar — touch-gesteuert abspielbar, auch offline.',
+  description: 'CHAPEL verwaltet Gottesdienst-Playlists: Liturgieelemente sind fix, Lieder frei wählbar — touch-gesteuert abspielbar.',
   ogTitle: 'CHAPEL — Liturgie-Audio einfach steuern',
   ogDescription: 'Moderne Web-App zur Verwaltung und touch-gesteuerten Wiedergabe von Gottesdienst-Playlists für Ihre Gemeinde.'
 })
@@ -45,44 +35,14 @@ const previewById: Record<string, Component> = {
   'service-types': LandingPreviewServiceType,
   'services': LandingPreviewService,
   'playback': LandingPreviewPlayback,
-  'realtime': LandingPreviewRealtime,
-  'offline': LandingPreviewOffline
+  'realtime': LandingPreviewRealtime
 }
 
 const { open: loginOpen } = useLoginModal()
-
-// Offline ohne Cache: kein Login-Modal öffnen
-if (showOfflineHint.value) {
-  loginOpen.value = false
-}
 </script>
 
 <template>
-  <div
-    v-if="showOfflineHint"
-    class="min-h-[70vh] flex items-center justify-center px-4"
-  >
-    <div class="max-w-md w-full text-center space-y-6">
-      <UiAppLogo size="lg" />
-      <div class="space-y-2">
-        <h1 class="text-2xl font-semibold">
-          Offline — keine vorbereiteten Gottesdienste
-        </h1>
-        <p class="text-muted">
-          Melden Sie sich einmal online an und bereiten Sie einen Gottesdienst vor.
-          Danach startet die Wiedergabe auch ohne Netzwerk direkt.
-        </p>
-      </div>
-      <UAlert
-        color="info"
-        variant="subtle"
-        title="Tipp"
-        description="Installieren Sie CHAPEL als App (PWA), damit die Oberfläche offline verfügbar bleibt."
-      />
-    </div>
-  </div>
-
-  <div v-else-if="!loggedIn">
+  <div v-if="!loggedIn">
     <LandingHero />
 
     <section

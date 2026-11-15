@@ -14,6 +14,8 @@ export const DEMO_TRACKS: TrackDto[] = [
     originalFilename: 'lobe-den-herren.mp3',
     mimeType: 'audio/mpeg',
     fileSizeBytes: 4_200_000,
+    parentTrackId: null,
+    playbackRate: 1,
     createdAt: DEMO_NOW,
     updatedAt: DEMO_NOW
   },
@@ -28,6 +30,8 @@ export const DEMO_TRACKS: TrackDto[] = [
     originalFilename: 'kyrie.mp3',
     mimeType: 'audio/mpeg',
     fileSizeBytes: 1_800_000,
+    parentTrackId: null,
+    playbackRate: 1,
     createdAt: DEMO_NOW,
     updatedAt: DEMO_NOW
   },
@@ -42,6 +46,8 @@ export const DEMO_TRACKS: TrackDto[] = [
     originalFilename: 'gloria.mp3',
     mimeType: 'audio/mpeg',
     fileSizeBytes: 3_100_000,
+    parentTrackId: null,
+    playbackRate: 1,
     createdAt: DEMO_NOW,
     updatedAt: DEMO_NOW
   },
@@ -56,6 +62,8 @@ export const DEMO_TRACKS: TrackDto[] = [
     originalFilename: 'nun-danket.mp3',
     mimeType: 'audio/mpeg',
     fileSizeBytes: 3_400_000,
+    parentTrackId: null,
+    playbackRate: 1,
     createdAt: DEMO_NOW,
     updatedAt: DEMO_NOW
   }
@@ -134,6 +142,7 @@ export const DEMO_PLAYLIST_STEPS: PlaylistStepDto[] = [
     title: 'Lobe den Herren',
     composer: 'Joachim Neander',
     durationMs: 245000,
+    playbackRate: 1,
     streamUrl: null
   },
   {
@@ -145,6 +154,7 @@ export const DEMO_PLAYLIST_STEPS: PlaylistStepDto[] = [
     title: 'Kyrie eleison',
     composer: 'Liturgisch',
     durationMs: 95000,
+    playbackRate: 1,
     streamUrl: null
   },
   {
@@ -156,6 +166,7 @@ export const DEMO_PLAYLIST_STEPS: PlaylistStepDto[] = [
     title: 'Gloria in excelsis',
     composer: 'Liturgisch',
     durationMs: 180000,
+    playbackRate: 1,
     streamUrl: null
   },
   {
@@ -167,6 +178,7 @@ export const DEMO_PLAYLIST_STEPS: PlaylistStepDto[] = [
     title: null,
     composer: null,
     durationMs: null,
+    playbackRate: 1,
     streamUrl: null
   },
   {
@@ -178,6 +190,7 @@ export const DEMO_PLAYLIST_STEPS: PlaylistStepDto[] = [
     title: 'Nun danket alle Gott',
     composer: 'Johann Crüger',
     durationMs: 198000,
+    playbackRate: 1,
     streamUrl: null
   }
 ]
@@ -203,7 +216,7 @@ export const LANDING_FEATURES: LandingFeature[] = [
   {
     id: 'services',
     title: 'Gottesdienste planen',
-    description: 'Erstellen Sie konkrete Gottesdienste aus einer Vorlage, weisen Sie Lieder zu und bereiten Sie alles offline vor — Liturgieelemente sind dabei fest vorgegeben.'
+    description: 'Erstellen Sie konkrete Gottesdienste aus einer Vorlage, weisen Sie Lieder zu — Liturgieelemente sind dabei fest vorgegeben.'
   },
   {
     id: 'playback',
@@ -216,12 +229,6 @@ export const LANDING_FEATURES: LandingFeature[] = [
     title: 'Gemeinsame Bibliothek',
     description: 'Mehrere Nutzer können parallel in CHAPEL arbeiten. Neu hochgeladene, bearbeitete oder gelöschte Audiodateien erscheinen in der Bibliothek auf allen Geräten automatisch — ohne Seite neu zu laden. Neu angelegte Gottesdienste tauchen ebenfalls in der Übersicht auf.',
     hint: 'Geöffnete Detail-Ansichten (z. B. einzelner Gottesdienst oder Vorlage) zeigen Änderungen anderer Nutzer erst nach erneutem Öffnen.'
-  },
-  {
-    id: 'offline',
-    title: 'Offline & PWA',
-    description: 'Installieren Sie CHAPEL als App und bereiten Sie Gottesdienste offline vor. Audiodateien werden lokal gespeichert — die Wiedergabe startet auch ohne Netzwerk, ohne erneuten Login.',
-    hint: 'Einmal online anmelden und „Offline vorbereiten“ tippen. Danach öffnet die App offline direkt die Wiedergabe.'
   }
 ]
 
@@ -284,7 +291,7 @@ export const LANDING_WORKFLOW_STEPS: LandingWorkflowStep[] = [
   {
     step: 3,
     title: 'Gottesdienst',
-    description: 'Konkreten Termin anlegen, Lieder zuweisen, offline vorbereiten'
+    description: 'Konkreten Termin anlegen, Lieder zuweisen, Tempo anpassen'
   },
   {
     step: 4,

@@ -1,8 +1,13 @@
 import type { PlaylistStepDto } from '#shared/types/chapel'
 
-import { AUDIO_CACHE_NAME } from '~/composables/useOfflineCache'
-
 export type PlayerState = 'idle' | 'playing' | 'paused' | 'pausedAfterTrack'
+
+/** Nicht-destruktive Tempo-Anpassung, tonhöhenerhaltend */
+export function applyRate(audio: HTMLAudioElement, rate: number) {
+  audio.preservesPitch = true
+  audio.defaultPlaybackRate = rate
+  audio.playbackRate = rate
+}
 
 export function useChapelPlayer() {
   const audio = import.meta.client ? new Audio() : null
@@ -57,25 +62,6 @@ export function useChapelPlayer() {
     currentIndex.value = Math.min(Math.max(0, startIndex), last)
   }
 
-  async function resolveStreamUrl(step: PlaylistStepDto): Promise<string | null> {
-    if (!step.trackId || !step.streamUrl) return null
-
-    if ('caches' in window) {
-      try {
-        const cache = await caches.open(AUDIO_CACHE_NAME)
-        const cached = await cache.match(step.streamUrl)
-        if (cached) {
-          const blob = await cached.blob()
-          return URL.createObjectURL(blob)
-        }
-      } catch {
-        // fall through to network
-      }
-    }
-
-    return step.streamUrl
-  }
-
   async function playCurrent() {
     const step = currentStep.value
     if (!step?.trackId || !audio) return
@@ -86,19 +72,17 @@ export function useChapelPlayer() {
       return
     }
 
-    const url = await resolveStreamUrl(step)
-    if (!url) return
+    if (!step.streamUrl) return
 
     if (loadedTrackId.value !== step.trackId || audio.ended) {
-      audio.src = url
+      audio.src = step.streamUrl
       loadedTrackId.value = step.trackId
       if (audio.ended) {
         audio.currentTime = 0
       }
-    } else if (url.startsWith('blob:')) {
-      audio.src = url
     }
 
+    applyRate(audio, step.playbackRate ?? 1)
     await audio.play()
     state.value = 'playing'
   }

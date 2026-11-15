@@ -19,7 +19,8 @@ export default defineEventHandler(async (event) => {
       trackId: schema.serviceItems.trackId,
       title: schema.tracks.title,
       composer: schema.tracks.composer,
-      durationMs: schema.tracks.durationMs
+      durationMs: schema.tracks.durationMs,
+      playbackRate: schema.tracks.playbackRate
     })
     .from(schema.serviceItems)
     .leftJoin(schema.tracks, eq(schema.serviceItems.trackId, schema.tracks.id))
@@ -35,6 +36,7 @@ export default defineEventHandler(async (event) => {
     title: item.title,
     composer: item.composer,
     durationMs: item.durationMs,
+    playbackRate: item.playbackRate ?? 1,
     streamUrl: item.trackId ? `/api/tracks/${item.trackId}/stream` : null
   }))
 

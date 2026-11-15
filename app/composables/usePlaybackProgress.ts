@@ -1,3 +1,5 @@
+import type { PlaylistStepDto } from '#shared/types/chapel'
+
 const STORAGE_PREFIX = 'chapel-playback-progress'
 const TTL_MS = 24 * 60 * 60 * 1000
 
@@ -5,6 +7,13 @@ export interface PlaybackProgressSnapshot {
   currentIndex: number
   playedIndices: number[]
   savedAt: number
+  /** Fingerprint des Ablaufs – ändert er sich, wurde der Gottesdienst bearbeitet */
+  fingerprint?: string
+}
+
+/** Stabiler Fingerprint des abspielbaren Inhalts (unabhängig von Item-IDs). */
+export function playlistFingerprint(steps: PlaylistStepDto[]): string {
+  return JSON.stringify(steps.map(s => [s.position, s.kind, s.label, s.trackId, s.playbackRate ?? 1]))
 }
 
 function storageKey(serviceId: number) {
@@ -35,8 +44,17 @@ function readSnapshot(serviceId: number): PlaybackProgressSnapshot | null {
 }
 
 export function usePlaybackProgress(serviceId: number) {
-  function load() {
-    return readSnapshot(serviceId)
+  let fingerprint: string | undefined
+
+  /** Lädt den Fortschritt – verwirft ihn, wenn der Gottesdienst seitdem bearbeitet wurde. */
+  function load(steps: PlaylistStepDto[]) {
+    fingerprint = playlistFingerprint(steps)
+    const snapshot = readSnapshot(serviceId)
+    if (snapshot?.fingerprint && snapshot.fingerprint !== fingerprint) {
+      clear()
+      return null
+    }
+    return snapshot
   }
 
   function save(currentIndex: number, playedIndices: number[]) {
@@ -44,7 +62,8 @@ export function usePlaybackProgress(serviceId: number) {
     const snapshot: PlaybackProgressSnapshot = {
       currentIndex,
       playedIndices: [...playedIndices],
-      savedAt: Date.now()
+      savedAt: Date.now(),
+      fingerprint
     }
     localStorage.setItem(storageKey(serviceId), JSON.stringify(snapshot))
   }

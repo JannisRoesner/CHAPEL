@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
+import type { ServiceTypeDto } from '#shared/types/chapel'
 
 const servicesStore = useServicesStore()
 const toast = useToast()
@@ -7,6 +8,21 @@ const creating = ref(false)
 const newName = ref('')
 const deleteOpen = ref(false)
 const deleteTarget = ref<{ id: number, name: string } | null>(null)
+const nameDialog = useNameDialog()
+
+function renameType(id: number, current: string) {
+  nameDialog.ask({ title: 'Vorlage umbenennen', initialName: current }, async (name) => {
+    servicesStore.upsertServiceType(await $fetch<ServiceTypeDto>(`/api/service-types/${id}`, { method: 'PATCH', body: { name } }))
+  })
+}
+
+function duplicateType(id: number, current: string) {
+  nameDialog.ask({ title: 'Vorlage duplizieren', initialName: `${current} (Kopie)`, confirmLabel: 'Duplizieren' }, async (name) => {
+    const copy = await $fetch<ServiceTypeDto>(`/api/service-types/${id}/duplicate`, { method: 'POST', body: { name } })
+    servicesStore.upsertServiceType(copy)
+    toast.add({ title: 'Vorlage dupliziert', color: 'success' })
+  })
+}
 
 onMounted(() => servicesStore.fetchServiceTypes())
 
@@ -48,6 +64,17 @@ function typeMenu(id: number, name: string): DropdownMenuItem[][] {
       icon: 'i-lucide-pencil',
       to: `/service-types/${id}`
     },
+    {
+      label: 'Umbenennen',
+      icon: 'i-lucide-text-cursor-input',
+      onSelect: () => renameType(id, name)
+    },
+    {
+      label: 'Duplizieren',
+      icon: 'i-lucide-copy',
+      onSelect: () => duplicateType(id, name)
+    }
+  ], [
     {
       label: 'Löschen',
       icon: 'i-lucide-trash',
@@ -121,6 +148,16 @@ function typeMenu(id: number, name: string): DropdownMenuItem[][] {
       v-else
       title="Keine Vorlagen"
       description="Erstellen Sie eine Vorlage für Ihren Gottesdienstablauf."
+    />
+
+    <UiNameDialog
+      v-model:open="nameDialog.state.open"
+      :title="nameDialog.state.title"
+      :description="nameDialog.state.description"
+      :initial-name="nameDialog.state.initialName"
+      :confirm-label="nameDialog.state.confirmLabel"
+      :loading="nameDialog.state.loading"
+      @confirm="nameDialog.confirm"
     />
 
     <UiConfirmModal

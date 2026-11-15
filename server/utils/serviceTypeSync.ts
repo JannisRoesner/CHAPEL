@@ -8,6 +8,12 @@ export interface ServiceTypeTemplateItem {
   kind: ItemKind
   label: string
   defaultTrackId?: number | null
+  /**
+   * Position, die dieser Schritt vor der Änderung hatte – damit gewählte Lieder in
+   * bestehenden Gottesdiensten beim Umsortieren mitwandern.
+   * `null` = neuer Schritt, `undefined` = unbekannt (Abgleich über gleiche Position).
+   */
+  sourcePosition?: number | null
 }
 
 function resolveTrackId(
@@ -56,7 +62,12 @@ export async function syncServicesFromTypeTemplate(
           position: templateItem.position,
           kind: templateItem.kind,
           label: templateItem.label.trim(),
-          trackId: resolveTrackId(templateItem, oldByPosition.get(templateItem.position))
+          trackId: resolveTrackId(
+            templateItem,
+            templateItem.sourcePosition === null
+              ? undefined
+              : oldByPosition.get(templateItem.sourcePosition ?? templateItem.position)
+          )
         }))
       )
     }

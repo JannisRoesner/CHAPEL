@@ -1,8 +1,10 @@
 import {
+  type AnyPgColumn,
   boolean,
   integer,
   pgEnum,
   pgTable,
+  real,
   serial,
   text,
   timestamp,
@@ -47,6 +49,12 @@ export const tracks = pgTable(
     originalFilename: text('original_filename').notNull(),
     mimeType: text('mime_type').notNull(),
     fileSizeBytes: integer('file_size_bytes').notNull(),
+    /** Tempo-Variante: verweist auf das Original, teilt dessen Audiodatei */
+    parentTrackId: integer('parent_track_id').references((): AnyPgColumn => tracks.id, {
+      onDelete: 'cascade'
+    }),
+    /** Wiedergabegeschwindigkeit (1 = Original), tonhöhenerhaltend beim Abspielen */
+    playbackRate: real('playback_rate').notNull().default(1),
     createdBy: integer('created_by').references(() => users.id, {
       onDelete: 'set null'
     }),

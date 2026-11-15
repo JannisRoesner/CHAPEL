@@ -13,6 +13,7 @@ function attachListeners() {
 
 export function useTrackPreview() {
   if (import.meta.client) attachListeners()
+  const libraryStore = useLibraryStore()
 
   function isPlaying(trackId: number) {
     return activeTrackId.value === trackId && playing.value
@@ -30,6 +31,7 @@ export function useTrackPreview() {
 
     activeTrackId.value = trackId
     audio.src = `/api/tracks/${trackId}/stream`
+    applyRate(audio, libraryStore.tracks.find(t => t.id === trackId)?.playbackRate ?? 1)
     try {
       await audio.play()
       playing.value = true

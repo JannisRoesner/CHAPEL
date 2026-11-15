@@ -114,24 +114,7 @@ export default defineNuxtConfig({
     workbox: {
       globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
       navigateFallback: '/',
-      navigateFallbackDenylist: [/^\/api\//],
-      runtimeCaching: [
-        {
-          // Match pathname only — Workbox tests against the full request URL
-          urlPattern: /\/api\/tracks\/\d+\/stream$/,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'chapel-audio-v1',
-            expiration: {
-              maxEntries: 200,
-              maxAgeSeconds: 60 * 60 * 24 * 30
-            },
-            cacheableResponse: {
-              statuses: [0, 200]
-            }
-          }
-        }
-      ]
+      navigateFallbackDenylist: [/^\/api\//]
     },
     client: {
       installPrompt: true

@@ -9,6 +9,18 @@ const editTrack = ref<TrackDto | null>(null)
 const editOpen = ref(false)
 const deleteOpen = ref(false)
 const deleteTarget = ref<TrackDto | null>(null)
+const tempoTrack = ref<TrackDto | null>(null)
+const tempoOpen = ref(false)
+
+function openTempo(track: TrackDto) {
+  tempoTrack.value = track
+  tempoOpen.value = true
+}
+
+function onTempoSaved(track: TrackDto, created: boolean) {
+  libraryStore.upsertTrack(track)
+  toast.add({ title: created ? 'Tempo-Variante angelegt' : 'Tempo gespeichert', description: track.title, color: 'success' })
+}
 
 const categoryItems = [
   { label: 'Alle', value: 'all' as const },
@@ -45,7 +57,10 @@ function requestDelete(track: TrackDto) {
 async function confirmDelete() {
   if (!deleteTarget.value) return
   await $fetch(`/api/tracks/${deleteTarget.value.id}`, { method: 'DELETE' })
-  libraryStore.removeTrack(deleteTarget.value.id)
+  const removedId = deleteTarget.value.id
+  libraryStore.removeTrack(removedId)
+  // Varianten werden serverseitig mitgelöscht
+  libraryStore.tracks = libraryStore.tracks.filter(t => t.parentTrackId !== removedId)
   toast.add({ title: 'Track gelöscht', color: 'neutral' })
   deleteOpen.value = false
   deleteTarget.value = null
@@ -97,7 +112,14 @@ function onSaved(track: TrackDto) {
       :tracks="libraryStore.filteredTracks"
       :loading="libraryStore.loading"
       @edit="openEdit"
+      @tempo="openTempo"
       @delete="requestDelete"
+    />
+
+    <LibraryTrackTempoModal
+      v-model:open="tempoOpen"
+      :track="tempoTrack"
+      @saved="onTempoSaved"
     />
 
     <LibraryTrackEditModal
@@ -109,7 +131,7 @@ function onSaved(track: TrackDto) {
     <UiConfirmModal
       v-model:open="deleteOpen"
       title="Track löschen"
-      :description="deleteTarget ? `„${deleteTarget.title}“ wirklich löschen?` : undefined"
+      :description="deleteTarget ? `„${deleteTarget.title}“ wirklich löschen?${deleteTarget.parentTrackId ? '' : ' Zugehörige Tempo-Varianten werden ebenfalls gelöscht.'}` : undefined"
       confirm-label="Löschen"
       @confirm="confirmDelete"
     />

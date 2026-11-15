@@ -9,15 +9,11 @@ const { user, loggedIn } = useUserSession()
 const online = useOnline()
 const localSession = useLocalSession()
 
-const isOfflineMode = computed(() => !online.value)
 const displayName = computed(() => {
   return user.value?.name || localSession.getLocalSession()?.user.name || null
 })
 
-const navItems = computed(() => {
-  if (!isOfflineMode.value) return APP_NAV_ITEMS
-  return APP_NAV_ITEMS.filter(item => item.to === '/playback' || item.to === '/settings')
-})
+const navItems = APP_NAV_ITEMS
 
 useHead({
   htmlAttrs: {
@@ -139,20 +135,6 @@ const accountItems = computed<DropdownMenuItem[][]>(() => {
           </div>
         </div>
       </header>
-
-      <div
-        v-if="isOfflineMode"
-        class="border-b border-warning/30 bg-warning/10"
-      >
-        <div class="w-full max-w-6xl mx-auto px-4 py-3">
-          <p class="font-medium text-warning">
-            Offline-Modus
-          </p>
-          <p class="text-sm text-warning/90 mt-0.5">
-            Nur Wiedergabe und Cache-Verwaltung verfügbar
-          </p>
-        </div>
-      </div>
 
       <main class="w-full min-w-0 max-w-6xl mx-auto px-4 py-6 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:pb-6">
         <slot />

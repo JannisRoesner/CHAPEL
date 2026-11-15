@@ -44,18 +44,10 @@ export function useLocalSession() {
     return localStorage.getItem(LEGACY_OFFLINE_SESSION_KEY) === '1'
   }
 
-  async function canUseOfflinePlayback(): Promise<boolean> {
-    if (!import.meta.client) return false
-    if (hadValidSession()) return true
-    const cached = await useOfflineCache().getCachedServices()
-    return cached.length > 0
-  }
-
   return {
     saveLocalSession,
     clearLocalSession,
     getLocalSession,
-    hadValidSession,
-    canUseOfflinePlayback
+    hadValidSession
   }
 }

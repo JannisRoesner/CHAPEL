@@ -20,7 +20,7 @@ import { LOGIN_PATH } from '#shared/constants/app'
 
       <p class="text-lg md:text-xl text-muted max-w-2xl mx-auto mb-10 leading-relaxed">
         CHAPEL verwaltet Gottesdienst-Playlists: Liturgieelemente sind fix, Lieder pro Gottesdienst
-        frei wählbar — touch-gesteuert abspielbar, auch offline.
+        frei wählbar — touch-gesteuert abspielbar.
       </p>
 
       <UButton
