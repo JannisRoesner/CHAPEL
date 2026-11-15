@@ -1,5 +1,3 @@
-import { asc, eq } from 'drizzle-orm'
-
 import { schema, useDb, type DbExecutor } from '../database'
 import type { ItemKind } from '#shared/types/chapel'
 
@@ -15,85 +13,23 @@ export const DEFAULT_SONNTAGS_GOTTESDIENST = {
   ]
 }
 
-type ExistingItem = typeof schema.serviceTypeItems.$inferSelect
-
-function liturgyTrackByPositionKind(items: ExistingItem[]) {
-  return new Map(
-    items
-      .filter(item => item.kind === 'liturgy' && item.defaultTrackId != null)
-      .map(item => [`${item.position}:${item.kind}`, item.defaultTrackId] as const)
-  )
-}
-
-async function insertDefaultItems(
-  db: DbExecutor,
-  serviceTypeId: number,
-  preserveTracksFrom: ExistingItem[] = []
-) {
-  const preserved = liturgyTrackByPositionKind(preserveTracksFrom)
-
+async function insertDefaultItems(db: DbExecutor, serviceTypeId: number) {
   await db.insert(schema.serviceTypeItems).values(
     DEFAULT_SONNTAGS_GOTTESDIENST.items.map(item => ({
       serviceTypeId,
       position: item.position,
       kind: item.kind,
       label: item.label,
-      defaultTrackId:
-        item.kind === 'liturgy'
-          ? (preserved.get(`${item.position}:${item.kind}`) ?? null)
-          : null
+      defaultTrackId: null
     }))
   )
 }
 
+/**
+ * Legt die Standardvorlage nur auf einer leeren Installation an (noch keine Vorlage vorhanden).
+ * Bestehende Vorlagen werden nie verändert – auch nicht der „Sonntagsgottesdienst“.
+ */
 export async function ensureDefaultServiceType(db: DbExecutor = useDb()) {
-  const [existingByName] = await db
-    .select()
-    .from(schema.serviceTypes)
-    .where(eq(schema.serviceTypes.name, DEFAULT_SONNTAGS_GOTTESDIENST.name))
-    .limit(1)
-
-  if (existingByName) {
-    const items = await db
-      .select()
-      .from(schema.serviceTypeItems)
-      .where(eq(schema.serviceTypeItems.serviceTypeId, existingByName.id))
-      .orderBy(asc(schema.serviceTypeItems.position))
-
-    if (items.length === DEFAULT_SONNTAGS_GOTTESDIENST.items.length) {
-      return
-    }
-
-    const preservedTracks = liturgyTrackByPositionKind(items)
-
-    await db
-      .delete(schema.serviceTypeItems)
-      .where(eq(schema.serviceTypeItems.serviceTypeId, existingByName.id))
-    await insertDefaultItems(db, existingByName.id, items)
-    await db
-      .update(schema.serviceTypes)
-      .set({
-        description: DEFAULT_SONNTAGS_GOTTESDIENST.description,
-        updatedAt: new Date()
-      })
-      .where(eq(schema.serviceTypes.id, existingByName.id))
-
-    await syncServicesFromTypeTemplate(
-      existingByName.id,
-      DEFAULT_SONNTAGS_GOTTESDIENST.items.map(item => ({
-        ...item,
-        defaultTrackId:
-          item.kind === 'liturgy'
-            ? (preservedTracks.get(`${item.position}:${item.kind}`) ?? null)
-            : null
-      })),
-      db
-    )
-
-    console.info('[CHAPEL] Restored default Sonntagsgottesdienst template')
-    return
-  }
-
   const [anyType] = await db.select({ id: schema.serviceTypes.id }).from(schema.serviceTypes).limit(1)
   if (anyType) return
 
