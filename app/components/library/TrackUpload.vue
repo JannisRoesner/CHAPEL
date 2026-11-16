@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import type { TrackCategory, TrackDto } from '#shared/types/chapel'
 import { AUDIO_FILE_ACCEPT } from '#shared/constants/audio'
-import type { TrackDto } from '#shared/types/chapel'
+
+const categoryOptions = TRACK_CATEGORIES.map(value => ({ label: TRACK_CATEGORY_LABELS[value], value }))
 
 const props = withDefaults(defineProps<{
-  defaultCategory?: 'hymn' | 'liturgy'
+  defaultCategory?: TrackCategory
   /** Einzeldatei-Modus (z. B. im Auswahl-Dialog) */
   single?: boolean
 }>(), {
@@ -16,7 +18,7 @@ const emit = defineEmits<{
   duplicate: [existing: TrackDto]
 }>()
 
-const category = ref<'hymn' | 'liturgy'>(props.defaultCategory)
+const category = ref<TrackCategory>(props.defaultCategory)
 const uploading = ref(false)
 const dragOver = ref(false)
 const error = ref('')
@@ -91,10 +93,7 @@ function onDrop(event: DragEvent) {
       <div class="w-full min-w-0 sm:w-44">
         <USelect
           v-model="category"
-          :items="[
-            { label: 'Lied', value: 'hymn' },
-            { label: 'Liturgie', value: 'liturgy' }
-          ]"
+          :items="categoryOptions"
           class="w-full"
         />
       </div>

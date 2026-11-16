@@ -1,5 +1,5 @@
 export type ItemKind = 'liturgy' | 'songSlot'
-export type TrackCategory = 'hymn' | 'liturgy'
+export type TrackCategory = 'hymn' | 'voluntary' | 'liturgy'
 export type UserRole = 'admin' | 'editor'
 
 export type { AppearanceMode, ColorSchemeId } from '#shared/constants/colorSchemes'

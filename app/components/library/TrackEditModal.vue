@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import type { TrackDto } from '#shared/types/chapel'
+import type { TrackCategory, TrackDto } from '#shared/types/chapel'
+
+const categoryOptions = TRACK_CATEGORIES.map(value => ({ label: TRACK_CATEGORY_LABELS[value], value }))
 
 const props = defineProps<{
   track: TrackDto | null
@@ -13,7 +15,7 @@ const emit = defineEmits<{
 
 const title = ref('')
 const composer = ref('')
-const category = ref<'hymn' | 'liturgy'>('hymn')
+const category = ref<TrackCategory>('hymn')
 const saving = ref(false)
 
 watch(
@@ -79,10 +81,7 @@ async function save() {
             <USelect
               v-model="category"
               class="w-full"
-              :items="[
-                { label: 'Lied', value: 'hymn' },
-                { label: 'Liturgie', value: 'liturgy' }
-              ]"
+              :items="categoryOptions"
             />
           </UFormField>
         </div>

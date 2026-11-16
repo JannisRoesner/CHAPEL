@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 
-import type { TrackDto } from '#shared/types/chapel'
+import type { TrackCategory, TrackDto } from '#shared/types/chapel'
 
 export const useLibraryStore = defineStore('library', () => {
   const tracks = ref<TrackDto[]>([])
   const loading = ref(false)
   const search = ref('')
-  const categoryFilter = ref<'all' | 'hymn' | 'liturgy'>('all')
+  const categoryFilter = ref<'all' | TrackCategory>('all')
 
   const filteredTracks = computed(() => {
     let result = tracks.value

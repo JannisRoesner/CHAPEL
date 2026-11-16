@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm'
 
 import { useDb, schema } from '../../database'
 import { toTrackDto } from './index.get'
+import type { TrackCategory } from '#shared/types/chapel'
 
 export default defineEventHandler(async (event) => {
   const id = Number(getRouterParam(event, 'id'))
@@ -12,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<{
     title?: string
     composer?: string | null
-    category?: 'hymn' | 'liturgy'
+    category?: TrackCategory
     categoryId?: number | null
     playbackRate?: number
   }>(event)
@@ -52,7 +53,7 @@ export default defineEventHandler(async (event) => {
     .set({
       title: body.title?.trim() || existing.title,
       composer: body.composer !== undefined ? body.composer : existing.composer,
-      category: body.category ?? existing.category,
+      category: body.category !== undefined ? parseTrackCategory(body.category) : existing.category,
       categoryId: body.categoryId !== undefined ? body.categoryId : existing.categoryId,
       ...variantUpdate,
       updatedAt: new Date()

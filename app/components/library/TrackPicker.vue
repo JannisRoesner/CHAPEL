@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { TrackDto } from '#shared/types/chapel'
+import type { TrackCategory, TrackDto } from '#shared/types/chapel'
 import { useMediaQuery } from '@vueuse/core'
 
 const props = defineProps<{
   open: boolean
-  categoryFilter?: 'hymn' | 'liturgy' | 'all'
+  categoryFilter?: TrackCategory | 'all'
 }>()
 
 const emit = defineEmits<{
@@ -24,10 +24,17 @@ const modeItems = [
   { label: 'Hochladen', value: 'upload' as const, icon: 'i-lucide-upload' }
 ]
 
+/** Vorauswahl kommt vom Aufrufer, lässt sich im Dialog aber umschalten. */
+const activeCategory = ref<TrackCategory | 'all'>(props.categoryFilter ?? 'all')
+const categoryChips = [
+  { label: 'Alle', value: 'all' as const },
+  ...TRACK_CATEGORIES.map(value => ({ label: TRACK_CATEGORY_LABELS[value], value }))
+]
+
 const filtered = computed(() => {
   let list = libraryStore.tracks
-  if (props.categoryFilter && props.categoryFilter !== 'all') {
-    list = list.filter(t => t.category === props.categoryFilter)
+  if (activeCategory.value !== 'all') {
+    list = list.filter(t => t.category === activeCategory.value)
   }
   const q = search.value.trim().toLowerCase()
   if (q) {
@@ -45,6 +52,7 @@ watch(
   (open) => {
     if (open) {
       mode.value = 'library'
+      activeCategory.value = props.categoryFilter ?? 'all'
       if (!libraryStore.tracks.length) void libraryStore.fetchTracks()
     } else {
       stop()
@@ -121,6 +129,24 @@ function onDuplicate(existing: TrackDto) {
             class="w-full"
             type="search"
           />
+          <div
+            v-if="mode === 'library'"
+            class="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none]"
+          >
+            <button
+              v-for="chip in categoryChips"
+              :key="chip.value"
+              type="button"
+              class="press min-h-10 shrink-0 rounded-full border px-4 text-sm font-medium"
+              :class="activeCategory === chip.value
+                ? 'border-primary bg-primary/10 text-primary'
+                : 'border-default text-muted hover:bg-elevated/60'"
+              :aria-pressed="activeCategory === chip.value"
+              @click="activeCategory = chip.value"
+            >
+              {{ chip.label }}
+            </button>
+          </div>
         </div>
 
         <div
@@ -188,7 +214,7 @@ function onDuplicate(existing: TrackDto) {
         >
           <LibraryTrackUpload
             single
-            :default-category="categoryFilter === 'liturgy' ? 'liturgy' : 'hymn'"
+            :default-category="activeCategory === 'all' ? 'hymn' : activeCategory"
             @uploaded="onUploaded"
             @duplicate="onDuplicate"
           />

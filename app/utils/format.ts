@@ -1,3 +1,5 @@
+import type { TrackCategory } from '#shared/types/chapel'
+
 export function formatDuration(ms: number | null | undefined): string {
   if (!ms || ms <= 0) return '–'
   const totalSeconds = Math.floor(ms / 1000)
@@ -15,8 +17,8 @@ export function formatServiceDate(iso: string): string {
   })
 }
 
-export function categoryLabel(category: 'hymn' | 'liturgy'): string {
-  return category === 'liturgy' ? 'Liturgie' : 'Lied'
+export function categoryLabel(category: TrackCategory): string {
+  return TRACK_CATEGORY_LABELS[category]
 }
 
 export function kindLabel(kind: 'liturgy' | 'songSlot'): string {

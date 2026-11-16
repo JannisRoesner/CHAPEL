@@ -12,7 +12,7 @@ import {
 } from 'drizzle-orm/pg-core'
 
 export const userRoleEnum = pgEnum('user_role', ['admin', 'editor'])
-export const trackCategoryEnum = pgEnum('track_category', ['hymn', 'liturgy'])
+export const trackCategoryEnum = pgEnum('track_category', ['hymn', 'liturgy', 'voluntary'])
 export const itemKindEnum = pgEnum('item_kind', ['liturgy', 'songSlot'])
 
 export const users = pgTable('users', {

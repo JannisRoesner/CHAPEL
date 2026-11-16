@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
     )
   }
 
-  if (category === 'hymn' || category === 'liturgy') {
+  if (isTrackCategory(category)) {
     conditions.push(eq(schema.tracks.category, category))
   }
 

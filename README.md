@@ -6,7 +6,7 @@ CHAPEL ist eine moderne Web-App zur Verwaltung und touch-gesteuerten Wiedergabe 
 
 ## Funktionen
 
-- MP3-Bibliothek mit Upload, Metadaten, Kategorien (Lied / Liturgie) und Auto-Deduplication (SHA-256)
+- MP3-Bibliothek mit Upload, Metadaten, Kategorien (Lied / Ein-/Ausgang / Liturgie) und Auto-Deduplication (SHA-256)
 - Nicht-destruktive Tempo-Varianten (50–150 %, tonhöhenerhaltend) – als eigene Einträge in der Bibliothek, in Gottesdiensten auswählbar
 - Gottesdienst-Typen als Vorlagen (Liturgie + Lied-Slots), Reihenfolge per Drag & Drop (Touch, Maus, Tastatur)
 - Konkrete Gottesdienste aus Vorlagen erstellen und Lied-Slots befüllen; Vorlagen und Gottesdienste umbenennen und duplizieren
