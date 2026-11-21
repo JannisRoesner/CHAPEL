@@ -369,13 +369,13 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
                 <FontAwesomeIcon :icon="isPlaying(item.defaultTrackId) ? 'stop' : 'play'" />
               </UButton>
               <UButton
-                v-if="item.defaultTrackId && !isFixedKind(item.kind)"
+                v-if="item.defaultTrackId"
                 variant="ghost"
                 color="neutral"
                 square
                 icon="i-lucide-x"
                 class="press min-h-10 min-w-10 justify-center"
-                aria-label="Standard-Lied entfernen"
+                aria-label="Track entfernen"
                 @click="clearTrack(item)"
               />
               <UButton
