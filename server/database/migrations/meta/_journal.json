@@ -57,6 +57,13 @@
       "when": 1795100000000,
       "tag": "0007_element_types",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795200000000,
+      "tag": "0008_element_type_colors",
+      "breakpoints": true
     }
   ]
 }

@@ -16,11 +16,15 @@ const { toggle, isPlaying } = useTrackPreview()
 </script>
 
 <template>
-  <div class="rounded-2xl border border-default bg-default p-3 sm:p-4 space-y-3">
+  <div
+    class="type-card-plain rounded-2xl border border-default p-3 sm:p-4 space-y-3"
+    :style="{ '--type': typeColorVar(item.kind) }"
+  >
     <div class="flex items-center gap-2">
       <UBadge
         :color="type.color"
-        variant="subtle"
+        variant="solid"
+        :icon="type.icon"
         class="shrink-0"
       >
         {{ index + 1 }} · {{ kindLabel(item.kind) }}

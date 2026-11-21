@@ -11,8 +11,8 @@ export const LITURGY_KIND = 'liturgy'
 export const BUILTIN_ELEMENT_TYPES: readonly ElementTypeDto[] = [
   { key: SONG_KIND, label: 'Lied', defaultLabel: 'Lied', fixed: false, color: 'primary', icon: 'i-lucide-music', sortOrder: 0, builtin: true },
   { key: LITURGY_KIND, label: 'Liturgie', defaultLabel: 'Liturgieelement', fixed: true, color: 'secondary', icon: 'i-lucide-lock', sortOrder: 1, builtin: true },
-  { key: 'voluntary', label: 'Ein-/Ausgang', defaultLabel: 'Eingangsmusik', fixed: false, color: 'neutral', icon: 'i-lucide-door-open', sortOrder: 2, builtin: false },
-  { key: 'communion', label: 'Abendmahl-Musik', defaultLabel: 'Musik zum Abendmahl', fixed: false, color: 'neutral', icon: 'i-lucide-wine', sortOrder: 3, builtin: false }
+  { key: 'voluntary', label: 'Ein-/Ausgang', defaultLabel: 'Eingangsmusik', fixed: false, color: 'info', icon: 'i-lucide-door-open', sortOrder: 2, builtin: false },
+  { key: 'communion', label: 'Abendmahl-Musik', defaultLabel: 'Musik zum Abendmahl', fixed: false, color: 'warning', icon: 'i-lucide-wine', sortOrder: 3, builtin: false }
 ]
 
 export const ELEMENT_TYPE_COLORS: ReadonlyArray<{ value: ElementTypeColor, label: string }> = [

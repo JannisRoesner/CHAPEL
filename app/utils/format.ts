@@ -22,6 +22,12 @@ export function elementType(kind: string) {
   return useElementTypesStore().get(kind)
 }
 
+/** CSS-Farbwert der Typfarbe, z. B. für Streifen und Tönung (`--type`) */
+export function typeColorVar(kind: string): string {
+  const color = elementType(kind).color
+  return color === 'neutral' ? 'var(--ui-text-muted)' : `var(--ui-${color})`
+}
+
 export function isFixedKind(kind: string): boolean {
   return elementType(kind).fixed
 }

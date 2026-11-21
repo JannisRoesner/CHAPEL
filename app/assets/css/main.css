@@ -25,18 +25,18 @@ html {
   --color-green-900: #0A5331;
   --color-green-950: #052E16;
 
-  /* Liturgie = Schemafarbe, mit Grau gedämpft → bleibt im Farbton jedes Schemas */
-  --color-liturgy-50: color-mix(in oklab, var(--color-green-50) 42%, var(--color-slate-50));
-  --color-liturgy-100: color-mix(in oklab, var(--color-green-100) 42%, var(--color-slate-100));
-  --color-liturgy-200: color-mix(in oklab, var(--color-green-200) 42%, var(--color-slate-200));
-  --color-liturgy-300: color-mix(in oklab, var(--color-green-300) 42%, var(--color-slate-300));
-  --color-liturgy-400: color-mix(in oklab, var(--color-green-400) 42%, var(--color-slate-400));
-  --color-liturgy-500: color-mix(in oklab, var(--color-green-500) 42%, var(--color-slate-500));
-  --color-liturgy-600: color-mix(in oklab, var(--color-green-600) 42%, var(--color-slate-600));
-  --color-liturgy-700: color-mix(in oklab, var(--color-green-700) 42%, var(--color-slate-700));
-  --color-liturgy-800: color-mix(in oklab, var(--color-green-800) 42%, var(--color-slate-800));
-  --color-liturgy-900: color-mix(in oklab, var(--color-green-900) 42%, var(--color-slate-900));
-  --color-liturgy-950: color-mix(in oklab, var(--color-green-950) 42%, var(--color-slate-950));
+  /* Liturgie = Schiefergrau mit Hauch Schemafarbe → klar unterscheidbar von „Lied“ (volle Schemafarbe) */
+  --color-liturgy-50: color-mix(in oklab, var(--color-green-50) 18%, var(--color-slate-50));
+  --color-liturgy-100: color-mix(in oklab, var(--color-green-100) 18%, var(--color-slate-100));
+  --color-liturgy-200: color-mix(in oklab, var(--color-green-200) 18%, var(--color-slate-200));
+  --color-liturgy-300: color-mix(in oklab, var(--color-green-300) 18%, var(--color-slate-300));
+  --color-liturgy-400: color-mix(in oklab, var(--color-green-400) 18%, var(--color-slate-400));
+  --color-liturgy-500: color-mix(in oklab, var(--color-green-500) 18%, var(--color-slate-500));
+  --color-liturgy-600: color-mix(in oklab, var(--color-green-600) 18%, var(--color-slate-600));
+  --color-liturgy-700: color-mix(in oklab, var(--color-green-700) 18%, var(--color-slate-700));
+  --color-liturgy-800: color-mix(in oklab, var(--color-green-800) 18%, var(--color-slate-800));
+  --color-liturgy-900: color-mix(in oklab, var(--color-green-900) 18%, var(--color-slate-900));
+  --color-liturgy-950: color-mix(in oklab, var(--color-green-950) 18%, var(--color-slate-950));
 }
 
 [data-color-scheme="liturgical-blue"] {
@@ -177,4 +177,17 @@ html {
 html.theme-transition,
 html.theme-transition * {
   transition: background-color 250ms ease, border-color 250ms ease, color 250ms ease !important;
+}
+
+/* Elementtyp-Karten: farbiger Streifen links + leichte Tönung in der Typfarbe (--type) */
+.type-card {
+  border-left-width: 6px;
+  border-left-color: var(--type);
+  background-color: color-mix(in oklab, var(--type) 7%, var(--ui-bg-elevated));
+}
+
+.type-card-plain {
+  border-left-width: 6px;
+  border-left-color: var(--type);
+  background-color: color-mix(in oklab, var(--type) 6%, var(--ui-bg));
 }

@@ -292,11 +292,11 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
       <li
         v-for="(item, index) in items"
         :key="item.uid"
-        class="sortable-item relative rounded-2xl border bg-elevated p-3 sm:p-4"
+        class="sortable-item type-card relative rounded-2xl border p-3 sm:p-4"
         :class="sortable.dragIndex.value === index
           ? 'border-primary ring-2 ring-primary/40 shadow-2xl shadow-black/25'
           : 'border-accented shadow-sm shadow-black/5'"
-        :style="sortable.itemStyle(index)"
+        :style="[sortable.itemStyle(index), { '--type': typeColorVar(item.kind) }]"
       >
         <div class="flex items-start gap-2 sm:gap-3">
           <button
@@ -314,7 +314,7 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
             <div class="flex items-center gap-2">
               <UBadge
                 :color="elementType(item.kind).color"
-                variant="subtle"
+                variant="solid"
                 class="shrink-0 tabular-nums"
               >
                 {{ index + 1 }}
