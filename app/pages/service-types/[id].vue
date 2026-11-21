@@ -371,7 +371,7 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
               <UButton
                 v-if="item.defaultTrackId"
                 variant="ghost"
-                color="neutral"
+                color="error"
                 square
                 icon="i-lucide-x"
                 class="press min-h-10 min-w-10 justify-center"

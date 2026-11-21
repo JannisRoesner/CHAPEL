@@ -10,25 +10,76 @@ const nameDialog = useNameDialog()
 
 const service = ref<ServiceDto | null>(null)
 const loading = ref(true)
-const saveState = ref<'idle' | 'saving' | 'saved' | 'error'>('idle')
+const saving = ref(false)
+/** Zuletzt gespeicherte Track-Zuordnung je Schritt – Grundlage für „ungespeichert“ */
+const savedTracks = ref(new Map<number, number | null>())
 const pickerOpen = ref(false)
 const pickerItemId = ref<number | null>(null)
 const pickerCategory = ref<TrackCategory>(SONG_KIND)
 const trackPreview = useTrackPreview()
 
-let savedResetTimer: ReturnType<typeof setTimeout> | undefined
+function rememberSaved() {
+  savedTracks.value = new Map((service.value?.items ?? []).map(i => [i.id, i.trackId]))
+}
+
+const changedItems = computed(() =>
+  (service.value?.items ?? []).filter(i => savedTracks.value.get(i.id) !== i.trackId)
+)
+const dirty = computed(() => changedItems.value.length > 0)
 
 async function load() {
   loading.value = true
   try {
     service.value = await $fetch<ServiceDto>(`/api/services/${id}`)
+    rememberSaved()
   } finally {
     loading.value = false
   }
 }
 
-onMounted(load)
-onUnmounted(() => trackPreview.stop())
+async function save() {
+  if (saving.value || !dirty.value) return
+  saving.value = true
+  try {
+    await $fetch(`/api/services/${id}/items`, {
+      method: 'PATCH',
+      body: { items: changedItems.value.map(i => ({ id: i.id, trackId: i.trackId })) }
+    })
+    rememberSaved()
+    toast.add({ title: 'Gottesdienst gespeichert', color: 'success', icon: 'i-lucide-check' })
+  } catch {
+    toast.add({ title: 'Speichern fehlgeschlagen', color: 'error' })
+  } finally {
+    saving.value = false
+  }
+}
+
+function onKeydown(event: KeyboardEvent) {
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+    event.preventDefault()
+    void save()
+  }
+}
+
+function onBeforeUnload(event: BeforeUnloadEvent) {
+  if (dirty.value) event.preventDefault()
+}
+
+onMounted(() => {
+  void load()
+  window.addEventListener('keydown', onKeydown)
+  window.addEventListener('beforeunload', onBeforeUnload)
+})
+
+onUnmounted(() => {
+  trackPreview.stop()
+  window.removeEventListener('keydown', onKeydown)
+  window.removeEventListener('beforeunload', onBeforeUnload)
+})
+
+onBeforeRouteLeave(() => {
+  if (dirty.value && !window.confirm('Ungespeicherte Änderungen verwerfen?')) return false
+})
 
 function openPicker(item: ServiceItemDto) {
   if (isFixedKind(item.kind)) return
@@ -37,32 +88,14 @@ function openPicker(item: ServiceItemDto) {
   pickerOpen.value = true
 }
 
-async function onTrackSelected(track: TrackDto) {
-  if (!pickerItemId.value || !service.value?.items) return
-  saveState.value = 'saving'
-  try {
-    await $fetch(`/api/services/${id}/items`, {
-      method: 'PATCH',
-      body: {
-        items: [{ id: pickerItemId.value, trackId: track.id }]
-      }
-    })
-    const item = service.value.items.find(i => i.id === pickerItemId.value)
-    if (item) {
-      item.trackId = track.id
-      item.track = track
-    }
-    pickerOpen.value = false
-    pickerItemId.value = null
-    saveState.value = 'saved'
-    clearTimeout(savedResetTimer)
-    savedResetTimer = setTimeout(() => {
-      if (saveState.value === 'saved') saveState.value = 'idle'
-    }, 2000)
-  } catch {
-    saveState.value = 'error'
-    toast.add({ title: 'Speichern fehlgeschlagen', color: 'error' })
+function onTrackSelected(track: TrackDto) {
+  const item = service.value?.items?.find(i => i.id === pickerItemId.value)
+  if (item) {
+    item.trackId = track.id
+    item.track = track
   }
+  pickerOpen.value = false
+  pickerItemId.value = null
 }
 
 function rename() {
@@ -120,22 +153,10 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
     >
       <template #below>
         <p
-          v-if="saveState === 'saving'"
-          class="text-muted"
+          v-if="dirty"
+          class="text-warning font-medium"
         >
-          Speichert…
-        </p>
-        <p
-          v-else-if="saveState === 'saved'"
-          class="text-success"
-        >
-          Gespeichert
-        </p>
-        <p
-          v-else-if="saveState === 'error'"
-          class="text-error"
-        >
-          Fehler beim Speichern
+          Ungespeicherte Änderungen
         </p>
       </template>
       <template #actions>
@@ -209,10 +230,30 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
       />
       <UButton
         :to="`/playback/${id}`"
-        class="press min-h-11 rounded-full px-5"
+        variant="ghost"
+        color="neutral"
+        class="press min-h-11 rounded-full px-3 sm:px-4"
       >
         <FontAwesomeIcon icon="play" />
-        <span>Zur Wiedergabe</span>
+        <span>Wiedergabe</span>
+      </UButton>
+      <UButton
+        class="press min-h-11 rounded-full px-4 sm:px-5"
+        :loading="saving"
+        :aria-label="dirty ? 'Speichern (ungespeicherte Änderungen)' : 'Speichern'"
+        title="Speichern (Strg/⌘ + S)"
+        @click="save"
+      >
+        <FontAwesomeIcon
+          v-if="!saving"
+          icon="floppy-disk"
+        />
+        <span class="hidden min-[400px]:inline">Speichern</span>
+        <span
+          v-if="dirty"
+          class="size-2 rounded-full bg-current opacity-90"
+          aria-hidden="true"
+        />
       </UButton>
     </UiFloatingBar>
   </div>
