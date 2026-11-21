@@ -77,7 +77,8 @@ export interface ServiceItemDto {
 
 export interface ServiceDto {
   id: number
-  serviceTypeId: number
+  /** `null`, wenn die Vorlage gelöscht wurde */
+  serviceTypeId: number | null
   name: string
   serviceDate: string
   notes: string | null

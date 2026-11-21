@@ -108,6 +108,13 @@ async function addItem(kind: ItemKind) {
   last?.querySelector('input')?.focus({ preventScroll: true })
 }
 
+/** Liturgie ↔ Lied-Slot; Standard-Bezeichnungen wandern mit, eigene bleiben. */
+function toggleKind(item: EditableItem) {
+  const next: ItemKind = item.kind === 'liturgy' ? 'songSlot' : 'liturgy'
+  if (DEFAULT_LABELS.includes(item.label)) item.label = next === 'liturgy' ? 'Liturgieelement' : 'Lied'
+  item.kind = next
+}
+
 function removeItem(uid: number) {
   items.value = items.value.filter(i => i.uid !== uid)
 }
@@ -311,6 +318,17 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
               >
                 {{ index + 1 }} · {{ kindLabel(item.kind) }}
               </UBadge>
+              <UButton
+                variant="ghost"
+                color="neutral"
+                size="sm"
+                icon="i-lucide-repeat"
+                class="press min-h-9 shrink-0"
+                :aria-label="`Art ändern zu ${kindLabel(item.kind === 'liturgy' ? 'songSlot' : 'liturgy')}`"
+                @click="toggleKind(item)"
+              >
+                {{ item.kind === 'liturgy' ? 'Zu Lied-Slot' : 'Zu Liturgie' }}
+              </UButton>
             </div>
             <UInput
               v-model="item.label"

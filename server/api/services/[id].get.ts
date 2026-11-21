@@ -21,11 +21,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Gottesdienst nicht gefunden' })
   }
 
-  const [serviceType] = await db
-    .select()
-    .from(schema.serviceTypes)
-    .where(eq(schema.serviceTypes.id, service.serviceTypeId))
-    .limit(1)
+  const [serviceType] = service.serviceTypeId == null
+    ? []
+    : await db
+        .select()
+        .from(schema.serviceTypes)
+        .where(eq(schema.serviceTypes.id, service.serviceTypeId))
+        .limit(1)
 
   const items = await db
     .select()

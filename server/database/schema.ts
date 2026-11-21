@@ -87,9 +87,9 @@ export const serviceTypeItems = pgTable('service_type_items', {
 
 export const services = pgTable('services', {
   id: serial('id').primaryKey(),
+  // Vorlage gelöscht → Gottesdienst bleibt mit eigenen Schritten bestehen
   serviceTypeId: integer('service_type_id')
-    .notNull()
-    .references(() => serviceTypes.id, { onDelete: 'restrict' }),
+    .references(() => serviceTypes.id, { onDelete: 'set null' }),
   name: text('name').notNull(),
   serviceDate: timestamp('service_date', { withTimezone: true }).notNull(),
   notes: text('notes'),

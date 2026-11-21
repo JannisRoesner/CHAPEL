@@ -64,7 +64,12 @@ function requestDelete(id: number, name: string) {
 
 async function confirmDelete() {
   if (!deleteTarget.value) return
-  await $fetch(`/api/service-types/${deleteTarget.value.id}`, { method: 'DELETE' })
+  try {
+    await $fetch(`/api/service-types/${deleteTarget.value.id}`, { method: 'DELETE' })
+  } catch {
+    toast.add({ title: 'Löschen fehlgeschlagen', color: 'error' })
+    return
+  }
   servicesStore.removeServiceType(deleteTarget.value.id)
   deleteOpen.value = false
   deleteTarget.value = null
@@ -184,7 +189,7 @@ function typeMenu(id: number, name: string): DropdownMenuItem[][] {
     <UiConfirmModal
       v-model:open="deleteOpen"
       title="Vorlage löschen"
-      :description="deleteTarget ? `„${deleteTarget.name}“ wirklich löschen?` : undefined"
+      :description="deleteTarget ? `„${deleteTarget.name}“ wirklich löschen? Bereits angelegte Gottesdienste bleiben erhalten.` : undefined"
       confirm-label="Löschen"
       @confirm="confirmDelete"
     />

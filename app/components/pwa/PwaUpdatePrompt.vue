@@ -1,10 +1,6 @@
 <script setup lang="ts">
 const { $pwa } = useNuxtApp()
 
-async function dismissOfflineReady() {
-  await $pwa?.cancelPrompt()
-}
-
 async function updateApp() {
   await $pwa?.updateServiceWorker(true)
 }
@@ -13,26 +9,9 @@ async function updateApp() {
 <template>
   <ClientOnly>
     <div
-      v-if="$pwa?.offlineReady || $pwa?.needRefresh"
+      v-if="$pwa?.needRefresh"
       class="fixed left-4 right-4 z-[100] max-w-lg mx-auto space-y-2 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] md:bottom-4"
     >
-      <UAlert
-        v-if="$pwa?.offlineReady"
-        color="success"
-        variant="subtle"
-        title="App bereit"
-        description="CHAPEL kann jetzt als App installiert werden."
-      >
-        <template #actions>
-          <UButton
-            variant="soft"
-            class="min-h-11"
-            @click="dismissOfflineReady"
-          >
-            OK
-          </UButton>
-        </template>
-      </UAlert>
       <UAlert
         v-if="$pwa?.needRefresh"
         color="primary"
