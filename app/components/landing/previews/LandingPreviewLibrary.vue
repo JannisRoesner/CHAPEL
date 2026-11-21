@@ -48,7 +48,7 @@ import { DEMO_TRACKS } from '#shared/constants/landingDemo'
         </div>
         <UBadge
           variant="subtle"
-          :color="track.category === 'liturgy' ? 'secondary' : 'primary'"
+          :color="categoryColor(track.category)"
           class="text-xs shrink-0"
         >
           {{ categoryLabel(track.category) }}

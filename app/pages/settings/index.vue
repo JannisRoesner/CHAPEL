@@ -64,6 +64,12 @@ const showAdmin = computed(() => isAdmin.value && online.value)
         :items="ADMIN_SETTINGS_SECTIONS"
         :default-open="DEFAULT_OPEN_ADMIN_SECTIONS"
       >
+        <template #elementTypes>
+          <SettingsElementTypesSection />
+        </template>
+        <template #templates>
+          <SettingsTemplateTransferSection />
+        </template>
         <template #branding>
           <SettingsBrandingSection />
         </template>

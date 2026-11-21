@@ -10,10 +10,9 @@ import {
   timestamp,
   uniqueIndex
 } from 'drizzle-orm/pg-core'
+import type { ItemKind, TrackCategory } from '../../shared/types/chapel'
 
 export const userRoleEnum = pgEnum('user_role', ['admin', 'editor'])
-export const trackCategoryEnum = pgEnum('track_category', ['hymn', 'liturgy', 'voluntary'])
-export const itemKindEnum = pgEnum('item_kind', ['liturgy', 'songSlot'])
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -40,7 +39,7 @@ export const tracks = pgTable(
     title: text('title').notNull(),
     composer: text('composer'),
     durationMs: integer('duration_ms'),
-    category: trackCategoryEnum('category').notNull().default('hymn'),
+    category: text('category').$type<TrackCategory>().notNull().default('songSlot'),
     categoryId: integer('category_id').references(() => categories.id, {
       onDelete: 'set null'
     }),
@@ -78,7 +77,7 @@ export const serviceTypeItems = pgTable('service_type_items', {
     .notNull()
     .references(() => serviceTypes.id, { onDelete: 'cascade' }),
   position: integer('position').notNull(),
-  kind: itemKindEnum('kind').notNull(),
+  kind: text('kind').$type<ItemKind>().notNull(),
   label: text('label').notNull(),
   defaultTrackId: integer('default_track_id').references(() => tracks.id, {
     onDelete: 'set null'
@@ -103,7 +102,7 @@ export const serviceItems = pgTable('service_items', {
     .notNull()
     .references(() => services.id, { onDelete: 'cascade' }),
   position: integer('position').notNull(),
-  kind: itemKindEnum('kind').notNull(),
+  kind: text('kind').$type<ItemKind>().notNull(),
   label: text('label').notNull(),
   trackId: integer('track_id').references(() => tracks.id, { onDelete: 'set null' })
 })
@@ -120,3 +119,15 @@ export type ServiceType = typeof serviceTypes.$inferSelect
 export type ServiceTypeItem = typeof serviceTypeItems.$inferSelect
 export type Service = typeof services.$inferSelect
 export type ServiceItem = typeof serviceItems.$inferSelect
+
+/** Elementtypen für Vorlagen/Gottesdienste; der Schlüssel dient auch als Bibliotheks-Kategorie */
+export const elementTypes = pgTable('element_types', {
+  key: text('key').primaryKey(),
+  label: text('label').notNull(),
+  defaultLabel: text('default_label').notNull(),
+  fixed: boolean('fixed').notNull().default(false),
+  color: text('color').notNull().default('neutral'),
+  icon: text('icon').notNull().default('i-lucide-music'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  builtin: boolean('builtin').notNull().default(false)
+})

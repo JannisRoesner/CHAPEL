@@ -26,10 +26,11 @@ const modeItems = [
 
 /** Vorauswahl kommt vom Aufrufer, lässt sich im Dialog aber umschalten. */
 const activeCategory = ref<TrackCategory | 'all'>(props.categoryFilter ?? 'all')
-const categoryChips = [
-  { label: 'Alle', value: 'all' as const },
-  ...TRACK_CATEGORIES.map(value => ({ label: TRACK_CATEGORY_LABELS[value], value }))
-]
+const elementTypes = useElementTypesStore()
+const categoryChips = computed(() => [
+  { label: 'Alle', value: 'all' },
+  ...elementTypes.types.map(t => ({ label: t.label, value: t.key }))
+])
 
 const filtered = computed(() => {
   let list = libraryStore.tracks
@@ -214,7 +215,7 @@ function onDuplicate(existing: TrackDto) {
         >
           <LibraryTrackUpload
             single
-            :default-category="activeCategory === 'all' ? 'hymn' : activeCategory"
+            :default-category="activeCategory === 'all' ? SONG_KIND : activeCategory"
             @uploaded="onUploaded"
             @duplicate="onDuplicate"
           />

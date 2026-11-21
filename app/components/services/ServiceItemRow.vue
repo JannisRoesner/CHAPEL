@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { ServiceItemDto } from '#shared/types/chapel'
 
-defineProps<{
+const props = defineProps<{
   item: ServiceItemDto
   index: number
 }>()
+
+const type = computed(() => elementType(props.item.kind))
 
 defineEmits<{
   pick: []
@@ -17,7 +19,7 @@ const { toggle, isPlaying } = useTrackPreview()
   <div class="rounded-2xl border border-default bg-default p-3 sm:p-4 space-y-3">
     <div class="flex items-center gap-2">
       <UBadge
-        :color="item.kind === 'liturgy' ? 'secondary' : 'primary'"
+        :color="type.color"
         variant="subtle"
         class="shrink-0"
       >
@@ -27,7 +29,7 @@ const { toggle, isPlaying } = useTrackPreview()
         {{ item.label }}
       </p>
       <FontAwesomeIcon
-        v-if="item.kind === 'liturgy'"
+        v-if="type.fixed"
         icon="lock"
         class="ml-auto text-dimmed text-sm shrink-0"
         title="Fest durch Vorlage"
@@ -51,7 +53,7 @@ const { toggle, isPlaying } = useTrackPreview()
           >· {{ formatPlaybackRate(item.track.playbackRate) }}</span>
         </template>
         <template v-else>
-          {{ item.kind === 'liturgy' ? 'Kein Track' : 'Noch kein Lied gewählt' }}
+          {{ type.fixed ? 'Kein Track' : 'Noch nichts gewählt' }}
         </template>
       </p>
       <UButton
@@ -66,7 +68,7 @@ const { toggle, isPlaying } = useTrackPreview()
         <FontAwesomeIcon :icon="isPlaying(item.trackId) ? 'stop' : 'play'" />
       </UButton>
       <UButton
-        v-if="item.kind === 'songSlot'"
+        v-if="!type.fixed"
         :variant="item.trackId ? 'soft' : 'solid'"
         class="press min-h-10 shrink-0"
         @click="$emit('pick')"

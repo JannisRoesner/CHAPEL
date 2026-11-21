@@ -31,12 +31,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const itemMap = new Map(existingItems.map(item => [item.id, item]))
+  const types = await elementTypeMap(db)
 
   for (const update of body.items) {
     const existing = itemMap.get(update.id)
     if (!existing) continue
 
-    if (existing.kind === 'liturgy') {
+    if (types.get(existing.kind)?.fixed) {
       continue
     }
 

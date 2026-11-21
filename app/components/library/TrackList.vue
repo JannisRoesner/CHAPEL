@@ -103,8 +103,8 @@ function trackMenu(track: TrackDto): DropdownMenuItem[][] {
         </p>
         <div class="mt-2 flex flex-wrap gap-1.5">
           <UBadge
-            :color="track.category === 'liturgy' ? 'secondary' : track.category === 'voluntary' ? 'neutral' : 'primary'"
-            :icon="track.category === 'voluntary' ? 'i-lucide-door-open' : undefined"
+            :color="categoryColor(track.category)"
+            :icon="categoryIcon(track.category)"
             variant="subtle"
           >
             {{ categoryLabel(track.category) }}

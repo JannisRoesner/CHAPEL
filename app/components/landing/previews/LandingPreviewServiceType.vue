@@ -39,7 +39,7 @@ import { DEMO_SERVICE_TYPE_ITEMS } from '#shared/constants/landingDemo'
       </div>
 
       <UBadge
-        :color="item.kind === 'liturgy' ? 'secondary' : 'primary'"
+        :color="elementType(item.kind).color"
         variant="subtle"
         class="shrink-0 text-xs"
       >
@@ -51,7 +51,7 @@ import { DEMO_SERVICE_TYPE_ITEMS } from '#shared/constants/landingDemo'
           {{ item.label }}
         </p>
         <p class="text-xs text-muted truncate">
-          {{ item.trackTitle || (item.kind === 'liturgy' ? 'Kein Track' : 'Standard optional') }}
+          {{ item.trackTitle || (isFixedKind(item.kind) ? 'Kein Track' : 'Standard optional') }}
         </p>
       </div>
     </div>

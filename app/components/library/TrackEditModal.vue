@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TrackCategory, TrackDto } from '#shared/types/chapel'
 
-const categoryOptions = TRACK_CATEGORIES.map(value => ({ label: TRACK_CATEGORY_LABELS[value], value }))
+const categoryOptions = computed(() => useElementTypesStore().options)
 
 const props = defineProps<{
   track: TrackDto | null
@@ -15,7 +15,7 @@ const emit = defineEmits<{
 
 const title = ref('')
 const composer = ref('')
-const category = ref<TrackCategory>('hymn')
+const category = ref<TrackCategory>(SONG_KIND)
 const saving = ref(false)
 
 watch(

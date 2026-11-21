@@ -17,10 +17,29 @@ export function formatServiceDate(iso: string): string {
   })
 }
 
-export function categoryLabel(category: TrackCategory): string {
-  return TRACK_CATEGORY_LABELS[category]
+/** Elementtyp zum Schlüssel (aus dem Store; vor dem Laden die Grundtypen). */
+export function elementType(kind: string) {
+  return useElementTypesStore().get(kind)
 }
 
-export function kindLabel(kind: 'liturgy' | 'songSlot'): string {
-  return kind === 'liturgy' ? 'Liturgie' : 'Lied-Slot'
+export function isFixedKind(kind: string): boolean {
+  return elementType(kind).fixed
+}
+
+export function kindLabel(kind: string): string {
+  return elementType(kind).label
+}
+
+export function categoryLabel(category: TrackCategory): string {
+  return elementType(category).label
+}
+
+export function categoryColor(category: TrackCategory) {
+  return elementType(category).color
+}
+
+/** Symbol nur für Zusatztypen, damit Lied/Liturgie ruhig bleiben */
+export function categoryIcon(category: TrackCategory) {
+  const type = elementType(category)
+  return type.builtin ? undefined : type.icon
 }

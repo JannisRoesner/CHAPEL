@@ -30,7 +30,7 @@ import { DEMO_SERVICE_ITEMS } from '#shared/constants/landingDemo'
         class="flex items-center gap-3 px-3 py-2.5"
       >
         <UBadge
-          :color="item.kind === 'liturgy' ? 'secondary' : 'primary'"
+          :color="elementType(item.kind).color"
           variant="subtle"
           class="shrink-0 text-xs"
         >
@@ -42,12 +42,12 @@ import { DEMO_SERVICE_ITEMS } from '#shared/constants/landingDemo'
             {{ item.label }}
           </p>
           <p class="text-xs text-muted truncate">
-            {{ item.track?.title || (item.kind === 'liturgy' ? 'Kein Track' : 'Noch kein Lied gewählt') }}
+            {{ item.track?.title || (isFixedKind(item.kind) ? 'Kein Track' : 'Noch kein Lied gewählt') }}
           </p>
         </div>
 
         <UButton
-          v-if="item.kind === 'songSlot'"
+          v-if="!isFixedKind(item.kind)"
           variant="outline"
           size="xs"
           disabled

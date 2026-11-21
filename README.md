@@ -6,9 +6,10 @@ CHAPEL ist eine moderne Web-App zur Verwaltung und touch-gesteuerten Wiedergabe 
 
 ## Funktionen
 
-- MP3-Bibliothek mit Upload, Metadaten, Kategorien (Lied / Ein-/Ausgang / Liturgie) und Auto-Deduplication (SHA-256)
+- MP3-Bibliothek mit Upload, Metadaten, Kategorien (= Elementtypen) und Auto-Deduplication (SHA-256)
 - Nicht-destruktive Tempo-Varianten (50–150 %, tonhöhenerhaltend) – als eigene Einträge in der Bibliothek, in Gottesdiensten auswählbar
-- Gottesdienst-Typen als Vorlagen (Liturgie + Lied-Slots), Reihenfolge per Drag & Drop (Touch, Maus, Tastatur)
+- Gottesdienst-Typen als Vorlagen, Reihenfolge per Drag & Drop (Touch, Maus, Tastatur); Export/Import als JSON in den Einstellungen
+- Elementtypen (Lied, Liturgie, Ein-/Ausgang, Abendmahl-Musik, eigene) in den Einstellungen verwaltbar: fest in der Vorlage oder pro Gottesdienst wählbar
 - Konkrete Gottesdienste aus Vorlagen erstellen und Lied-Slots befüllen; Vorlagen und Gottesdienste umbenennen und duplizieren
 - Lieder direkt im Auswahl-Dialog hochladen
 - Wiedergabe-Fortschritt bleibt beim Neuladen erhalten und wird nur zurückgesetzt, wenn der Ablauf des Gottesdienstes geändert wurde
@@ -234,7 +235,7 @@ audio/<sha256>.<ext>      # jede Audiodatei genau einmal, auch wenn mehrfach ver
 
 Feldbedeutung:
 
-- `steps` sind nach `position` sortiert und bilden den Ablauf. `kind`: `liturgy` (fest) oder `songSlot` (Lied).
+- `steps` sind nach `position` sortiert und bilden den Ablauf. `kind` ist der Schlüssel eines Elementtyps, z. B. `liturgy` (fest), `songSlot` (Lied), `voluntary`, `communion` oder eigene Typen (`t-…`); die Liste liefert `GET /api/element-types` (`fixed`, `label`, `color`, `icon`). Unbekannte Schlüssel wie ein Lied behandeln.
 - `audio: null` → leerer Schritt (z. B. kein Lied gewählt). Der Player zeigt ihn an, überspringt ihn aber beim Abspielen.
 - `playbackRate` → **Tempo-Faktor, beim Abspielen anzuwenden, Tonhöhe erhalten**
   (iOS: `AVAudioPlayer.enableRate = true; rate = …` bzw. `AVPlayerItem.audioTimePitchAlgorithm = .timeDomain`;

@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
     .set({
       title: body.title?.trim() || existing.title,
       composer: body.composer !== undefined ? body.composer : existing.composer,
-      category: body.category !== undefined ? parseTrackCategory(body.category) : existing.category,
+      category: body.category !== undefined ? await parseTrackCategory(body.category) : existing.category,
       categoryId: body.categoryId !== undefined ? body.categoryId : existing.categoryId,
       ...variantUpdate,
       updatedAt: new Date()

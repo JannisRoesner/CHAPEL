@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
-import type { ServiceDto, ServiceItemDto, TrackDto } from '#shared/types/chapel'
+import type { ServiceDto, ServiceItemDto, TrackCategory, TrackDto } from '#shared/types/chapel'
 
 const route = useRoute()
 const id = Number(route.params.id)
@@ -13,6 +13,7 @@ const loading = ref(true)
 const saveState = ref<'idle' | 'saving' | 'saved' | 'error'>('idle')
 const pickerOpen = ref(false)
 const pickerItemId = ref<number | null>(null)
+const pickerCategory = ref<TrackCategory>(SONG_KIND)
 const trackPreview = useTrackPreview()
 
 let savedResetTimer: ReturnType<typeof setTimeout> | undefined
@@ -30,8 +31,9 @@ onMounted(load)
 onUnmounted(() => trackPreview.stop())
 
 function openPicker(item: ServiceItemDto) {
-  if (item.kind === 'liturgy') return
+  if (isFixedKind(item.kind)) return
   pickerItemId.value = item.id
+  pickerCategory.value = item.kind
   pickerOpen.value = true
 }
 
@@ -176,7 +178,7 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
 
     <LibraryTrackPicker
       v-model:open="pickerOpen"
-      category-filter="hymn"
+      :category-filter="pickerCategory"
       @pick="onTrackSelected"
     />
 

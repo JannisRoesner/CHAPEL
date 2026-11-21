@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
 
   const parsed = await parseAudioMetadata(filePart.data, mimeType)
   const categoryValue
-    = parseTrackCategory(categoryPart?.data?.toString())
+    = await parseTrackCategory(categoryPart?.data?.toString())
   const title
     = titlePart?.data?.toString().trim()
       || parsed.title

@@ -22,8 +22,11 @@ export default defineEventHandler(async (event) => {
   if (!Array.isArray(body.items)) {
     throw createError({ statusCode: 400, statusMessage: 'Items erforderlich' })
   }
-
   const db = useDb()
+  const types = await elementTypeMap(db)
+  if (body.items.some(item => !types.has(item.kind))) {
+    throw createError({ statusCode: 400, statusMessage: 'Unbekannter Elementtyp' })
+  }
   const [type] = await db
     .select({ id: schema.serviceTypes.id })
     .from(schema.serviceTypes)

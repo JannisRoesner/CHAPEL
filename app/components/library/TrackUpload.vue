@@ -2,14 +2,14 @@
 import type { TrackCategory, TrackDto } from '#shared/types/chapel'
 import { AUDIO_FILE_ACCEPT } from '#shared/constants/audio'
 
-const categoryOptions = TRACK_CATEGORIES.map(value => ({ label: TRACK_CATEGORY_LABELS[value], value }))
+const categoryOptions = computed(() => useElementTypesStore().options)
 
 const props = withDefaults(defineProps<{
   defaultCategory?: TrackCategory
   /** Einzeldatei-Modus (z. B. im Auswahl-Dialog) */
   single?: boolean
 }>(), {
-  defaultCategory: 'hymn',
+  defaultCategory: SONG_KIND,
   single: false
 })
 

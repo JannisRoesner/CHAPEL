@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
-import type { ItemKind, ServiceTypeDto, TrackDto } from '#shared/types/chapel'
+import type { ItemKind, ServiceTypeDto, TrackCategory, TrackDto } from '#shared/types/chapel'
 
 interface EditableItem {
   uid: number
@@ -26,13 +26,14 @@ const loading = ref(true)
 const saving = ref(false)
 const pickerOpen = ref(false)
 const pickerTargetUid = ref<number | null>(null)
-const pickerFilter = ref<'hymn' | 'liturgy'>('hymn')
+const pickerFilter = ref<TrackCategory>(SONG_KIND)
 const listRef = ref<HTMLElement | null>(null)
 let uidCounter = 0
 
 const { toggle, isPlaying, stop } = useTrackPreview()
 
-const DEFAULT_LABELS = ['Liturgieelement', 'Lied-Slot', 'Lied']
+const elementTypes = useElementTypesStore()
+const typeOptions = computed(() => elementTypes.options)
 
 function snapshot() {
   return JSON.stringify(items.value.map(i => [i.kind, i.label.trim(), i.defaultTrackId]))
@@ -98,7 +99,7 @@ async function addItem(kind: ItemKind) {
   items.value.push({
     uid: ++uidCounter,
     kind,
-    label: kind === 'liturgy' ? 'Liturgieelement' : 'Lied',
+    label: elementType(kind).defaultLabel,
     defaultTrackId: null,
     defaultTrack: null
   })
@@ -108,10 +109,10 @@ async function addItem(kind: ItemKind) {
   last?.querySelector('input')?.focus({ preventScroll: true })
 }
 
-/** Liturgie ↔ Lied-Slot; Standard-Bezeichnungen wandern mit, eigene bleiben. */
-function toggleKind(item: EditableItem) {
-  const next: ItemKind = item.kind === 'liturgy' ? 'songSlot' : 'liturgy'
-  if (DEFAULT_LABELS.includes(item.label)) item.label = next === 'liturgy' ? 'Liturgieelement' : 'Lied'
+/** Elementtyp wechseln; Standard-Bezeichnungen wandern mit, eigene bleiben. */
+function changeKind(item: EditableItem, next: ItemKind) {
+  if (item.kind === next) return
+  if (elementTypes.defaultLabels.includes(item.label.trim())) item.label = elementType(next).defaultLabel
   item.kind = next
 }
 
@@ -121,7 +122,7 @@ function removeItem(uid: number) {
 
 function openPicker(item: EditableItem) {
   pickerTargetUid.value = item.uid
-  pickerFilter.value = item.kind === 'liturgy' ? 'liturgy' : 'hymn'
+  pickerFilter.value = item.kind
   pickerOpen.value = true
 }
 
@@ -133,7 +134,7 @@ function clearTrack(item: EditableItem) {
 function onTrackPicked(track: TrackDto) {
   const item = items.value.find(i => i.uid === pickerTargetUid.value)
   if (!item) return
-  if (!item.label.trim() || DEFAULT_LABELS.includes(item.label)) item.label = track.title
+  if (!item.label.trim() || elementTypes.defaultLabels.includes(item.label)) item.label = track.title
   item.defaultTrackId = track.id
   item.defaultTrack = track
   pickerTargetUid.value = null
@@ -150,7 +151,7 @@ async function save() {
           id: item.id,
           position,
           kind: item.kind,
-          label: item.label.trim() || (item.kind === 'liturgy' ? 'Liturgieelement' : 'Lied'),
+          label: item.label.trim() || elementType(item.kind).defaultLabel,
           defaultTrackId: item.defaultTrackId ?? null
         }))
       }
@@ -312,23 +313,22 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
           <div class="flex-1 min-w-0 space-y-3">
             <div class="flex items-center gap-2">
               <UBadge
-                :color="item.kind === 'liturgy' ? 'secondary' : 'primary'"
+                :color="elementType(item.kind).color"
                 variant="subtle"
-                class="shrink-0"
+                class="shrink-0 tabular-nums"
               >
-                {{ index + 1 }} · {{ kindLabel(item.kind) }}
+                {{ index + 1 }}
               </UBadge>
-              <UButton
-                variant="ghost"
-                color="neutral"
-                size="sm"
-                icon="i-lucide-repeat"
-                class="press min-h-9 shrink-0"
-                :aria-label="`Art ändern zu ${kindLabel(item.kind === 'liturgy' ? 'songSlot' : 'liturgy')}`"
-                @click="toggleKind(item)"
-              >
-                {{ item.kind === 'liturgy' ? 'Zu Lied-Slot' : 'Zu Liturgie' }}
-              </UButton>
+              <USelect
+                :model-value="item.kind"
+                :items="typeOptions"
+                :icon="elementType(item.kind).icon"
+                :color="elementType(item.kind).color"
+                variant="soft"
+                class="min-w-0 flex-1 sm:flex-none sm:w-56"
+                :aria-label="`Elementtyp Schritt ${index + 1}`"
+                @update:model-value="changeKind(item, $event as ItemKind)"
+              />
             </div>
             <UInput
               v-model="item.label"
@@ -354,7 +354,7 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
                   >· {{ formatPlaybackRate(item.defaultTrack.playbackRate) }}</span>
                 </template>
                 <template v-else>
-                  {{ item.kind === 'liturgy' ? 'Kein Track gewählt' : 'Kein Standard-Lied (optional)' }}
+                  {{ isFixedKind(item.kind) ? 'Kein Track gewählt' : 'Kein Standard-Track (optional)' }}
                 </template>
               </p>
               <UButton
@@ -369,7 +369,7 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
                 <FontAwesomeIcon :icon="isPlaying(item.defaultTrackId) ? 'stop' : 'play'" />
               </UButton>
               <UButton
-                v-if="item.defaultTrackId && item.kind === 'songSlot'"
+                v-if="item.defaultTrackId && !isFixedKind(item.kind)"
                 variant="ghost"
                 color="neutral"
                 square
@@ -447,7 +447,7 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
         variant="ghost"
         color="neutral"
         class="press min-h-11 rounded-full px-3 sm:px-4"
-        @click="addItem('liturgy')"
+        @click="addItem(LITURGY_KIND)"
       >
         <FontAwesomeIcon icon="plus" />
         <span>Liturgie<span class="hidden sm:inline">element</span></span>
@@ -456,7 +456,7 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
         variant="ghost"
         color="neutral"
         class="press min-h-11 rounded-full px-3 sm:px-4"
-        @click="addItem('songSlot')"
+        @click="addItem(SONG_KIND)"
       >
         <FontAwesomeIcon icon="plus" />
         <span>Lied</span>

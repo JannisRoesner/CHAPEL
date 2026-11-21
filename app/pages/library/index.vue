@@ -22,12 +22,11 @@ function onTempoSaved(track: TrackDto, created: boolean) {
   toast.add({ title: created ? 'Tempo-Variante angelegt' : 'Tempo gespeichert', description: track.title, color: 'success' })
 }
 
-const categoryItems = [
-  { label: 'Alle', value: 'all' as const },
-  { label: 'Lieder', value: 'hymn' as const },
-  { label: 'Ein-/Ausgang', value: 'voluntary' as const },
-  { label: 'Liturgie', value: 'liturgy' as const }
-]
+const elementTypes = useElementTypesStore()
+const categoryItems = computed(() => [
+  { label: 'Alle', value: 'all' },
+  ...elementTypes.types.map(t => ({ label: t.label, value: t.key }))
+])
 
 onMounted(() => libraryStore.fetchTracks())
 onUnmounted(() => trackPreview.stop())
@@ -93,7 +92,7 @@ function onSaved(track: TrackDto) {
         size="lg"
         class="w-full min-w-0 max-w-full"
       />
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 min-w-0">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 min-w-0">
         <button
           v-for="item in categoryItems"
           :key="item.value"

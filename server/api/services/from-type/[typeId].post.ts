@@ -52,10 +52,7 @@ export default defineEventHandler(async (event) => {
         position: item.position,
         kind: item.kind,
         label: item.label,
-        trackId:
-          item.kind === 'liturgy'
-            ? item.defaultTrackId
-            : item.defaultTrackId
+        trackId: item.defaultTrackId
       }))
     )
   }

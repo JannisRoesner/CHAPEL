@@ -1,5 +1,23 @@
-export type ItemKind = 'liturgy' | 'songSlot'
-export type TrackCategory = 'hymn' | 'voluntary' | 'liturgy'
+/** Schlüssel eines Elementtyps (Tabelle `element_types`), z. B. `songSlot`, `liturgy` */
+export type ItemKind = string
+/** Bibliotheks-Kategorie eines Tracks = Schlüssel eines Elementtyps */
+export type TrackCategory = string
+
+export type ElementTypeColor = 'primary' | 'secondary' | 'neutral' | 'info' | 'success' | 'warning' | 'error'
+
+export interface ElementTypeDto {
+  key: string
+  label: string
+  /** Vorgabe für die Bezeichnung neuer Elemente */
+  defaultLabel: string
+  /** true = Track steht fest in der Vorlage; false = wird pro Gottesdienst gewählt */
+  fixed: boolean
+  color: ElementTypeColor
+  icon: string
+  sortOrder: number
+  /** Grundtyp (Lied, Liturgie): nicht löschbar, Verhalten fest */
+  builtin: boolean
+}
 export type UserRole = 'admin' | 'editor'
 
 export type { AppearanceMode, ColorSchemeId } from '#shared/constants/colorSchemes'
@@ -111,6 +129,7 @@ export type ChapelEventType
     | 'service.created'
     | 'service.updated'
     | 'service.deleted'
+    | 'elementTypes.updated'
 
 export interface ChapelEvent {
   type: ChapelEventType

@@ -17,14 +17,15 @@ export interface ServiceTypeTemplateItem {
 }
 
 function resolveTrackId(
+  isFixedKind: (kind: string) => boolean,
   templateItem: ServiceTypeTemplateItem,
   oldItem: typeof schema.serviceItems.$inferSelect | undefined
 ): number | null {
-  if (templateItem.kind === 'liturgy') {
+  if (isFixedKind(templateItem.kind)) {
     return templateItem.defaultTrackId ?? null
   }
 
-  if (oldItem?.kind === 'songSlot') {
+  if (oldItem && !isFixedKind(oldItem.kind)) {
     return oldItem.trackId ?? templateItem.defaultTrackId ?? null
   }
 
@@ -38,6 +39,8 @@ export async function syncServicesFromTypeTemplate(
 ): Promise<number[]> {
   const sortedTemplate = [...templateItems].sort((a, b) => a.position - b.position)
   const updatedServiceIds: number[] = []
+  const types = await elementTypeMap(db)
+  const isFixedKind = (kind: string) => types.get(kind)?.fixed ?? false
 
   const services = await db
     .select({ id: schema.services.id })
@@ -63,6 +66,7 @@ export async function syncServicesFromTypeTemplate(
           kind: templateItem.kind,
           label: templateItem.label.trim(),
           trackId: resolveTrackId(
+            isFixedKind,
             templateItem,
             templateItem.sourcePosition === null
               ? undefined

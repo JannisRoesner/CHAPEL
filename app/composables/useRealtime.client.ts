@@ -43,6 +43,9 @@ export function useRealtime() {
       case 'serviceType.updated':
         servicesStore.upsertServiceType(event.payload as unknown as ServiceTypeDto)
         break
+      case 'elementTypes.updated':
+        void useElementTypesStore().fetchTypes()
+        break
       case 'serviceType.deleted':
         servicesStore.removeServiceType((event.payload as { id: number }).id)
         break

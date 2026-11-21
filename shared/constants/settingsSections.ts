@@ -5,7 +5,9 @@ export const SETTINGS_SECTION_IDS = {
   password: 'password',
   branding: 'branding',
   legal: 'legal',
-  users: 'users'
+  users: 'users',
+  elementTypes: 'elementTypes',
+  templates: 'templates'
 } as const
 
 export type SettingsSectionId = typeof SETTINGS_SECTION_IDS[keyof typeof SETTINGS_SECTION_IDS]
@@ -31,6 +33,18 @@ export const PERSONAL_SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
 ]
 
 export const ADMIN_SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
+  {
+    label: 'Elementtypen',
+    value: SETTINGS_SECTION_IDS.elementTypes,
+    slot: SETTINGS_SECTION_IDS.elementTypes,
+    icon: 'i-lucide-shapes'
+  },
+  {
+    label: 'Vorlagen exportieren / importieren',
+    value: SETTINGS_SECTION_IDS.templates,
+    slot: SETTINGS_SECTION_IDS.templates,
+    icon: 'i-lucide-file-json'
+  },
   {
     label: 'Branding',
     value: SETTINGS_SECTION_IDS.branding,
