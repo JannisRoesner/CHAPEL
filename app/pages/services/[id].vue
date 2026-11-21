@@ -54,6 +54,12 @@ async function save() {
   }
 }
 
+/** Zur Wiedergabe: ungespeicherte Änderungen vorher automatisch speichern */
+async function goToPlayback() {
+  if (dirty.value) await save()
+  if (!dirty.value) await navigateTo(`/playback/${id}`)
+}
+
 function onKeydown(event: KeyboardEvent) {
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
     event.preventDefault()
@@ -229,12 +235,16 @@ const headerMenu = computed<DropdownMenuItem[][]>(() => [[
         aria-hidden="true"
       />
       <UButton
-        :to="`/playback/${id}`"
         variant="ghost"
+        :loading="saving"
         color="neutral"
         class="press min-h-11 rounded-full px-3 sm:px-4"
+        @click="goToPlayback"
       >
-        <FontAwesomeIcon icon="play" />
+        <FontAwesomeIcon
+          v-if="!saving"
+          icon="play"
+        />
         <span>Wiedergabe</span>
       </UButton>
       <UButton
