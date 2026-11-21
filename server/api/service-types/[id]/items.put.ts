@@ -40,17 +40,18 @@ export default defineEventHandler(async (event) => {
   const result = await db.transaction(async (tx) => {
     // Bisherige Positionen der Schritte merken, damit Lieder beim Umsortieren mitwandern
     const previous = await tx
-      .select({ id: schema.serviceTypeItems.id, position: schema.serviceTypeItems.position })
+      .select({ id: schema.serviceTypeItems.id, position: schema.serviceTypeItems.position, defaultTrackId: schema.serviceTypeItems.defaultTrackId })
       .from(schema.serviceTypeItems)
       .where(eq(schema.serviceTypeItems.serviceTypeId, serviceTypeId))
-    const previousPosition = new Map(previous.map(item => [item.id, item.position]))
+    const previousById = new Map(previous.map(item => [item.id, item]))
 
     const templateItems = body.items.map(item => ({
       position: item.position,
       kind: item.kind,
       label: item.label.trim(),
       defaultTrackId: item.defaultTrackId ?? null,
-      sourcePosition: item.id != null ? previousPosition.get(item.id) ?? null : null
+      sourcePosition: item.id != null ? previousById.get(item.id)?.position ?? null : null,
+      sourceDefaultTrackId: item.id != null ? previousById.get(item.id)?.defaultTrackId ?? null : null
     }))
 
     await tx

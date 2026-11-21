@@ -14,6 +14,8 @@ export interface ServiceTypeTemplateItem {
    * `null` = neuer Schritt, `undefined` = unbekannt (Abgleich über gleiche Position).
    */
   sourcePosition?: number | null
+  /** Standard-Track dieses Schritts vor der Änderung – zum Erkennen übernommener Tracks */
+  sourceDefaultTrackId?: number | null
 }
 
 function resolveTrackId(
@@ -26,7 +28,10 @@ function resolveTrackId(
   }
 
   if (oldItem && !isFixedKind(oldItem.kind)) {
-    return oldItem.trackId ?? templateItem.defaultTrackId ?? null
+    // Track stammt nur aus der Vorlage (nicht im Gottesdienst geändert) → folgt der Vorlage,
+    // auch wenn der Standard-Track dort entfernt oder ersetzt wurde
+    const inherited = oldItem.trackId == null || oldItem.trackId === templateItem.sourceDefaultTrackId
+    return inherited ? templateItem.defaultTrackId ?? null : oldItem.trackId
   }
 
   return templateItem.defaultTrackId ?? null
