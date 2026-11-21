@@ -133,7 +133,7 @@ async function confirmDelete() {
           <p class="font-semibold truncate">
             {{ type.label }}
           </p>
-          <p class="text-sm text-muted truncate">
+          <p class="text-sm text-muted line-clamp-2">
             {{ type.fixed ? 'Fest in der Vorlage' : 'Pro Gottesdienst wählbar' }} · „{{ type.defaultLabel }}“
             <template v-if="type.builtin">
               · Grundtyp
@@ -190,7 +190,7 @@ async function confirmDelete() {
           </UFormField>
           <UFormField
             label="Standard-Bezeichnung neuer Schritte"
-            :hint="form.label ? `leer = „${form.label}“` : undefined"
+            :help="form.label ? `Leer lassen für „${form.label}“` : undefined"
           >
             <UInput
               v-model="form.defaultLabel"
